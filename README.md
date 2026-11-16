@@ -1,3 +1,5 @@
+<img src="icon.svg" width="96" alt="Иконка «Градиента»: кривая ошибки и шарик, скатившийся на дно">
+
 # Градиент
 
 https://avtorhanov.github.io/Gradient/
@@ -10,7 +12,16 @@ https://avtorhanov.github.io/Gradient/
 - Уроки открываются по очереди, решённое возвращается в интервальное повторение (1, 3, 7, 16, 35 дней)
 - Работает на телефоне и компьютере, светлая и тёмная тема
 
-Весь проект — один файл `index.html`, без сборки и зависимостей.
+Вся игра — один файл `index.html`, без сборки и зависимостей.
+
+## Иконка
+
+Кривая ошибки и шарик, который скатился на её дно. Следы показывают шаги градиентного спуска: на крутом склоне шаги большие, у дна всё короче.
+
+- `icon.svg` — исходник иконки;
+- `apple-touch-icon.png` (180×180) — иконка на экране «Домой» iPhone и iPad (Safari → Поделиться → «На экран „Домой“»);
+- `icon-512.png` — большая версия для превью и магазинов;
+- значок вкладки браузера встроен прямо в `index.html`, поэтому работает и у локального файла.
 
 ## Запуск
 
@@ -19,7 +30,7 @@ https://avtorhanov.github.io/Gradient/
 **На GitHub Pages:**
 
 1. Создайте на GitHub новый публичный репозиторий, например `gradient`.
-2. Загрузите в него файлы из архива: `index.html`, `README.md`, `.nojekyll` (кнопка **Add file → Upload files**).
+2. Загрузите в него файлы: `index.html`, `README.md`, `.nojekyll`, `icon.svg`, `apple-touch-icon.png`, `icon-512.png` (кнопка **Add file → Upload files**).
 3. Откройте **Settings → Pages**.
 4. В разделе **Build and deployment** выберите **Source: Deploy from a branch**, ветку `main` и папку `/ (root)`, нажмите **Save**.
 5. Через 1–2 минуты игра будет доступна по адресу `https://<ваш-логин>.github.io/gradient/`.
@@ -28,7 +39,7 @@ https://avtorhanov.github.io/Gradient/
 
 ```bash
 git init
-git add index.html README.md .nojekyll
+git add index.html README.md .nojekyll icon.svg apple-touch-icon.png icon-512.png
 git commit -m "Градиент: первая версия"
 git branch -M main
 git remote add origin https://github.com/<ваш-логин>/gradient.git
