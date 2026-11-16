@@ -1,0 +1,2110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Градиент — от одной формулы до своей GPT</title>
+<meta name="description" content="Игра для изучения нейросетей с нуля: 24 урока, 128 задач, от формулы w·x + b до своей мини-GPT.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* layout: one narrow column on graph paper; the course map is a 4-layer network, one band per stage */
+  --paper:#E6EBF0; --card:#F8FAFC; --ink:#131B26; --muted:#586474; --line:#C6CFD9;
+  --accent:#D4470C; --cool:#1F6CB0; --good:#2B8A3E; --bad:#C0392B; --codebg:#EEF2F6;
+  --grid:rgba(31,108,176,.08); --band:rgba(31,108,176,.045);
+  --f-display:'Unbounded','Golos Text',system-ui,sans-serif;
+  --f-body:'Golos Text',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0D131B; --card:#151E2A; --ink:#E4EAF1; --muted:#8B98A8; --line:#283547;
+    --accent:#FF7A3D; --cool:#5AA8EA; --good:#55C26B; --bad:#FF6B5E; --codebg:#101823;
+    --grid:rgba(90,168,234,.07); --band:rgba(90,168,234,.05); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0D131B; --card:#151E2A; --ink:#E4EAF1; --muted:#8B98A8; --line:#283547;
+  --accent:#FF7A3D; --cool:#5AA8EA; --good:#55C26B; --bad:#FF6B5E; --codebg:#101823;
+  --grid:rgba(90,168,234,.07); --band:rgba(90,168,234,.05); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{margin:0}
+html.noscroll,html.noscroll body{overflow:hidden}
+body{
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px;
+  color:var(--ink); font-family:var(--f-body); font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+#app{max-width:720px;margin:0 auto;padding:16px 16px 72px}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;text-wrap:balance;margin:0;line-height:1.15}
+a{color:var(--cool)}
+button,input,textarea,select,a,.node,label{touch-action:manipulation}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible,.node:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--f-mono)}
+.muted{color:var(--muted)}
+.legend{font-size:13px;color:var(--muted);margin:6px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.row.two > *{flex:1}
+.next{display:flex;justify-content:flex-end;margin-top:18px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--accent);color:#fff;border:0;border-radius:10px;padding:11px 16px;font-weight:600;text-decoration:none;min-height:44px}
+.btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:7px 12px;min-height:36px;font-size:14px}
+.btn[disabled]{opacity:.45;cursor:default}
+.pill{font-size:12px;border-radius:999px;padding:3px 9px;border:1px solid var(--line);color:var(--muted);white-space:nowrap;font-family:var(--f-body);font-weight:500}
+.pill.ok{background:var(--good);border-color:var(--good);color:#fff}
+.pill.cur{border-color:var(--accent);color:var(--accent)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;font-size:14px;color:var(--muted)}
+.xp{font-family:var(--f-mono);font-variant-numeric:tabular-nums;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+.back{background:none;border:0;padding:8px 0;color:var(--muted);font-size:15px}
+.glyph{display:inline-grid;place-items:center;flex:0 0 auto;width:40px;height:40px;border-radius:11px;background:var(--accent);color:#fff;font-family:var(--f-mono);font-weight:600;font-size:19px;line-height:1}
+.glyph.g2{font-size:15px}.glyph.g3{font-size:12px}
+.glyph.big{width:52px;height:52px;border-radius:14px;font-size:24px}
+.glyph.big.g2{font-size:19px}.glyph.big.g3{font-size:15px}
+.glyph.huge{width:84px;height:84px;border-radius:22px;font-size:40px}
+.glyph.huge.g3{font-size:24px}
+
+/* главная */
+.hero{padding:6px 0 2px}
+.hero h1{font-size:clamp(28px,8vw,44px);letter-spacing:-.01em}
+.hero h1 span{color:var(--accent)}
+.hero p{color:var(--muted);max-width:60ch;margin:10px 0 0}
+.map{margin:16px -4px 0}
+.map svg{display:block;width:100%;height:auto}
+.map .band{fill:var(--band);stroke:var(--line);stroke-width:1}
+.map .band.cur{stroke:var(--accent);stroke-width:1.6}
+.map .shead circle{fill:var(--card);stroke:var(--ink);stroke-width:1.6}
+.map .shead text{font-family:var(--f-display);font-weight:700;font-size:13px;fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+.map .shead.cur circle{fill:var(--ink)} .map .shead.cur text{fill:var(--paper)}
+.map .shead.done circle{fill:var(--accent);stroke:var(--accent)} .map .shead.done text{fill:#fff}
+.map .sname{font-family:var(--f-display);font-weight:700;font-size:12px;fill:var(--ink);text-anchor:middle;letter-spacing:.02em}
+.map .sprog{font-family:var(--f-mono);font-size:10.5px;fill:var(--muted);text-anchor:middle}
+.map .e{stroke:var(--line);stroke-width:.7;opacity:.75}
+.map .e.on{stroke:var(--accent);opacity:.35}
+.map .p{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:2 5;opacity:.8}
+.map .p.on{stroke:var(--accent);stroke-width:2.6;stroke-dasharray:none;opacity:1}
+.map .node{cursor:pointer;outline:none}
+.map .node .c{fill:var(--card);stroke:var(--ink);stroke-width:1.6}
+.map .node text{font-family:var(--f-mono);font-weight:600;font-size:15px;fill:var(--ink);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.map .node text.g2{font-size:12.5px}.map .node text.g3{font-size:10px}
+.map .node.done .c{fill:var(--accent);stroke:var(--accent)} .map .node.done text{fill:#fff}
+.map .node.cur .c{stroke:var(--accent);stroke-width:3}
+.map .node.lock .c{fill:var(--paper);stroke:var(--line);stroke-dasharray:3 3}
+.map .node.lock text{fill:var(--muted);opacity:.55}
+.map .node.sel .c{stroke:var(--cool);stroke-width:3.2}
+.map .node.done.sel .c{stroke:var(--cool)}
+.map .pulse{fill:none;stroke:var(--accent);stroke-width:2;transform-box:fill-box;transform-origin:center;animation:pulse 1.8s ease-out infinite}
+@keyframes pulse{from{transform:scale(1);opacity:.85}to{transform:scale(1.7);opacity:0}}
+.nodeinfo{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:8px 0 14px;flex-wrap:wrap}
+.ni-t{flex:1 1 160px;display:flex;flex-direction:column;min-width:0;line-height:1.35}
+.ni-t small{color:var(--muted);font-size:12px}
+.ni-t b{font-size:15.5px}
+.ni-t span{font-size:13.5px;color:var(--muted)}
+.now{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.now-t{display:flex;gap:12px;align-items:center}
+.now h2{font-size:21px}
+.now p{margin:4px 0 0;color:var(--muted);font-size:14.5px}
+.prog{height:6px;background:var(--codebg);border-radius:4px;margin:14px 0 6px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--accent);border-radius:4px}
+.prog-l{font-size:13px;color:var(--muted)}
+.tlist{list-style:none;padding:0;margin:12px 0 4px;display:grid;gap:6px}
+.ti{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:center;width:100%;text-align:left;border:1px solid var(--line);background:var(--paper);border-radius:11px;padding:9px 10px}
+.ti .tn{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-mono);font-size:13px;border:1.5px solid var(--line)}
+.ti .tl{font-size:14px;line-height:1.35;color:var(--muted);min-width:0}
+.ti .tl b{display:block;color:var(--ink);font-weight:600;font-size:14px}
+.ti.done .tn{background:var(--accent);border-color:var(--accent);color:#fff}
+.ti.cur{border-color:var(--accent)} .ti.cur .tn{border-color:var(--accent);color:var(--accent)}
+.ti[disabled]{opacity:.45;cursor:default}
+.review-card{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--ink);color:var(--paper);border-radius:14px;padding:14px 16px;margin:14px 0}
+.review-card .rc-l{font-size:13px;opacity:.75}
+.review-card b{font-family:var(--f-display);font-size:19px}
+.review-card button{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:10px 14px;font-weight:600;white-space:nowrap;min-height:44px}
+.review-card button[disabled]{opacity:.45;cursor:default}
+.srcs{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.srcs summary{cursor:pointer;font-weight:600}
+.srcs p{font-size:14px;color:var(--muted)}
+.srow{display:grid;gap:2px;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px}
+.srow span{color:var(--muted)}
+.foot{color:var(--muted);font-size:13px;margin-top:20px}
+
+/* урок */
+.lhead{display:flex;gap:12px;align-items:center;margin:4px 0 12px}
+.lhead small{color:var(--muted);font-size:12.5px;display:block;margin-bottom:2px}
+.lhead h1{font-size:clamp(21px,5.6vw,28px)}
+.seg2{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:12px}
+.seg2 button{border:0;background:none;border-radius:9px;padding:10px;font-weight:600;font-size:15px}
+.seg2 button.on{background:var(--ink);color:var(--paper)}
+.intro p{margin:0 0 10px;max-width:65ch}
+.blk{font-size:15px;margin:20px 0 8px}
+.symtab{display:grid;gap:6px}
+.sr{display:grid;grid-template-columns:104px 1fr;gap:2px 12px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.sy{font-family:var(--f-mono);font-weight:600;color:var(--accent);grid-row:span 2;align-self:center;overflow-wrap:anywhere}
+.sm{font-size:15px}
+.se{font-size:13.5px;color:var(--muted);font-family:var(--f-mono)}
+.steps{list-style:none;padding:0;margin:0;display:grid;gap:8px;counter-reset:s}
+.steps li{counter-increment:s;position:relative;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px 10px 42px}
+.steps li::before{content:counter(s);position:absolute;left:12px;top:10px;width:20px;height:20px;border-radius:50%;background:var(--cool);color:#fff;font-size:12px;font-weight:600;display:grid;place-items:center}
+.steps code{font-family:var(--f-mono);font-size:14px;background:var(--codebg);padding:2px 6px;border-radius:6px;display:inline-block;max-width:100%;overflow-wrap:anywhere}
+.steps p{margin:4px 0 0;font-size:14.5px;color:var(--muted)}
+.analog{border-left:4px solid var(--cool);background:var(--card);padding:12px 14px;border-radius:0 12px 12px 0;margin-top:16px}
+.analog b{display:block;font-size:13px;color:var(--cool);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.src{font-size:13.5px;color:var(--muted);margin-top:12px}
+.tdots{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 12px}
+.tdots button{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);font-family:var(--f-mono);font-size:13px}
+.tdots button.done{background:var(--accent);border-color:var(--accent);color:#fff}
+.tdots button.cur{box-shadow:0 0 0 2.5px var(--ink)}
+.tdots button.fin{border-color:var(--accent);color:var(--accent)}
+.tdots button[disabled]{opacity:.35;cursor:default}
+
+/* окно задачи */
+.task{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.task.fs{position:fixed;inset:0;z-index:60;border-radius:0;border:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:max(14px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));background:var(--paper)}
+.task.fs > *{max-width:860px;margin-left:auto;margin-right:auto}
+.thead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.tlabel{font-size:13px;color:var(--muted)}
+.tools{display:flex;gap:4px;margin-left:auto}
+.tools button{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:5px 9px;font-size:13px;min-height:34px}
+.tools button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tools [data-tool="fs"]{font-size:16px;min-width:38px}
+.tq{font-weight:600;font-size:17px;line-height:1.4;margin:8px 0 10px}
+.tpanel{background:var(--codebg);border-radius:10px;padding:10px 12px;font-size:14.5px;margin-bottom:10px}
+.tpanel .symtab{margin-top:8px}
+.tpanel .sr{background:var(--card)}
+.tfb:empty{display:none}
+.fbx{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--codebg);font-size:15px}
+.fbx b{display:block;margin-bottom:2px}
+.fbx.ok{border-left:4px solid var(--good)} .fbx.ok b{color:var(--good)}
+.fbx.no{border-left:4px solid var(--bad)} .fbx.no b{color:var(--bad)}
+.fbx.sol{border-left:4px solid var(--cool)} .fbx.sol b{color:var(--cool)}
+.fbx small{color:var(--muted)}
+.tact{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:12px}
+.tact:empty{display:none}
+.opts{display:grid;gap:8px}
+.opts.two{grid-template-columns:1fr 1fr}
+.opt{text-align:left;border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:12px;font-size:15.5px;min-height:48px}
+.opts.two .opt{text-align:center;font-weight:600}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--card))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--card))}
+.opt[disabled]{cursor:default}
+.qcode{background:var(--codebg);border-radius:8px;padding:10px;font-family:var(--f-mono);font-size:14px;overflow-x:auto;margin:0 0 10px}
+.numbox{display:flex;align-items:center;font-family:var(--f-mono);font-size:26px;border:1.5px solid var(--ink);border-radius:12px;padding:6px 14px;min-height:54px;background:var(--paper);max-width:360px}
+.numbox .ph{color:var(--muted);font-size:16px;font-family:var(--f-body)}
+.keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px;max-width:360px}
+.keypad button{height:46px;border-radius:10px;border:1px solid var(--line);background:var(--paper);font-family:var(--f-mono);font-size:19px}
+.keypad button:active{background:var(--codebg)}
+.keypad .wide{grid-column:span 2}
+.ord-ans{list-style:none;padding:0;margin:0;display:grid;gap:6px;counter-reset:o}
+.ord-ans li{counter-increment:o;border:1.5px dashed var(--line);border-radius:10px;padding:9px 12px 9px 40px;position:relative;min-height:42px;font-size:15px}
+.ord-ans li::before{content:counter(o);position:absolute;left:14px;top:9px;font-family:var(--f-display);font-size:13px;color:var(--muted)}
+.ord-ans li.f{border-style:solid;border-color:var(--ink)}
+.ord-ans li.right{border-style:solid;border-color:var(--good)}
+.ord-ans li.wrong{border-style:solid;border-color:var(--bad)}
+.ord-pool{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.chip{border:1.5px solid var(--ink);background:var(--paper);border-radius:9px;padding:9px 12px;font-size:15px;text-align:left;min-height:42px}
+.chip[disabled]{opacity:.22;cursor:default}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mcol{display:grid;gap:6px;align-content:start}
+.mbtn{border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:10px;text-align:left;min-height:48px;font-size:15px}
+.mbtn.sel{border-color:var(--cool);box-shadow:0 0 0 2px color-mix(in srgb,var(--cool) 35%,transparent)}
+.mbtn.ok{border-color:var(--good);background:color-mix(in srgb,var(--good) 12%,var(--card));opacity:.75}
+.mbtn.bad{border-color:var(--bad);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.fillcode{font-family:var(--f-mono);font-size:15px;background:var(--codebg);border-radius:10px;padding:12px;white-space:pre-wrap;line-height:2.2;overflow-x:auto;overflow-wrap:anywhere}
+.blank{font-family:var(--f-mono);font-size:15px;border:1.5px dashed var(--accent);border-radius:6px;padding:2px 8px;background:var(--card);color:var(--ink);min-height:30px}
+.blank.sel{border-style:solid;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent)}
+.blank.filled{border-style:solid;border-color:var(--ink)}
+.blank.bad{border-color:var(--bad);color:var(--bad)}
+.plot{width:100%;display:block;background:var(--paper);border:1px solid var(--line);border-radius:12px}
+.plot.sq{margin:10px auto 0}
+.formula{font-family:var(--f-mono);font-size:14.5px;margin:10px 0;background:var(--codebg);padding:8px 10px;border-radius:8px;overflow-x:auto;white-space:nowrap}
+.formula b{color:var(--accent)} .formula b.fixed{color:var(--muted)}
+.slider{display:grid;grid-template-columns:118px 1fr 52px;gap:10px;align-items:center;margin:8px 0;font-size:14px}
+.slider input{width:100%;accent-color:var(--accent);height:28px}
+.slider output{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+.meter{display:flex;justify-content:space-between;align-items:baseline;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
+.meter b{font-family:var(--f-mono);font-size:21px;font-variant-numeric:tabular-nums}
+.good{color:var(--good)!important}
+.status{min-height:22px;margin:8px 0;font-weight:500;font-size:15px}
+.status.good{color:var(--good)} .status.bad{color:var(--bad)}
+.stats{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--f-mono);font-size:13.5px;color:var(--muted);margin:8px 0}
+.stats b{color:var(--ink);font-variant-numeric:tabular-nums}
+.pos{color:var(--bad)} .neg{color:var(--cool)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:7px 11px;font-family:var(--f-mono);font-size:14px;min-height:38px}
+.seg button.on{background:var(--cool);border-color:var(--cool);color:#fff}
+.tbl{overflow-x:auto;margin:8px 0}
+.tbl table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+.tbl th,.tbl td{padding:7px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl th{font-weight:500;color:var(--muted);font-size:12.5px}
+.tbl tr.okr td{color:var(--good)}
+.graph svg{width:100%;height:auto;display:block;background:var(--paper);border:1px solid var(--line);border-radius:12px}
+.gnode rect{fill:var(--card);stroke:var(--ink);stroke-width:1.3}
+.gnode.lit rect{stroke:var(--accent);stroke-width:2.6}
+.gnode .nm{font-family:var(--f-mono);font-size:11px;fill:var(--muted)}
+.gnode .vl{font-family:var(--f-mono);font-size:13px;font-weight:600;fill:var(--ink)}
+.gnode .gr{font-family:var(--f-mono);font-size:11px;fill:var(--muted)}
+.gnode.has .gr,.gnode.lit .gr{fill:var(--accent);font-weight:600}
+.gedge{stroke:var(--line);stroke-width:1.6}
+.explain{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0}
+.emap text{font-size:13px;fill:var(--ink);font-family:var(--f-body);pointer-events:none}
+.emap g{cursor:pointer}
+.emap circle{fill:var(--cool)}
+.emap .hi circle{fill:var(--accent)} .emap .hi text{font-weight:600}
+.emap .bad circle{fill:var(--bad)}
+.txt{width:100%;font:inherit;font-size:16px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink)}
+.tokens{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0;min-height:44px}
+.tok{display:inline-flex;flex-direction:column;align-items:center;border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:4px 7px;min-width:30px}
+.tok span{font-family:var(--f-mono);font-size:15px;white-space:pre}
+.tok small{font-family:var(--f-mono);font-size:11px;color:var(--accent)}
+.bars{display:grid;gap:4px;margin:10px 0}
+.bar{display:grid;grid-template-columns:78px 1fr 48px;gap:8px;align-items:center;font-family:var(--f-mono);font-size:13.5px}
+.bar .tr{height:16px;background:var(--codebg);border-radius:4px;overflow:hidden}
+.bar .fl{height:100%;background:var(--accent);border-radius:4px}
+.bar .fl.cool{background:var(--cool)}
+.bar.off{opacity:.45}
+.bar span:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.words{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.words button{border:1.5px solid var(--line);background:var(--paper);border-radius:8px;padding:8px 11px;min-height:42px}
+.words button.src{border-color:var(--cool);color:var(--cool);font-weight:600}
+.words button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.words button.bad{border-color:var(--bad);animation:shake .35s}
+.names{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.nm-chip{font-family:var(--f-mono);font-size:14px;border-radius:8px;padding:4px 9px;border:1px solid var(--line);background:var(--paper)}
+.nm-chip.new{border-color:var(--good);color:var(--good)}
+.nm-chip.copy{color:var(--muted)}
+.mgrid{display:grid;grid-template-columns:52px repeat(4,1fr);gap:5px;max-width:380px;align-items:center}
+.mh{font-size:12.5px;text-align:center;color:var(--muted);font-family:var(--f-mono)}
+.mh.r{text-align:right;padding-right:4px}
+.mc{aspect-ratio:1;border:1.5px solid var(--line);background:var(--paper);border-radius:8px;font-size:18px;color:var(--bad);min-height:44px}
+.mc.diag{background:color-mix(in srgb,var(--cool) 10%,var(--paper))}
+.mc.on{background:color-mix(in srgb,var(--bad) 15%,var(--card));border-color:var(--bad)}
+.mc.bad{box-shadow:0 0 0 3px var(--bad)}
+.check{display:flex;gap:10px;align-items:flex-start;margin:12px 0;font-size:15px}
+.check input{width:22px;height:22px;flex:0 0 auto;accent-color:var(--accent);margin-top:1px}
+.howto{margin:8px 0;padding-left:20px;font-size:14.5px;color:var(--muted)}
+
+/* редактор кода */
+.editor{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--codebg)}
+.ed-bar{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:5px 6px 5px 12px;font-size:12.5px;color:var(--muted);border-bottom:1px solid var(--line);background:var(--card);flex-wrap:wrap}
+.ed-tools{display:flex;gap:4px}
+.ed-tools button{border:1px solid var(--line);background:var(--paper);border-radius:7px;padding:4px 9px;font-size:13px;min-height:32px}
+.ed-tools button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.editor textarea{display:block;width:100%;border:0;background:transparent;color:var(--ink);font-family:var(--f-mono);font-size:16px;line-height:1.5;padding:12px;resize:vertical;white-space:pre;overflow-x:auto;tab-size:4;max-height:60vh}
+.editor.wrap textarea{white-space:pre-wrap;overflow-wrap:anywhere}
+.keys{display:flex;gap:4px;overflow-x:auto;padding:6px;border-top:1px solid var(--line);background:var(--card);scrollbar-width:none}
+.keys::-webkit-scrollbar{display:none}
+.keys button{flex:0 0 auto;min-width:38px;height:38px;font-family:var(--f-mono);font-size:16px;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
+.task.fs .editor textarea{max-height:none;min-height:50vh}
+.out{background:var(--ink);color:var(--paper);font-family:var(--f-mono);font-size:13.5px;border-radius:12px;padding:12px;white-space:pre-wrap;overflow-x:auto;margin:10px 0}
+.result{text-align:center;padding:18px 8px}
+.result h2{font-size:21px;margin:14px 0 6px}
+.result p{color:var(--muted);max-width:46ch;margin:8px auto}
+.result .row{justify-content:center}
+.result .score{font-family:var(--f-display);font-size:60px;line-height:1;color:var(--accent)}
+.unl{display:inline-flex;flex-direction:column;align-items:center;gap:6px;border:1.5px dashed var(--accent);border-radius:14px;padding:12px 18px;margin:10px 0}
+.unl small{color:var(--accent);font-family:var(--f-mono);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+@media (prefers-reduced-motion: reduce){ .map .pulse{animation:none;opacity:0} .mbtn.bad,.words button.bad{animation:none} }
+@media (max-width:420px){ .slider{grid-template-columns:96px 1fr 46px} .bar{grid-template-columns:70px 1fr 44px} }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script type="text/plain" id="code-mse">
+xs = [10, 15, 20, 25, 30, 35]          # температура
+ys = [110, 160, 215, 260, 310, 365]    # реальные продажи
+w, b = 10, 20
+
+def predict(x):
+    return w * x + b
+
+# квадрат промаха для каждого дня
+errors = [(predict(x) - y) ** 2 for x, y in zip(xs, ys)]
+loss = sum(errors) / len(errors)       # среднее = MSE
+print("Квадраты промахов:", errors)
+print("Ошибка (MSE):", loss)
+</script>
+<script type="text/plain" id="code-gdbug">
+xs = [1, 2, 3, 4, 5]
+ys = [3, 5, 7, 9, 11]      # правда: y = 2x + 1, но модель этого не знает
+w, b = 0.0, 0.0            # начинаем с нулей
+lr = 0.05                  # скорость обучения (длина шага)
+
+for step in range(1001):
+    # 1) прогноз и 2) градиенты ошибки по w и по b
+    dw = db = 0
+    for x, y in zip(xs, ys):
+        err = (w * x + b) - y
+        dw += 2 * err * x / len(xs)
+        db += 2 * err / len(xs)
+    # 3) шаг (здесь ошибка в знаках!)
+    w += lr * dw
+    b += lr * db
+    if step % 200 == 0:
+        loss = sum(((w * x + b) - y) ** 2 for x, y in zip(xs, ys)) / len(xs)
+        print(f"шаг {step}: w={w:.2f}, b={b:.2f}, ошибка={loss:.4f}")
+</script>
+<script type="text/plain" id="code-value">
+class Value:
+    """Число, которое помнит, откуда оно взялось."""
+    def __init__(self, data, parents=()):
+        self.data = data
+        self.grad = 0.0
+        self._parents = parents
+        self._backward = lambda: None
+
+    def __add__(self, other):
+        out = Value(self.data + other.data, (self, other))
+        def _backward():               # сложение: градиент проходит как есть
+            self.grad += out.grad
+            other.grad += out.grad
+        out._backward = _backward
+        return out
+
+    def __mul__(self, other):
+        out = Value(self.data * other.data, (self, other))
+        def _backward():               # умножение: × на соседа
+            self.grad += other.data * out.grad
+            other.grad += self.data * out.grad
+        out._backward = _backward
+        return out
+
+    def backward(self):
+        # выстраиваем узлы от начала к концу, потом идём назад
+        order, seen = [], set()
+        def build(v):
+            if v not in seen:
+                seen.add(v)
+                for p in v._parents:
+                    build(p)
+                order.append(v)
+        build(self)
+        self.grad = 1.0
+        for v in reversed(order):
+            v._backward()
+
+a, b, c, f = Value(2.0), Value(-3.0), Value(10.0), Value(-2.0)
+L = (a * b + c) * f
+L.backward()
+print("L =", L.data)
+for name, v in zip("abcf", [a, b, c, f]):
+    print(f"градиент {name}: {v.grad}")
+</script>
+<script type="text/plain" id="code-attn">
+import numpy as np
+np.random.seed(1)
+
+T, d = 4, 8                      # 4 токена, у каждого вектор из 8 чисел
+x = np.random.randn(T, d)        # эмбеддинги токенов
+
+# Три обучаемые матрицы делают из токена запрос, ключ и значение
+Wq, Wk, Wv = (np.random.randn(d, d) / np.sqrt(d) for _ in range(3))
+Q, K, V = x @ Wq, x @ Wk, x @ Wv
+
+scores = Q @ K.T / np.sqrt(d)    # совпадение каждого запроса с каждым ключом
+
+mask = np.triu(np.ones((T, T)), k=1).astype(bool)
+scores[mask] = -np.inf           # запрещаем смотреть в будущее
+
+def softmax(z):
+    e = np.exp(z - z.max(axis=1, keepdims=True))
+    return e / e.sum(axis=1, keepdims=True)
+
+weights = softmax(scores)        # доли внимания, в каждой строке сумма = 1
+out = weights @ V                # смесь значений
+print("Доли внимания:")
+print(weights.round(2))
+print("Размер выхода:", out.shape)
+</script>
+<script type="text/plain" id="code-gpt">
+import os
+import torch, torch.nn as nn, torch.nn.functional as F
+
+# ===== 1. Данные и токенизация =====
+# Загрузите в Colab любой русский текст как input.txt (чем больше, тем лучше)
+if os.path.exists("input.txt"):
+    text = open("input.txt", encoding="utf-8").read()
+else:
+    text = "Мама мыла раму, а кот смотрел в окно. " * 400   # заглушка
+
+chars = sorted(set(text))
+stoi = {c: i for i, c in enumerate(chars)}
+itos = {i: c for c, i in stoi.items()}
+encode = lambda s: [stoi[c] for c in s]
+decode = lambda ids: "".join(itos[i] for i in ids)
+
+data = torch.tensor(encode(text))
+n = int(0.9 * len(data))
+train, val = data[:n], data[n:]          # 10% откладываем для проверки
+
+# ===== 2. Ручки масштаба =====
+ctx = 64          # сколько букв модель видит
+d = 128           # длина векторов (ширина)
+n_layers = 4      # число блоков (глубина)
+n_heads = 4
+batch = 32
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+def get_batch(split):
+    src = train if split == "train" else val
+    ix = torch.randint(len(src) - ctx - 1, (batch,))
+    x = torch.stack([src[i:i + ctx] for i in ix])
+    y = torch.stack([src[i + 1:i + ctx + 1] for i in ix])   # сдвиг на 1 букву
+    return x.to(device), y.to(device)
+
+# ===== 3. Модель =====
+class Block(nn.Module):
+    def __init__(self, d, n_heads):
+        super().__init__()
+        self.ln1 = nn.LayerNorm(d)
+        self.attn = nn.MultiheadAttention(d, n_heads, batch_first=True)
+        self.ln2 = nn.LayerNorm(d)
+        self.mlp = nn.Sequential(nn.Linear(d, 4 * d), nn.GELU(), nn.Linear(4 * d, d))
+
+    def forward(self, x):
+        T = x.size(1)
+        mask = torch.triu(torch.ones(T, T, dtype=torch.bool, device=x.device), 1)
+        h = self.ln1(x)
+        x = x + self.attn(h, h, h, attn_mask=mask)[0]
+        x = x + self.mlp(self.ln2(x))
+        return x
+
+class MiniGPT(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.tok = nn.Embedding(len(chars), d)    # токен → вектор
+        self.pos = nn.Embedding(ctx, d)           # позиция → вектор
+        self.blocks = nn.Sequential(*[Block(d, n_heads) for _ in range(n_layers)])
+        self.ln = nn.LayerNorm(d)
+        self.head = nn.Linear(d, len(chars))      # вектор → оценка каждой буквы
+
+    def forward(self, idx, targets=None):
+        T = idx.size(1)
+        x = self.tok(idx) + self.pos(torch.arange(T, device=idx.device))
+        logits = self.head(self.ln(self.blocks(x)))
+        loss = None
+        if targets is not None:
+            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
+        return logits, loss
+
+    @torch.no_grad()
+    def generate(self, idx, n_new, temperature=1.0):
+        for _ in range(n_new):
+            logits, _ = self(idx[:, -ctx:])
+            probs = F.softmax(logits[:, -1] / temperature, dim=-1)
+            nxt = torch.multinomial(probs, 1)
+            idx = torch.cat([idx, nxt], dim=1)
+        return idx
+
+model = MiniGPT().to(device)
+print(sum(p.numel() for p in model.parameters()), "параметров")
+
+# ===== 4. Обучение: прогноз → ошибка → градиенты → шаг =====
+opt = torch.optim.AdamW(model.parameters(), lr=1e-3)
+for step in range(3001):
+    x, y = get_batch("train")
+    _, loss = model(x, y)
+    opt.zero_grad()
+    loss.backward()
+    opt.step()
+    if step % 500 == 0:
+        with torch.no_grad():
+            _, vloss = model(*get_batch("val"))
+        print(f"шаг {step}: обучение {loss.item():.3f}, проверка {vloss.item():.3f}")
+
+# ===== 5. Генерация =====
+start = torch.tensor([encode(text[:1])], device=device)
+print(decode(model.generate(start, 300)[0].tolist()))
+</script>
+
+<script>
+const NAMES = ("анна мария елена ольга наталья ирина светлана татьяна екатерина юлия анастасия дарья полина алина виктория ксения валерия вероника софья алиса арина варвара василиса милана ева кира ульяна есения злата яна маргарита людмила галина надежда вера любовь лариса нина тамара зоя раиса жанна кристина карина марина оксана диана элина эльвира лилия регина таисия агата стефания евгения александра валентина антонина лидия инна " +
+ "александр алексей андрей антон артем борис вадим валентин василий виктор виталий владимир владислав вячеслав геннадий георгий глеб григорий даниил денис дмитрий евгений егор иван игорь илья кирилл константин лев леонид максим марк матвей михаил никита николай олег павел петр роман руслан сергей семен станислав степан тимофей тимур федор филипп юрий ярослав арсений богдан всеволод захар лука мирон савелий эдуард герман аркадий анатолий валерий ростислав").split(" ");
+const NAMESET = new Set(NAMES);
+
+/* ================= Курс: 4 этапа, 24 урока ================= */
+const STAGES = [
+  {n:1, name:"Основы", sub:"одна формула и как она учится", src:"Траск, «Грокаем глубокое обучение», гл. 3–5 · Принс, «Understanding Deep Learning», гл. 2, 5, 6"},
+  {n:2, name:"Сеть", sub:"нейроны, слои, обратный проход", src:"Принс, гл. 3, 4, 7 · Карпатый, лекция micrograd · Траск, гл. 6, 13 · Рашка, приложение A"},
+  {n:3, name:"Язык", sub:"токены, вероятности, внимание", src:"Рашка, «Build a LLM from Scratch», гл. 2–3 · Аламмар, «Illustrated Word2vec» и «Illustrated Transformer» · Карпатый, makemore · Траск, гл. 11"},
+  {n:4, name:"GPT", sub:"трансформер, масштаб, обучение", src:"Рашка, гл. 4–5 · Карпатый, «Let's build GPT» и nanoGPT · Принс, гл. 11–12"}
+];
+
+const DS_W = [[5,60],[10,118],[15,182],[20,240],[25,298],[30,362]];
+const DS_B = [[10,108],[14,150],[18,186],[22,232],[26,265],[30,310],[34,349]];
+const STUDENTS = [[2,8,60],[5,7,81],[8,6,102],[1,9,55]];
+
+const LESSONS = [
+/* ---------- Этап 1. Основы ---------- */
+{ stage:1, g:"x", title:"x — вход", short:"Что модель получает на вход",
+  intro:[
+    "Любая модель начинается с входа. Вход — это то, что модель знает в момент прогноза. Его обозначают буквой <b>x</b>.",
+    "x — всегда число или набор чисел: температура, площадь квартиры, яркость пикселя, номер слова. Всё, что можно измерить или пронумеровать.",
+    "Модель — это правило, которое превращает x в ответ. Ответ-догадку пишут <b>ŷ</b> («игрек с крышечкой»), а правильный ответ из жизни — <b>y</b>. Хорошая модель — та, у которой ŷ близко к y."
+  ],
+  sym:[["x","вход: то, что известно заранее","температура 25°"],["ŷ","прогноз модели","270 порций"],["y","правильный ответ из жизни","265 порций"]],
+  ex:{t:"Кафе с мороженым", s:[
+    ["x = 25","Сегодня 25°. Это всё, что знает модель."],
+    ["модель(x)","Правило внутри модели превращает 25 в число порций. Какое именно правило — в следующих уроках."],
+    ["ŷ = 270","Догадка модели: продадим 270 порций."],
+    ["y = 265","Вечером считаем, сколько продали на самом деле. Разница ŷ и y покажет, хороша ли модель."]]},
+  analog:"x — как вопрос, который вы задаёте знакомому таксисту: «сколько будет стоить поездка на 10 км?». 10 км — это x, его ответ — ŷ, а цена в приложении — y.",
+  src:"Принс, гл. 2 (обучение с учителем: вход, выход, модель). Траск, гл. 3 (прогноз: вход → вес → прогноз).",
+  tasks:[
+    {t:"mc", q:"Модель предсказывает цену квартиры по её площади. Что здесь x?", o:["Площадь квартиры","Цена квартиры","Сама модель","Количество квартир"], a:0, hint:"x — то, что известно до прогноза.", why:"Площадь известна заранее, а цену модель угадывает. Цена — это ŷ (прогноз) или y (настоящая цена)."},
+    {t:"match", q:"Соедините обозначение и его смысл", pairs:[["x","вход: что известно"],["ŷ","прогноз модели"],["y","правильный ответ"]], why:"x — на входе, ŷ — догадка на выходе, y — то, с чем догадку сравнивают."},
+    {t:"xread", q:"Модель кафе уже настроена: ŷ = 10·x + 20. Подвиньте x так, чтобы прогноз стал ровно 320 порций.", target:320, hint:"Каждый градус добавляет 10 порций. От 20 до 320 нужно 300 порций.", why:"При x = 30: 10·30 + 20 = 320.", sol:"x = 30"},
+    {t:"num", q:"Та же модель ŷ = 10·x + 20. Сколько порций она предскажет при x = 18?", a:200, hint:"Подставьте 18 вместо x: 10·18 + 20.", why:"10·18 = 180, плюс 20 — получается 200."},
+    {t:"mc", q:"Какой вход модель не сможет использовать напрямую?", o:["Слово «жарко», пока его не превратили в число","Температуру 25","Влажность 60%","Номер дня недели: 3"], a:0, hint:"Модель умеет только считать.", why:"Слова сначала превращают в числа. Этому посвящён этап 3."},
+    {t:"tf", q:"ŷ и y — это одно и то же.", a:false, hint:"Одно — догадка модели, другое — правда.", why:"ŷ — прогноз, y — правильный ответ. Обучение и нужно, чтобы они сблизились."}
+  ]},
+
+{ stage:1, g:"w", title:"w — вес", short:"Насколько сильно вход влияет на ответ",
+  intro:[
+    "Вес <b>w</b> говорит, насколько сильно вход x влияет на прогноз. Модель умножает вход на вес: w · x.",
+    "Смысл веса: на сколько изменится прогноз, если x вырастет на 1. При w = 10 каждый лишний градус добавляет 10 порций.",
+    "Вес бывает любым. Большой — вход очень важен. Около нуля — вход почти не влияет. Отрицательный — чем больше x, тем меньше ответ: горячий чай в жару продаётся хуже.",
+    "На графике w — это наклон линии прогноза. Обучение модели — это во многом поиск правильных весов."
+  ],
+  sym:[["w","вес: сила влияния входа","10 порций на градус"],["w · x","вклад входа в прогноз","10 · 25 = 250"],["w < 0","вход уменьшает ответ","−4 чашки чая на градус"]],
+  ex:{t:"Как вес меняет прогноз", s:[
+    ["w = 10, x = 25","Вес 10: каждый градус добавляет 10 порций."],
+    ["w · x = 250","Вклад температуры — 250 порций."],
+    ["x = 26 → 260","Стало на градус теплее — прогноз вырос ровно на w = 10."],
+    ["w = −4","Для горячего чая вес отрицательный: каждый градус жары убирает 4 чашки."]]},
+  analog:"Вес — как ручка громкости у входа на микшерном пульте. Выше — вход звучит в ответе громче. На нуле — его не слышно. Ниже нуля — он работает в обратную сторону и уменьшает ответ.",
+  src:"Траск, гл. 3 (вес как чувствительность прогноза к входу). Принс, гл. 2 (наклон линии — параметр φ₁).",
+  tasks:[
+    {t:"fit", q:"Точки — реальные продажи. Сдвиг уже выставлен (b = 0). Подберите вес w, чтобы линия прошла через точки.", data:"W", ctrl:["w"], init:{w:4,b:0}, goal:120, hint:"При 10° продали около 120 порций. Сколько порций на один градус?", why:"w ≈ 12: каждый градус добавляет около 12 порций.", sol:"w = 12"},
+    {t:"num", q:"w = 3. Вход x вырос с 4 до 5. На сколько вырос прогноз?", a:3, hint:"Вес — это изменение прогноза на каждую единицу входа.", why:"Ровно на w = 3: 3·5 − 3·4 = 3."},
+    {t:"mc", q:"Модель продаж горячего чая: в жару продажи падают. Какой вес у температуры?", o:["Отрицательный","Положительный","Ноль","Больше 100"], a:0, hint:"Вход растёт — ответ падает.", why:"Отрицательный вес: чем больше x, тем меньше ŷ."},
+    {t:"tf", q:"Если w = 0, прогноз совсем не зависит от x.", a:true, hint:"Что будет, если умножить x на ноль?", why:"0 · x = 0 при любом x, вход перестаёт влиять."},
+    {t:"num", q:"w = 2,5, x = 8. Чему равен вклад входа w · x?", a:20, hint:"Умножьте 2,5 на 8.", why:"2,5 · 8 = 20."},
+    {t:"fill", q:"Допишите код, чтобы вклад зависел от веса", code:"w = 12\nx = 25\ncontribution = [[0]]\nprint(contribution)   # 300", blanks:["w * x"], pool:["w + x","x / w","w"], hint:"Вклад входа = вес, умноженный на вход.", why:"w * x = 12 · 25 = 300."}
+  ]},
+
+{ stage:1, g:"b", title:"b — сдвиг", short:"Ответ модели, когда вход равен нулю",
+  intro:[
+    "Сдвиг <b>b</b> — число, которое модель прибавляет в самом конце: <b>ŷ = w·x + b</b>. Это вся модель целиком.",
+    "Смысл сдвига: каким будет прогноз, если x = 0. У кафе это базовые продажи: даже в 0° кто-то купит мороженое.",
+    "На графике b поднимает или опускает всю линию, не меняя наклона. Без сдвига линия обязана проходить через ноль, а в жизни так бывает редко.",
+    "w и b вместе называют параметрами модели. Две ручки: w крутит наклон, b двигает линию вверх-вниз."
+  ],
+  sym:[["b","сдвиг: прогноз при x = 0","20 порций"],["w","наклон линии","10"],["ŷ = w·x + b","вся модель целиком","10·25 + 20 = 270"]],
+  ex:{t:"Собираем прогноз по шагам", s:[
+    ["x = 25","Вход: сегодня 25°."],
+    ["w · x = 10 · 25 = 250","Вклад температуры."],
+    ["+ b = 20","Базовые продажи, которые есть всегда."],
+    ["ŷ = 270","Итоговый прогноз. При 0° модель сказала бы ŷ = b = 20."]]},
+  analog:"Такси: цена = 30 ₽ за километр × расстояние + 100 ₽ за посадку. 30 — это вес w, 100 — сдвиг b: его платят, даже если проехать 0 км.",
+  src:"Принс, гл. 2 (параметр φ₀ — пересечение с осью). Гудфеллоу и соавторы, «Глубокое обучение», гл. 5 (линейная регрессия и смещение).",
+  tasks:[
+    {t:"fit", q:"Наклон уже верный (w = 10). Подвиньте сдвиг b, чтобы линия легла на точки.", data:"B", ctrl:["b"], init:{w:10,b:120}, goal:40, hint:"Линия должна опуститься. При 10° продали 108, а 10·10 = 100. Чего не хватает?", why:"b ≈ 10: при 10° прогноз 10·10 + 10 = 110 — почти 108.", sol:"b = 10 (подходит и 5)"},
+    {t:"num", q:"Такси: ŷ = 30·x + 100, где x — километры. Сколько стоит поездка на 0 км?", a:100, hint:"Подставьте x = 0.", why:"30·0 + 100 = 100. Это и есть сдвиг b."},
+    {t:"num", q:"ŷ = 4·x + 7. Чему равен прогноз при x = 5?", a:27, hint:"Сначала w·x, потом прибавьте b.", why:"4·5 = 20, плюс 7 — получается 27."},
+    {t:"match", q:"Соедините части модели ŷ = w·x + b", pairs:[["w","наклон линии"],["b","высота линии при x = 0"],["x","вход"],["ŷ","прогноз"]], why:"Две ручки (w, b), вход (x) и результат (ŷ)."},
+    {t:"fit", q:"Теперь обе ручки ваши. Подберите w и b, чтобы линия легла на точки.", data:"B", ctrl:["w","b"], init:{w:4,b:150}, goal:30, hint:"Сначала наклон w (около 10), потом сдвиг b.", why:"w = 10, b ≈ 10: линия почти проходит через все точки.", sol:"w = 10, b = 10"},
+    {t:"code", q:"Измените w и b, чтобы модель предсказала ровно 300 порций при 25°. Нажмите «Проверить».", src:"w = 10\nb = 20\nx = 25\nprint(w * x + b)\n", hint:"Например, оставьте w = 10 и подберите b. 10·25 = 250.", sol:"w = 10, b = 50 (или w = 12, b = 0)", why:"Подходит любая пара, где w·25 + b = 300.",
+     check:{out:o => Math.abs(parseFloat(o.trim()) - 300) < 1e-9, code:c => { const w = num(c,/^\s*w\s*=\s*(-?[\d.]+)/m), b = num(c,/^\s*b\s*=\s*(-?[\d.]+)/m); return w != null && b != null && Math.abs(w*25 + b - 300) < 1e-9; }}}
+  ]},
+
+{ stage:1, g:"L", title:"L — ошибка", short:"Одно число: насколько модель промахнулась",
+  intro:[
+    "Чтобы улучшить модель, сначала надо измерить, насколько она плоха. Для этого считают ошибку — функцию потерь (loss). Её обозначают <b>L</b>.",
+    "Шаг 1 — промах: <b>ŷ − y</b>. Прогноз 270, а продали 265 — промах +5. Прогноз 250 — промах −15.",
+    "Шаг 2 — квадрат промаха. Минус пропадает, а большие промахи штрафуются сильнее: промах 2 даёт штраф 4, промах 10 — уже 100.",
+    "Шаг 3 — среднее по всем примерам. Это <b>MSE</b>, средняя квадратичная ошибка. Ноль — идеально. Цель обучения — сделать L как можно меньше."
+  ],
+  sym:[["ŷ − y","промах на одном примере","270 − 265 = 5"],["(ŷ − y)²","штраф за промах","5² = 25"],["L (MSE)","среднее всех штрафов","(25 + 9) / 2 = 17"]],
+  ex:{t:"Ошибка за два дня", s:[
+    ["День 1: ŷ = 270, y = 265","Промах +5, штраф 5² = 25."],
+    ["День 2: ŷ = 200, y = 203","Промах −3, штраф (−3)² = 9."],
+    ["L = (25 + 9) / 2 = 17","Средний штраф за два дня."],
+    ["Цель: L → 0","Чем ближе L к нулю, тем точнее модель."]]},
+  analog:"Дартс: каждый бросок мимо центра даёт штраф, и дальние промахи наказываются особенно сильно. Счёт игрока — средний штраф. Хороший игрок тот, у кого он меньше.",
+  src:"Траск, гл. 4 (шаг «сравнить»: средняя квадратичная ошибка). Принс, гл. 2 и 5 (функция потерь, метод наименьших квадратов).",
+  tasks:[
+    {t:"num", q:"Прогноз ŷ = 12, правда y = 9. Чему равен промах ŷ − y?", a:3, hint:"Из прогноза вычтите правду.", why:"12 − 9 = 3: модель переоценила на 3."},
+    {t:"num", q:"Промах равен −4. Чему равен штраф (квадрат промаха)?", a:16, hint:"Минус на минус даёт плюс.", why:"(−4)² = 16."},
+    {t:"num", q:"Прогнозы: 3 и 5. Правда: 1 и 5. Посчитайте MSE.", a:2, hint:"Промахи 2 и 0. Квадраты? Среднее?", why:"Промахи 2 и 0, квадраты 4 и 0, среднее (4 + 0) / 2 = 2."},
+    {t:"fit", q:"Пунктир — промахи. Подберите w и b, чтобы ошибка L стала меньше 30.", data:"B", ctrl:["w","b"], init:{w:15,b:-50}, goal:30, resid:true, showLoss:true, hint:"Следите за числом L: двигайте по одной ручке и смотрите, растёт оно или падает.", why:"При w = 10, b = 10 ошибка около 7.", sol:"w = 10, b = 10"},
+    {t:"mc", q:"Почему промахи возводят в квадрат, а не просто складывают?", o:["Иначе +5 и −5 дали бы в сумме 0, будто ошибки нет","Так быстрее считать","Чтобы ошибка стала отрицательной","Квадрат нужен для красоты"], a:0, hint:"Подумайте о промахах с разными знаками.", why:"Квадрат делает каждый промах положительным, и они не гасят друг друга."},
+    {t:"tf", q:"Если L = 0, модель не ошиблась ни на одном примере.", a:true, hint:"Среднее неотрицательных чисел равно нулю, только если все они нули.", why:"Все квадраты ≥ 0, поэтому их среднее равно 0, только когда каждый промах равен 0."},
+    {t:"code", q:"Код считает MSE. Поменяйте w и b, чтобы ошибка стала меньше 20.", srcId:"code-mse", hint:"Продажи растут примерно на 10 за градус. Попробуйте w = 10 и уменьшайте b.", sol:"w, b = 10, 10 — ошибка ≈ 8,3", why:"Чем ближе линия к точкам, тем меньше средний квадрат промаха.",
+     check:{out:o => { const m = o.match(/MSE\):\s*([\d.]+)/); return !!m && parseFloat(m[1]) < 20; }, code:c => { const m = c.match(/w\s*,\s*b\s*=\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)/); if (!m) return false; const w=+m[1], b=+m[2], xs=[10,15,20,25,30,35], ys=[110,160,215,260,310,365]; return xs.reduce((s,x,i)=>s+(w*x+b-ys[i])**2,0)/6 < 20; }}}
+  ]},
+
+{ stage:1, g:"∇", title:"∇ — градиент", short:"Куда двигать ручку, чтобы ошибка уменьшилась",
+  intro:[
+    "Ошибка зависит от ручек. Если нарисовать, как L меняется при разных w, получится долина: где-то на дне ошибка минимальна.",
+    "<b>Градиент</b> — это наклон долины в точке, где мы стоим. Его пишут ∇ («набла») или dL/dw: «как изменится L, если чуть сдвинуть w».",
+    "Знак градиента — это направление. Градиент больше нуля: если увеличить w, ошибка вырастет, значит w надо уменьшать. Меньше нуля — наоборот, увеличивать. Равен нулю — мы на дне.",
+    "Величина градиента — это крутизна. Чем дальше от дна, тем круче склон и тем больше градиент по модулю."
+  ],
+  sym:[["dL/dw","градиент: как меняется L, если чуть сдвинуть w","+4"],["знак «+»","склон идёт вверх вправо","уменьшаем w"],["знак «−»","склон идёт вверх влево","увеличиваем w"],["0","на дне долины","ошибка минимальна"]],
+  ex:{t:"Ошибка L(w) = (w − 3)²", s:[
+    ["w = 5","Стоим справа от дна. L = (5 − 3)² = 4."],
+    ["dL/dw = 2·(w − 3) = 4","Градиент положительный: вправо — вверх по склону."],
+    ["значит, w ↓","Чтобы ошибка падала, уменьшаем w — идём против градиента."],
+    ["w = 3 → dL/dw = 0","На дне склон ровный, двигаться некуда."]]},
+  analog:"Вы стоите на склоне в густом тумане и не видите долину. Но ногами чувствуете, куда земля уходит вниз. Градиент — это наклон под ногами: он не показывает всю карту, но говорит, куда шагнуть прямо сейчас.",
+  src:"Траск, гл. 4 (градиентный спуск, «горячо-холодно»). Принс, гл. 6 (подбор параметров). 3Blue1Brown, видео про градиентный спуск.",
+  tasks:[
+    {t:"slope", q:"Кривая — ошибка при разных w. Смотрите на знак градиента и спуститесь на дно (зелёная зона). Два раунда, в каждом не больше 12 шагов.", hint:"Градиент «+» — жмите «уменьшить w». Градиент «−» — «увеличить w».", why:"Вы шли против знака градиента и каждый раз приходили на дно.", sol:"В первом раунде 9 раз «уменьшить w», во втором 7 раз «увеличить w»."},
+    {t:"mc", q:"Градиент равен +6. Что делать с w?", o:["Уменьшить w","Увеличить w","Ничего, мы на дне","Сделать w = 6"], a:0, hint:"Плюс значит: вправо ошибка растёт.", why:"Идём против градиента: он положительный, значит w уменьшаем."},
+    {t:"num", q:"L(w) = (w − 3)². Градиент: 2·(w − 3). Чему он равен при w = 1?", a:-4, hint:"2 · (1 − 3) = ?", why:"2 · (−2) = −4. Знак минус: w надо увеличивать."},
+    {t:"mc", q:"Где градиент ближе всего к нулю?", o:["На дне долины","На самом крутом месте склона","Всегда в начале обучения","Там, где ошибка самая большая"], a:0, hint:"Где склон ровный?", why:"На дне склон горизонтальный, и наклон равен нулю."},
+    {t:"tf", q:"Для такой долины чем дальше от дна, тем больше градиент по модулю.", a:true, hint:"Посмотрите на формулу 2·(w − 3).", why:"Градиент растёт вместе с расстоянием до дна: склон всё круче."}
+  ]},
+
+{ stage:1, g:"η", title:"η — скорость обучения", short:"Длина шага: не слишком мало и не слишком много",
+  intro:[
+    "Градиент говорит, куда идти. Скорость обучения <b>η</b> («эта», в коде <b>lr</b> — learning rate) говорит, какой длины сделать шаг.",
+    "Правило шага: <b>w_новое = w − η · градиент</b>. Минус — потому что идём против наклона, вниз.",
+    "Маленькая η — шаги крошечные, спуск займёт вечность. Слишком большая — перепрыгиваем дно и улетаем на другой склон, ошибка растёт.",
+    "Хорошую η подбирают опытом: обычно пробуют 0,1, 0,01, 0,001 и смотрят, как падает ошибка."
+  ],
+  sym:[["η (lr)","длина шага","0,25"],["η · градиент","на сколько сдвинуть w","0,25 · 4 = 1"],["w − η·∇","новое значение w","5 − 1 = 4"]],
+  ex:{t:"Шаги по долине L = (w − 3)²", s:[
+    ["w = 5, градиент = 4","Склон идёт вверх вправо."],
+    ["η = 0,5 → шаг = 0,5 · 4 = 2","Длина шага."],
+    ["w = 5 − 2 = 3","Попали ровно на дно."],
+    ["η = 1,5 → w = 5 − 6 = −1","С длинным шагом перелетели дно: теперь стоим дальше, чем были."]]},
+  analog:"Спуск по лестнице в темноте. Крошечные шажки — дойдёте к утру. Прыжки через пять ступенек — пролетите площадку. Нужен шаг размером со ступеньку.",
+  src:"Траск, гл. 4 (коэффициент α и расходимость, когда шаг «перелетает»). Принс, гл. 6 (скорость обучения).",
+  tasks:[
+    {t:"num", q:"w = 5, градиент = 4, η = 0,25. Какое новое w?", a:4, hint:"w − η · градиент = 5 − 0,25 · 4.", why:"0,25 · 4 = 1, и 5 − 1 = 4."},
+    {t:"lrrun", q:"Подберите η, чтобы за 10 шагов спуститься на дно (w ≈ 3) и не улететь.", hint:"0,01 — слишком мелко. 1,05 — уже разлёт. Ищите посередине.", why:"При η от 0,2 до 0,8 спуск укладывается в 10 шагов.", sol:"η = 0,3 или 0,5"},
+    {t:"mc", q:"Ошибка с каждым шагом растёт и скачет. Что, скорее всего, не так?", o:["Скорость обучения слишком большая","Скорость обучения слишком маленькая","Данных слишком много","Модель уже идеальна"], a:0, hint:"Вспомните перелёт через дно.", why:"Длинные шаги перепрыгивают минимум, и ошибка раскачивается."},
+    {t:"fill", q:"Допишите правило шага", code:"w = w [[0]] lr [[1]] dw", blanks:["-","*"], pool:["+","/"], hint:"Идём против градиента, а длина шага — lr, умноженная на градиент.", why:"w = w − lr · dw."},
+    {t:"tf", q:"Чем больше скорость обучения, тем всегда быстрее и лучше обучение.", a:false, hint:"А если шаг перепрыгнет долину?", why:"Слишком большая η ломает обучение: ошибка начинает расти."}
+  ]},
+
+{ stage:1, g:"↻", title:"↻ — цикл обучения", short:"Прогноз → ошибка → градиент → шаг",
+  intro:[
+    "Теперь соберём всё вместе. Обучение — это повторение четырёх действий: сделать прогноз ŷ, посчитать ошибку L, найти градиенты для каждой ручки (w и b), сдвинуть ручки на шаг.",
+    "Один проход по всем обучающим примерам называют <b>эпохой</b>. Обычно нужно много эпох: ошибка падает постепенно.",
+    "Правильные w и b модели никто не сообщает. Она находит их сама, только по сигналу ошибки. Так учится и наша линия, и GPT с миллиардами ручек."
+  ],
+  sym:[["шаг","одно обновление ручек","w и b сдвинулись"],["эпоха","проход по всем примерам","все 7 дней данных"],["dw, db","градиенты для w и b","как в уроке ∇"]],
+  ex:{t:"Один круг цикла", s:[
+    ["Прогноз","ŷ = w·x + b для каждого дня."],
+    ["Ошибка","L = среднее (ŷ − y)²."],
+    ["Градиенты","dw и db: куда и насколько двигать каждую ручку."],
+    ["Шаг","w = w − η·dw, b = b − η·db. И снова к прогнозу."]]},
+  analog:"Стрелок пристреливает винтовку: выстрел (прогноз), смотрит, насколько мимо (ошибка), понимает, куда подкрутить прицел (градиент), подкручивает чуть-чуть (шаг). Через десяток выстрелов он попадает в центр.",
+  src:"Траск, гл. 4–5 («прогноз, сравнение, обучение»). Принс, гл. 6. Карпатый, лекция про micrograd (цикл обучения в коде).",
+  tasks:[
+    {t:"order", q:"Расставьте один круг обучения по порядку", items:["Сделать прогноз ŷ","Посчитать ошибку L","Найти градиенты dw и db","Сдвинуть w и b на шаг"], why:"Прогноз → ошибка → градиенты → шаг, и снова по кругу."},
+    {t:"gd", q:"Нажимайте «Шаг» или «Авто», пока ошибка не станет меньше 30. Ручки двигает сама модель.", hint:"Если ошибка растёт — уменьшите скорость и нажмите «Сброс».", why:"Модель сама нашла w и b, видя только ошибку.", sol:"Скорость 0,3 и «Авто»."},
+    {t:"mc", q:"Что такое эпоха?", o:["Один проход по всем обучающим примерам","Один шаг изменения одной ручки","Время, за которое модель отвечает","Количество слоёв"], a:0, hint:"Это про данные.", why:"Эпоха — модель «прочитала» все примеры один раз."},
+    {t:"code", q:"В коде ошибка: модель шагает вверх по склону, и ошибка улетает. Исправьте знаки в двух строках шага и нажмите «Проверить».", srcId:"code-gdbug", hint:"Идём против градиента. Какой знак в правиле шага?", sol:"w -= lr * dw и b -= lr * db", why:"Минус — шаг против градиента, вниз по склону.",
+     check:{out:o => { const all = [...o.matchAll(/ошибка=([\d.einfa+-]+)/g)]; if (!all.length) return false; const v = parseFloat(all[all.length-1][1]); return isFinite(v) && v < 0.001; }, code:c => /w\s*-=\s*lr\s*\*\s*dw/.test(c) && /b\s*-=\s*lr\s*\*\s*db/.test(c)}},
+    {t:"tf", q:"Правильные значения w и b модели сообщает программист.", a:false, hint:"Откуда модель узнаёт, куда двигаться?", why:"Модель находит их сама, по градиентам ошибки."}
+  ]},
+
+/* ---------- Этап 2. Сеть ---------- */
+{ stage:2, g:"Σ", title:"Σ — несколько входов", short:"Каждому входу — свой вес",
+  intro:[
+    "В жизни ответ зависит от многих вещей. Оценка за экзамен — от часов подготовки, часов сна, посещаемости. Каждый такой вход — <b>x₁, x₂, x₃…</b>",
+    "У каждого входа свой вес: w₁, w₂, w₃. Модель умножает каждый вход на его вес и всё складывает: <b>ŷ = w₁·x₁ + w₂·x₂ + b</b>.",
+    "Это называют взвешенной суммой (Σ — знак суммы). Вес показывает важность входа: чем больше он по модулю, тем сильнее вход влияет.",
+    "В коде входы и веса хранят списками-векторами, а взвешенную сумму считают одной командой: <b>x @ w</b> (скалярное произведение)."
+  ],
+  sym:[["x₁","часы подготовки","5"],["x₂","часы сна","7"],["w₁, w₂","вес каждого входа","8 и 3"],["Σ wᵢ·xᵢ","взвешенная сумма","8·5 + 3·7 = 61"],["ŷ","прогноз балла","61 + 20 = 81"]],
+  ex:{t:"Прогноз балла за экзамен", s:[
+    ["w₁·x₁ = 8 · 5 = 40","Подготовка даёт 40 баллов."],
+    ["w₂·x₂ = 3 · 7 = 21","Сон добавляет 21."],
+    ["+ b = 20","Базовый балл."],
+    ["ŷ = 81","Вес подготовки больше: для модели час учёбы важнее часа сна."]]},
+  analog:"Жюри на конкурсе: голосуют все, но голос председателя весит больше. Итог — взвешенная сумма голосов.",
+  src:"Траск, гл. 3 и 5 (несколько входов, взвешенная сумма, скалярное произведение). Принс, гл. 3.",
+  tasks:[
+    {t:"num", q:"ŷ = 8·x₁ + 3·x₂ + 20. Посчитайте прогноз при x₁ = 2, x₂ = 8.", a:60, hint:"8·2 + 3·8 + 20.", why:"16 + 24 + 20 = 60."},
+    {t:"num", q:"Скалярное произведение: [1, 2] · [3, 4] = 1·3 + 2·4 = ?", a:11, hint:"Перемножьте попарно и сложите.", why:"3 + 8 = 11."},
+    {t:"mc", q:"Веса модели: подготовка 8, сон 3, цвет ручки 0. Что это значит?", o:["Цвет ручки не влияет на прогноз","Цвет ручки самый важный","Сон важнее подготовки","Модель сломана"], a:0, hint:"Что даёт умножение на ноль?", why:"Вес 0 — вход не влияет."},
+    {t:"wfit", q:"Подберите w₁ (подготовка) и w₂ (сон), чтобы модель точно угадала баллы четырёх студентов. Сдвиг b = 20.", hint:"Студенты 1 и 4 отличаются на час подготовки и час сна (в разные стороны), а баллы — на 5. Значит, w₁ − w₂ = 5.", why:"w₁ = 8, w₂ = 3 — все четыре балла совпадают.", sol:"w₁ = 8, w₂ = 3"},
+    {t:"match", q:"Соедините обозначение и смысл", pairs:[["x₁, x₂","входы"],["w₁, w₂","важность каждого входа"],["Σ","сложить всё вместе"],["x @ w","взвешенная сумма в коде"]], why:"Входы × веса, всё сложить — это и есть x @ w."},
+    {t:"fill", q:"Допишите взвешенную сумму на numpy", code:"import numpy as np\nx = np.array([5, 7])\nw = np.array([8, 3])\nb = 20\ny_hat = [[0]] + b\nprint(y_hat)   # 81", blanks:["x @ w"], pool:["x + w","np.sum(x)","w"], hint:"Знак @ — скалярное произведение.", why:"x @ w = 8·5 + 3·7 = 61, плюс 20 = 81."}
+  ]},
+
+{ stage:2, g:"f", title:"f — активация ReLU", short:"Изгиб, без которого сеть — просто прямая",
+  intro:[
+    "Взвешенная сумма рисует только прямую. Но мир не прямой: кошку от собаки линией не отделишь.",
+    "Решение — пропустить сумму через простую функцию-изгиб. Её называют функцией активации <b>f</b>. Самая популярная — <b>ReLU</b>: всё отрицательное превращает в 0, положительное оставляет как есть. ReLU(z) = max(0, z).",
+    "Взвешенная сумма + активация = <b>нейрон</b>. Нейрон с ReLU рисует ломаную с одним изломом. Где излом, решают w и b: там, где w·x + b = 0, то есть при x = −b / w.",
+    "Если сложить несколько таких ломаных, можно согнуть любую форму, как из кусочков проволоки."
+  ],
+  sym:[["z = w·x + b","сумма до изгиба","−3 или 2,5"],["ReLU(z)","max(0, z): минус → 0","ReLU(−3) = 0, ReLU(2,5) = 2,5"],["−b / w","где излом","w = 1, b = −2 → x = 2"]],
+  ex:{t:"Нейрон с w = 1, b = −2", s:[
+    ["x = 1 → z = 1 − 2 = −1","Сумма отрицательная."],
+    ["ReLU(−1) = 0","Нейрон молчит."],
+    ["x = 5 → z = 3 → ReLU = 3","Сумма положительная — проходит как есть."],
+    ["излом в x = 2","До x = 2 нейрон выключен, после — растёт прямой."]]},
+  analog:"ReLU — как кран с порогом: пока давление ниже нуля, вода не течёт; выше — течёт пропорционально давлению. Много кранов с разными порогами вместе дают поток любой формы.",
+  src:"Принс, гл. 3 (неглубокие сети: ReLU, изломы, кусочно-линейные функции). Траск, гл. 9 (функции активации).",
+  tasks:[
+    {t:"num", q:"ReLU(−3) = ?", a:0, hint:"Отрицательное превращается в…", why:"max(0, −3) = 0."},
+    {t:"num", q:"ReLU(2,5) = ?", a:2.5, hint:"Положительное проходит без изменений.", why:"max(0; 2,5) = 2,5."},
+    {t:"relu", q:"Подвиньте w и b так, чтобы излом нейрона оказался в точке x = 2, а линия после него шла вверх.", hint:"Излом там, где w·x + b = 0. При w = 1 нужно b = −2.", why:"Излом в x = −b/w = 2, а при w > 0 линия справа растёт.", sol:"w = 1, b = −2 (или w = 2, b = −4)"},
+    {t:"mc", q:"Нейрон: w = 2, b = −6. Где у него излом?", o:["x = 3","x = −3","x = 6","x = 12"], a:0, hint:"x = −b / w.", why:"−(−6) / 2 = 3."},
+    {t:"tf", q:"Если убрать активации, сеть из 10 слоёв всё равно сможет нарисовать только прямую.", a:true, hint:"Прямая от прямой — это…", why:"Композиция прямых — снова прямая. Изгибы дают сложные формы."}
+  ]},
+
+{ stage:2, g:"W", title:"W — слой нейронов", short:"Много нейронов рядом = одно умножение матриц",
+  intro:[
+    "Один нейрон даёт один излом. <b>Слой</b> — это много нейронов, которые смотрят на одни и те же входы, но у каждого свои веса. Каждый замечает что-то своё.",
+    "Веса всего слоя складывают в таблицу — матрицу <b>W</b>. Строки — входы, столбцы — нейроны. 2 входа и 4 нейрона → матрица 2 × 4.",
+    "Весь слой считается одной командой: <b>h = ReLU(x @ W + b)</b>. Поэтому для ИИ важны видеокарты: они очень быстро перемножают матрицы.",
+    "Слои ставят друг за другом: выход одного — вход следующего. Отсюда «глубокое» обучение: первые слои замечают простое, следующие собирают из простого сложное."
+  ],
+  sym:[["W","матрица весов слоя","2 входа × 4 нейрона"],["x @ W + b","все суммы слоя разом","4 числа"],["h","выход слоя после ReLU","вход для следующего слоя"]],
+  ex:{t:"Слой из двух нейронов, вход x = [1, 2]", s:[
+    ["нейрон 1: веса [1, 1], b = 0","z₁ = 1·1 + 1·2 = 3 → ReLU = 3"],
+    ["нейрон 2: веса [1, −1], b = 0","z₂ = 1·1 − 1·2 = −1 → ReLU = 0"],
+    ["W = [[1, 1], [1, −1]]","Каждый столбец матрицы — веса одного нейрона."],
+    ["h = [3, 0]","Выход слоя: по одному числу от каждого нейрона."]]},
+  analog:"Слой — как бригада экспертов, которые смотрят на одну картинку: один ищет уши, другой усы, третий хвост. Каждый выдаёт свою оценку, а следующая бригада решает по их отчётам.",
+  src:"Принс, гл. 3–4 (неглубокие и глубокие сети, матричная запись). Гудфеллоу и соавторы, гл. 6.",
+  tasks:[
+    {t:"num", q:"Вход x = [2, 1]. Нейрон с весами [1, 3] и b = −4. Чему равен его выход после ReLU?", a:1, hint:"z = 1·2 + 3·1 − 4, потом ReLU.", why:"z = 2 + 3 − 4 = 1, ReLU(1) = 1."},
+    {t:"mc", q:"Слой: 3 входа, 5 нейронов. Какого размера матрица W?", o:["3 × 5","5 × 5","3 × 3","8 × 1"], a:0, hint:"Строки — входы, столбцы — нейроны.", why:"3 строки (входы) × 5 столбцов (нейроны)."},
+    {t:"circle", q:"Оранжевые точки внутри круга, синие снаружи. Выберите число нейронов в слое и обучите сеть, чтобы она угадывала не меньше 95% точек.", hint:"0 нейронов — это просто прямая. Попробуйте 3 и больше.", why:"Нескольких изломов хватает, чтобы обвести круг.", sol:"4 или 6 нейронов, «Обучать»."},
+    {t:"fill", q:"Допишите двухслойную сеть", code:"h = relu([[0]] @ W1 + b1)\nout = h @ [[1]] + b2", blanks:["x","W2"], pool:["W1","h","b1"], hint:"Первый слой получает вход, второй — выход первого.", why:"Слой 1: x @ W1. Слой 2: h @ W2."},
+    {t:"tf", q:"Все нейроны слоя считаются одной операцией умножения матриц.", a:true, hint:"Вспомните x @ W.", why:"x @ W сразу даёт суммы всех нейронов слоя."},
+    {t:"mc", q:"Почему для ИИ нужны видеокарты?", o:["Они очень быстро перемножают матрицы","У них больше памяти для фото","Без них Python не работает","Они охлаждают процессор"], a:0, hint:"Что делает каждый слой?", why:"Почти вся работа сети — умножение матриц, а видеокарта делает его параллельно."}
+  ]},
+
+{ stage:2, g:"∂", title:"∂ — правило цепочки", short:"Как вина за ошибку раздаётся назад",
+  intro:[
+    "В сети тысячи ручек. Нужно узнать градиент каждой: как изменится ошибка, если её чуть подвинуть. Двигать по одной — слишком долго.",
+    "Помогает <b>правило цепочки</b>: если a влияет на b с силой 2, а b влияет на ошибку с силой 3, то a влияет на ошибку с силой 2 × 3 = 6. Влияния вдоль пути перемножаются.",
+    "Двух правил хватает почти на всё. <b>Сложение</b> z = x + y: градиент, пришедший к z, достаётся x и y без изменений. <b>Умножение</b> z = x · y: x получает градиент z, умноженный на y («на соседа»), а y — умноженный на x.",
+    "Начинают с конца (градиент ошибки по самой себе = 1) и идут назад узел за узлом. Это и есть обратное распространение (backpropagation)."
+  ],
+  sym:[["∂L/∂a","градиент: влияние a на L","6"],["сложение","градиент проходит как есть","−2 → −2 и −2"],["умножение","× на соседа","−2 · (−3) = 6"]],
+  ex:{t:"L = (a · b + c) · f;  a = 2, b = −3, c = 10, f = −2", s:[
+    ["вперёд: e = a·b = −6, d = e + c = 4, L = d·f = −8","Сначала считаем значения слева направо."],
+    ["∂L/∂L = 1; d получает f = −2; f получает d = 4","Последнее действие — умножение: каждому × сосед."],
+    ["e и c получают по −2","d = e + c — сложение: градиент проходит как есть."],
+    ["a получает −2 · b = 6; b получает −2 · a = −4","Проверка: при a = 2,01 выходит L = −7,94, то есть +0,06 = 6 · 0,01."]]},
+  analog:"Разбор провала в команде: директор спрашивает с руководителя, тот — со своих сотрудников, те — со своих. Каждый получает долю вины по своему вкладу, и никого не нужно проверять отдельно.",
+  src:"Карпатый, лекция «building micrograd» (этот пример с a, b, c, f). Принс, гл. 7 (градиенты и обратное распространение). Траск, гл. 6.",
+  tasks:[
+    {t:"num", q:"a влияет на b с силой 2, b влияет на ошибку с силой 5. С какой силой a влияет на ошибку?", a:10, hint:"Влияния вдоль пути перемножаются.", why:"2 × 5 = 10."},
+    {t:"num", q:"z = x + y. К z пришёл градиент 7. Какой градиент получит x?", a:7, hint:"Сложение передаёт градиент как есть.", why:"При сложении градиент проходит без изменений: 7."},
+    {t:"num", q:"z = x · y, x = 4, y = 5. К z пришёл градиент 1. Какой градиент получит x?", a:5, hint:"Умножение: × на соседа.", why:"1 × y = 5."},
+    {t:"chain", q:"Пройдите граф назад сами: впишите градиент каждого узла по очереди.", hint:"Умножение — × на соседа, сложение — как есть.", why:"Вы сделали обратное распространение руками: d = −2, f = 4, e = −2, c = −2, a = 6, b = −4.", sol:"d = −2, f = 4, e = −2, c = −2, a = 6, b = −4"},
+    {t:"mc", q:"Зачем идти от конца графа к началу?", o:["Градиент узла строится из градиента следующего за ним, поэтому начинаем с ошибки","Так быстрее читать код","Начало графа неважно","Так придумали случайно"], a:0, hint:"Что нужно знать, чтобы посчитать градиент a?", why:"Каждому узлу нужен градиент «сверху», поэтому идём от L назад."}
+  ]},
+
+{ stage:2, g:"⟲", title:"⟲ — обратный проход в коде", short:"loss.backward(): правило цепочки делает компьютер",
+  intro:[
+    "Правило цепочки можно поручить компьютеру. Для этого каждое число запоминает, из каких чисел и какой операцией оно получено. Получается граф вычислений.",
+    "Вызов <b>backward()</b> обходит граф от ошибки к началу и в каждом узле применяет правило: для сложения — передать как есть, для умножения — умножить на соседа. Это называют автоматическим дифференцированием.",
+    "В PyTorch это одна строка: <b>loss.backward()</b>. После неё у каждой ручки появляется поле <b>.grad</b> — её градиент. Дальше оптимизатор делает шаг.",
+    "Важная деталь: градиенты копятся (+=). Поэтому перед новым шагом их обнуляют: <b>optimizer.zero_grad()</b>."
+  ],
+  sym:[["Value / тензор","число, которое помнит своё происхождение","a = Value(2.0)"],["backward()","обратный проход по графу","L.backward()"],[".grad","градиент ручки после прохода","a.grad = 6.0"],["zero_grad()","стереть старые градиенты","перед каждым шагом"]],
+  ex:{t:"Что происходит при L.backward()", s:[
+    ["L.grad = 1","Старт с конца."],
+    ["узел умножения: d.grad += f · L.grad","Каждый узел знает свою операцию и раздаёт градиент родителям."],
+    ["обход в обратном порядке","Узлы выстраиваются так, чтобы каждый обработался после всех, кто от него зависит."],
+    ["a.grad = 6.0","Тот же ответ, что вы посчитали вручную."]]},
+  analog:"Бухгалтер хранит все чеки. Чтобы понять, откуда взялась итоговая сумма, он идёт по чекам в обратном порядке. Если не выбросить чеки прошлого месяца (zero_grad), они попадут в новый отчёт.",
+  src:"Карпатый, micrograd (класс Value и backward). Траск, гл. 13 (своя мини-библиотека с автоградиентами). Рашка, приложение A (основы PyTorch и autograd).",
+  tasks:[
+    {t:"code", q:"Запустите код: он считает градиенты сам. Потом поменяйте a на 3.0 и снова нажмите «Проверить». Каким станет градиент b?", srcId:"code-value", hint:"Градиент b = градиент e × a = −2 × a.", sol:"a = Value(3.0) → градиент b: −6.0", why:"b получает градиент −2 × a = −6: умножение берёт соседа.",
+     check:{out:o => /градиент b: -6\.0/.test(o), code:c => /=\s*Value\(\s*3(\.0*)?\s*\)\s*,\s*Value\(\s*-3/.test(c)}},
+    {t:"mc", q:"Что делает loss.backward()?", o:["Считает градиенты всех ручек, проходя граф от ошибки назад","Делает шаг обучения","Удаляет модель","Запускает модель задом наперёд для генерации"], a:0, hint:"backward — «назад».", why:"Шаг делает оптимизатор, а backward только считает градиенты."},
+    {t:"tf", q:"Если не вызывать zero_grad(), градиенты с прошлых шагов сложатся с новыми.", a:true, hint:"В коде градиент копится через +=.", why:"Градиенты накапливаются, поэтому их обнуляют перед каждым шагом."},
+    {t:"order", q:"Порядок действий в одном шаге обучения", items:["Прогноз модели","Ошибка loss","loss.backward()","optimizer.step()"], why:"Сначала прогноз и ошибка, потом градиенты, потом шаг."},
+    {t:"num", q:"После backward у ручки w: w.grad = 3. Шаг с lr = 0,1, w было 2. Каким станет w?", a:1.7, hint:"w − lr · grad.", why:"2 − 0,1 · 3 = 1,7."}
+  ]},
+
+/* ---------- Этап 3. Язык ---------- */
+{ stage:3, g:"#", title:"# — токены", short:"Текст режут на кусочки и нумеруют",
+  intro:[
+    "Модель умеет только считать, а текст — это буквы. Первый шаг — <b>токенизация</b>: режем текст на кусочки-токены и каждому даём номер из словаря.",
+    "Резать можно по буквам (словарь маленький, но текст длинный), по словам (текст короткий, но словарь огромный, и новые слова не помещаются) или по частям слов, как делают современные модели: «нейросеть» → «нейро» + «сеть».",
+    "<b>Словарь</b> — список всех токенов, которые знает модель. Номер токена (id) — его место в словаре. У GPT-2 словарь около 50 тысяч токенов.",
+    "После токенизации текст — просто список номеров."
+  ],
+  sym:[["токен","кусочек текста","«нейро», «сеть» или «м»"],["словарь","список всех токенов","« », а, л, м, ы"],["id","номер токена в словаре","«м» → 3"]],
+  ex:{t:"«мама мыла» по буквам", s:[
+    ["словарь: « », а, л, м, ы","Все разные символы по порядку. Пробел — тоже токен."],
+    ["« » = 0, а = 1, л = 2, м = 3, ы = 4","Место в словаре = номер."],
+    ["→ [3, 1, 3, 1, 0, 3, 4, 2, 1]","9 токенов, словарь из 5."],
+    ["по частям слов: «мама», « мыла»","2 токена: словарь больше, зато текст короче, и модели легче."]]},
+  analog:"Как азбука Морзе: перед передачей по проводу слово разбивают на знаки, и у каждого знака свой код. Модель получает не буквы, а коды.",
+  src:"Рашка, гл. 2 (токенизация, словарь, BPE). Аламмар и Грутендорст, «Hands-On Large Language Models», гл. 2. Карпатый, лекция «Let's build the GPT Tokenizer».",
+  tasks:[
+    {t:"num", q:"Сколько токенов в «кот ест», если резать по буквам? Пробел — тоже токен.", a:7, hint:"к-о-т-пробел-е-с-т.", why:"3 буквы + пробел + 3 буквы = 7."},
+    {t:"num", q:"Сколько разных токенов (размер словаря) в слове «мама» при разбиении по буквам?", a:2, hint:"Какие разные буквы там есть?", why:"Только «м» и «а»."},
+    {t:"tokgoal", q:"Напишите любой текст длиной от 6 символов, в котором ровно 5 разных токенов-букв (пробел тоже считается).", n:5, hint:"Например, «мама мыла» — там « », а, л, м, ы.", why:"Словарь — это набор разных токенов, сколько бы раз они ни повторялись.", sol:"«мама мыла»"},
+    {t:"mc", q:"Почему современные модели режут текст на части слов?", o:["Словарь остаётся небольшим, а любое новое слово собирается из частей","Так текст красивее","Буквы модель не понимает совсем","Чтобы убрать пробелы"], a:0, hint:"Подумайте о словах, которых нет в словаре.", why:"Части слов — компромисс между буквами и словами."},
+    {t:"match", q:"Соедините термин и смысл", pairs:[["токен","кусочек текста"],["словарь","все токены, которые знает модель"],["id","номер токена"]], why:"Текст → токены → номера из словаря."}
+  ]},
+
+{ stage:3, g:"E", title:"E — эмбеддинг", short:"Номер токена становится точкой на карте смыслов",
+  intro:[
+    "Номер токена — просто метка: токен 17 не «больше» токена 5 по смыслу. Поэтому каждому номеру сопоставляют список чисел — вектор. Это и есть <b>эмбеддинг</b>.",
+    "Вектор — координаты токена на карте смыслов. Похожие по смыслу токены оказываются рядом: «кот» возле «собаки», «Москва» возле «Парижа».",
+    "Направления на карте тоже несут смысл: шаг от «мужчины» к «женщине» такой же, как от «короля» к «королеве». Поэтому король − мужчина + женщина ≈ королева.",
+    "Все векторы хранятся в таблице: строк столько, сколько токенов в словаре, столбцов — длина вектора <b>d</b>. Это обычные ручки: модель сама подбирает их при обучении."
+  ],
+  sym:[["вектор","список чисел — координаты","[0,8; 0,1]"],["d","длина вектора","у GPT-2 small — 768"],["таблица E","словарь × d чисел","50 257 × 768"]],
+  ex:{t:"Как номер становится вектором", s:[
+    ["«кот» → id 7","Сначала токенизация."],
+    ["строка 7 таблицы → [0,8; 0,1]","Берём седьмую строку — это вектор «кота»."],
+    ["«собака» → [0,7; 0,2]","Близкие числа — близкие точки — похожий смысл."],
+    ["таблица учится","Сначала числа случайные, при обучении похожие слова сами «съезжаются»."]]},
+  analog:"Как координаты городов: по названию города ничего не посчитаешь, а по широте и долготе можно найти расстояние и соседей. Эмбеддинг даёт словам такие координаты, только измерений не два, а сотни.",
+  src:"Траск, гл. 11 («король − мужчина + женщина»). Аламмар, «The Illustrated Word2vec». Рашка, гл. 2 (слой эмбеддингов).",
+  tasks:[
+    {t:"emb", q:"Нажмите на слово, которое ближе всего к «кот».", target:"собака", from:"кот", hint:"Ищите среди животных.", why:"«Собака» лежит к «коту» ближе всех: тоже домашнее животное."},
+    {t:"emb", q:"Где окажется король − мужчина + женщина? Нажмите на это слово.", target:"королева", arrow:true, hint:"Приложите стрелку «мужчина → женщина» к «королю».", why:"Тот же сдвиг, что от «мужчины» к «женщине», ведёт от «короля» к «королеве»."},
+    {t:"num", q:"Словарь — 100 токенов, длина вектора d = 64. Сколько чисел в таблице эмбеддингов?", a:6400, hint:"Строк — по числу токенов, столбцов — d.", why:"100 × 64 = 6400."},
+    {t:"mc", q:"Кто задаёт числа в эмбеддингах?", o:["Модель сама при обучении","Программист для каждого слова","Их берут из толкового словаря","Они равны номеру токена"], a:0, hint:"Это такие же ручки, как w и b.", why:"Эмбеддинги учатся градиентным спуском вместе с остальной моделью."},
+    {t:"tf", q:"Номер токена 17 означает, что этот токен важнее токена 5.", a:false, hint:"Номер — просто место в словаре.", why:"Номер — метка без смысла. Смысл несёт вектор."}
+  ]},
+
+{ stage:3, g:"p", title:"p — позиция", short:"Модели нужно знать порядок слов",
+  intro:[
+    "«Собака укусила человека» и «человек укусил собаку» — почти одни и те же слова, но смысл противоположный. Значит, модель должна знать, где стоит каждое слово.",
+    "Для этого заводят вторую таблицу — эмбеддинги <b>позиций</b>: свой вектор для 1-го места, 2-го, 3-го и так далее, до длины контекста.",
+    "Вектор токена и вектор его позиции просто складывают: <b>вход = E(токен) + P(позиция)</b>. Теперь одно и то же слово на разных местах выглядит для модели по-разному.",
+    "Длина контекста <b>ctx</b> — сколько позиций в таблице, то есть сколько токенов модель видит за раз."
+  ],
+  sym:[["позиция","номер места токена в тексте","0, 1, 2…"],["P(позиция)","вектор позиции, тоже обучается","P(0) = [0; 0,5]"],["E + P","вход для блоков","[0,8; 0,1] + [0; 0,5]"],["ctx","длина контекста","у GPT-2 — 1024"]],
+  ex:{t:"«кот ест» и «ест кот»", s:[
+    ["«кот» на месте 0","вектор = E(кот) + P(0)"],
+    ["«ест» на месте 1","вектор = E(ест) + P(1)"],
+    ["«ест кот»","Теперь E(ест) + P(0) и E(кот) + P(1) — другие суммы."],
+    ["итог","Модель различает порядок слов."]]},
+  analog:"Как номера мест в театре: билеты на один спектакль, но первый ряд и тридцатый — разные впечатления. Позиция — номер места слова в предложении.",
+  src:"Рашка, гл. 2 (позиционные эмбеддинги). Аламмар, «The Illustrated Transformer». Принс, гл. 12.",
+  tasks:[
+    {t:"tf", q:"Без позиций модель не отличит «собака укусила человека» от «человек укусил собаку».", a:true, hint:"Набор слов почти тот же.", why:"Различается порядок, поэтому позицию добавляют явно."},
+    {t:"mc", q:"Как вектор позиции соединяют с вектором токена?", o:["Складывают","Перемножают все числа","Записывают позицию вместо токена","Никак, позиция не нужна"], a:0, hint:"Самая простая операция.", why:"E(токен) + P(позиция)."},
+    {t:"num", q:"Вектор токена [1; 2], вектор позиции [0,5; −1]. Чему равна первая координата суммы?", a:1.5, hint:"Складываем по координатам: 1 + 0,5.", why:"1 + 0,5 = 1,5 (а вторая: 2 − 1 = 1)."},
+    {t:"num", q:"Контекст ctx = 64, длина вектора d = 128. Сколько чисел в таблице позиций?", a:8192, hint:"Строк — по числу позиций.", why:"64 × 128 = 8192."},
+    {t:"fill", q:"Допишите код мини-GPT", code:"self.tok = nn.Embedding(vocab_size, d)\nself.pos = nn.Embedding([[0]], d)\n...\nx = self.tok(idx) [[1]] self.pos(positions)", blanks:["ctx","+"], pool:["vocab_size","*","@"], hint:"Сколько строк в таблице позиций? Как соединяем векторы?", why:"Позиций ctx штук, векторы складываются."}
+  ]},
+
+{ stage:3, g:"%", title:"% — softmax", short:"Сырые оценки превращаются в вероятности",
+  intro:[
+    "На выходе модель выдаёт по одному числу на каждый токен словаря — оценку (<b>logit</b>). Оценки бывают любыми: 3,1, −2, 0,5. Чтобы получить вероятности, их пропускают через <b>softmax</b>.",
+    "softmax делает три вещи: возводит e в степень каждой оценки (всё становится положительным), складывает результаты и делит каждый на сумму. Все числа оказываются от 0 до 1 и вместе дают 100%.",
+    "Больше оценка — больше вероятность. Важна разница оценок, а не их размер: [1, 1] и [10, 10] дают одинаковые 50 на 50.",
+    "softmax работает дважды: на выходе модели (вероятности следующего токена) и внутри внимания (доли внимания)."
+  ],
+  sym:[["logit","сырая оценка токена","«кот»: 2"],["eᶻ","экспонента: всегда > 0","e² ≈ 7,39"],["softmax","eᶻ / сумма всех eᶻ","7,39 / 9,39 ≈ 79%"]],
+  ex:{t:"Оценки: «кот» 2, «пёс» 0, «дом» 0", s:[
+    ["e² ≈ 7,39; e⁰ = 1; e⁰ = 1","Экспонента делает всё положительным."],
+    ["сумма = 9,39","Складываем."],
+    ["кот: 7,39 / 9,39 ≈ 79%","Делим каждое на сумму."],
+    ["пёс ≈ 11%, дом ≈ 11%","Вместе 100%."]]},
+  analog:"Как голосование с усилением: у кого оценка чуть выше, тот получает заметно больше голосов, но шанс остаётся у всех. Потом голоса переводят в проценты, чтобы в сумме было 100.",
+  src:"Траск, гл. 9 (softmax). Рашка, гл. 3–4. Гудфеллоу и соавторы, гл. 6.",
+  tasks:[
+    {t:"softmax", q:"Двигайте оценки трёх слов. Сделайте так, чтобы «кот» получил больше 70%.", goal:"cat", hint:"Поднимите оценку «кота» на 2–3 выше остальных.", why:"Разница оценок в 2 и больше даёт сильный перевес.", sol:"кот 2, пёс 0, дом 0"},
+    {t:"num", q:"Оценки двух токенов одинаковые: [3, 3]. Какая вероятность у первого, в процентах?", a:50, hint:"Одинаковые оценки — одинаковые шансы.", why:"e³ / (e³ + e³) = 1/2 = 50%."},
+    {t:"softmax", q:"Сделайте три вероятности почти равными (каждая от 30% до 37%), но так, чтобы все оценки были не меньше 2.", goal:"equal", hint:"Важна разница оценок, а не их размер.", why:"Одинаковые оценки дают равные доли, какими бы большими они ни были.", sol:"все три оценки = 2 (или все = 3)"},
+    {t:"tf", q:"После softmax сумма всех вероятностей равна 100%.", a:true, hint:"Мы делим на сумму.", why:"Каждое eᶻ делится на сумму всех, поэтому вместе выходит 1."},
+    {t:"mc", q:"Оценки [1, 2, 5]. У какого токена наибольшая вероятность?", o:["У третьего (оценка 5)","У первого","У всех одинаково","Нельзя сказать без обучения"], a:0, hint:"Больше оценка — больше вероятность.", why:"softmax сохраняет порядок: самая большая оценка — самая большая вероятность."}
+  ]},
+
+{ stage:3, g:"T", title:"T — следующий токен", short:"Угадывание по одному токену и температура",
+  intro:[
+    "Главная задача языковой модели: по началу текста угадать <b>следующий токен</b>. Ответы, код, стихи — всё это многократное угадывание.",
+    "Генерация идёт циклом: подать текст → получить вероятности следующего токена → выбрать один → приписать к тексту → повторить. Как бусины на нитку.",
+    "<b>Температура T</b> решает, насколько смело выбирать. Оценки делят на T перед softmax. Маленькая T (0,3) — почти всегда самый вероятный вариант: надёжно, но скучно. Большая T (1,5) — вероятности выравниваются: интереснее, но больше бреда.",
+    "Обучающие задания берутся из самого текста: закрываем следующий токен и спрашиваем модель. Ответ всегда известен, поэтому модели учат на огромных объёмах без ручной разметки."
+  ],
+  sym:[["контекст","то, что модель уже видит","«мари»"],["P(следующий)","вероятности всех токенов","«я» — 70%"],["T","температура","0,3 — осторожно, 1,5 — смело"]],
+  ex:{t:"Модель дописывает имя после «мари»", s:[
+    ["«мари» → я 70%, н 20%, конец 10%","Модель выдаёт вероятности."],
+    ["выбираем «я» → «мария»","Чаще выпадает самое вероятное, но не всегда."],
+    ["«мария» → конец 95%","Модель решила, что имя закончилось."],
+    ["T = 2 → может выйти «марин…»","С высокой температурой редкие варианты выпадают чаще."]]},
+  analog:"Как подсказки на клавиатуре телефона: она предлагает следующее слово. Если всё время нажимать подсказку, телефон «напишет» текст сам. Языковая модель делает то же, только очень хорошо.",
+  src:"Карпатый, makemore, часть 1 (биграммная модель на именах — как в задачах). Рашка, гл. 4–5 (генерация, температура).",
+  tasks:[
+    {t:"order", q:"Генерация текста: расставьте по порядку", items:["Подать текст в модель","Получить вероятности следующего токена","Выбрать токен","Приписать его к тексту и повторить"], why:"Модель пишет по одному токену, каждый раз читая всё написанное."},
+    {t:"temp", q:"Модель прочитала 124 русских имени. Двигайте температуру: сделайте так, чтобы после буквы «а» самый вероятный вариант получил больше 80%.", goal:"low", hint:"Низкая температура делает выбор увереннее.", why:"При T ≈ 0,3 модель почти всегда выбирает «конец имени» — так заканчивается много имён на «а».", sol:"T = 0,3 или ниже"},
+    {t:"temp", q:"Теперь наоборот: сделайте, чтобы самый вероятный вариант после «а» получил меньше 25%.", goal:"high", hint:"Высокая температура выравнивает вероятности.", why:"При T ≈ 1,5 и выше вероятности сглаживаются, и шанс есть у многих букв.", sol:"T = 1,5 или выше"},
+    {t:"gen", q:"Модель допишет начало «ма». Генерируйте, пока среди вариантов не появится новое имя, которого не было в обучающем списке (зелёное).", hint:"Нажмите «Дописать» несколько раз.", why:"Модель сочиняет новое, комбинируя частые сочетания букв.", sol:"Нажимайте «Дописать», пока не появится зелёное имя."},
+    {t:"mc", q:"Почему языковые модели можно учить без ручной разметки?", o:["Правильный ответ — следующее слово — уже есть в самом тексте","Тексты размечают миллионы людей","Моделям не нужны данные","Интернет сам размечает тексты"], a:0, hint:"Откуда взять «правильный ответ»?", why:"Каждый текст — готовый набор задач «угадай следующее»."},
+    {t:"tf", q:"Низкая температура делает текст разнообразнее.", a:false, hint:"Низкая T — модель выбирает самое вероятное.", why:"Наоборот: низкая T делает текст предсказуемым."}
+  ]},
+
+{ stage:3, g:"Q", title:"Q·K — внимание", short:"Каждое слово ищет нужные слова в контексте",
+  intro:[
+    "Модель, которая видит только предыдущую букву, слабая. В «Кошка не прыгнула на забор, потому что она устала» чтобы понять «она», нужно найти «кошку» далеко позади.",
+    "<b>Внимание</b> даёт каждому токену три вектора: запрос <b>Q</b> («что я ищу»), ключ <b>K</b> («что во мне есть») и значение <b>V</b> («что я передам, если меня выберут»). Все три получаются умножением эмбеддинга на свою обучаемую матрицу.",
+    "Совпадение запроса с каждым ключом считают скалярным произведением Q·K, делят на √d и пропускают через softmax — получаются доли внимания. Результат — смесь значений V с этими долями.",
+    "Голов внимания несколько, они работают параллельно и ищут разное: одна — кто к кому относится, другая — грамматику, третья — тему."
+  ],
+  sym:[["Q","запрос: что ищет токен","«она» ищет, о ком речь"],["K","ключ: что есть в токене","«Кошка»: существительное, ж. р."],["V","значение: что токен передаст","смысл «кошки»"],["Q·K / √d","сила совпадения","→ softmax → доли"]],
+  ex:{t:"Как «она» находит «Кошку»", s:[
+    ["Q(она) · K(Кошка) = 4","Большое совпадение."],
+    ["Q(она) · K(забор) = 2,3","Среднее: забор — тоже кандидат."],
+    ["softmax → Кошка 75%, забор 14%, …","Доли внимания."],
+    ["выход = 0,75·V(Кошка) + 0,14·V(забор) + …","«она» впитывает смысл кошки."]]},
+  analog:"Поиск в библиотеке. Запрос — ваш вопрос библиотекарю. Ключи — надписи на корешках. Значения — содержимое книг. Чем лучше вопрос совпадает с надписью, тем больше вы берёте из этой книги.",
+  src:"Аламмар, «The Illustrated Transformer» (Q, K, V). Рашка, гл. 3 (внимание с нуля). Принс, гл. 12. 3Blue1Brown, видео про внимание.",
+  tasks:[
+    {t:"attn", q:"«Кошка не прыгнула на забор, потому что она устала». Нажмите на слово, на которое больше всего смотрит «она».", hint:"Кто устал?", why:"«она» берёт 75% из «Кошки»: совпадение Q·K там самое большое.", sol:"Кошка"},
+    {t:"num", q:"Q = [1, 2], K = [3, 1]. Чему равно совпадение Q·K?", a:5, hint:"1·3 + 2·1.", why:"3 + 2 = 5."},
+    {t:"match", q:"Соедините вектор и его роль", pairs:[["Q","что я ищу"],["K","что во мне есть"],["V","что я передам"]], why:"Запрос сравнивают с ключами, а забирают значения."},
+    {t:"mc", q:"Из чего получается выход внимания для токена?", o:["Смесь значений V других токенов с долями внимания","Только его собственный вектор","Случайный токен","Ключ самого похожего токена"], a:0, hint:"Доли внимания умножают на…", why:"Выход = Σ доля × V."},
+    {t:"tf", q:"Разные головы внимания могут искать разные связи.", a:true, hint:"Зачем их несколько?", why:"Каждая голова учится своей специализации."}
+  ]},
+
+{ stage:3, g:"M", title:"M — маска", short:"Не подглядывать в будущее",
+  intro:[
+    "При обучении модель угадывает каждый следующий токен. Если токен 3 сможет посмотреть на токен 4, он просто спишет ответ.",
+    "Поэтому в таблице совпадений Q·K всё, что правее диагонали (будущее), заменяют на −∞. После softmax e^(−∞) = 0, и доля внимания к будущему становится ровно нулевой.",
+    "В таблице T × T строка — кто смотрит, столбец — на кого. Разрешено смотреть на себя и назад, то есть нижний треугольник вместе с диагональю.",
+    "Такое внимание называют <b>каузальным</b>: каждый токен опирается только на прошлое, как и при генерации, где будущего ещё нет."
+  ],
+  sym:[["T × T","таблица: кто смотрит на кого","4 × 4"],["−∞","запрет: после softmax даёт 0","клетки над диагональю"],["каузальное","смотреть только назад","как при генерации"]],
+  ex:{t:"Текст «я ем суп» (3 токена)", s:[
+    ["«я» видит: я","Первый токен видит только себя."],
+    ["«ем» видит: я, ем","Второй — себя и прошлое."],
+    ["«суп» видит: я, ем, суп","Последний видит всё."],
+    ["запрещено: я→ем, я→суп, ем→суп","Это 3 клетки над диагональю."]]},
+  analog:"Диктант: ученик пишет слово за словом и не может заглянуть в текст учителя дальше текущего слова. Маска — лист бумаги, который закрывает будущее.",
+  src:"Рашка, гл. 3 (каузальное внимание и маска). Карпатый, «Let's build GPT» (маска через нижний треугольник).",
+  tasks:[
+    {t:"mask", q:"Строка — кто смотрит, столбец — на кого. Отметьте все клетки, которые нужно запретить маской.", hint:"Запрещено всё, что правее диагонали: взгляд в будущее.", why:"6 клеток над диагональю — это будущее для каждого токена.", sol:"Все клетки правее диагонали: 3 в первой строке, 2 во второй, 1 в третьей."},
+    {t:"num", q:"Сколько клеток запрещено в таблице 5 × 5?", a:10, hint:"4 + 3 + 2 + 1.", why:"Над диагональю 4 + 3 + 2 + 1 = 10 клеток."},
+    {t:"mc", q:"Зачем нужна маска при обучении?", o:["Чтобы токен не подглядывал в будущее, которое модель должна угадать","Чтобы скрыть личные данные","Чтобы убрать знаки препинания","Чтобы ускорить видеокарту"], a:0, hint:"Иначе модель…", why:"Без маски модель просто списывала бы правильный ответ."},
+    {t:"num", q:"Какая доля внимания у запрещённой клетки после softmax (e в степени −∞)?", a:0, hint:"e в очень большой отрицательной степени…", why:"e^(−∞) = 0, доля ровно нулевая."},
+    {t:"code", q:"Поставьте # в начале строки с маской (scores[mask] = …), запустите и посмотрите: верхний правый угол таблицы перестанет быть нулевым. Потом нажмите «Проверить».", srcId:"code-attn", hint:"Строка: scores[mask] = -np.inf", sol:"# scores[mask] = -np.inf", why:"Без маски каждый токен «видит» будущее.",
+     check:{code:c => /^\s*#\s*scores\[mask\]/m.test(c)}}
+  ]},
+
+/* ---------- Этап 4. GPT ---------- */
+{ stage:4, g:"B", title:"B — блок трансформера", short:"Общение и размышление",
+  intro:[
+    "Трансформер собирают из одинаковых <b>блоков</b>. Каждый блок по очереди делает две вещи.",
+    "Сначала <b>внимание</b> — «общение»: токены обмениваются информацией. Потом <b>MLP</b> (два полносвязных слоя с активацией из этапа 2) — «размышление»: каждый токен отдельно обдумывает полученное.",
+    "Блоки ставят стопкой: выход одного — вход следующего. Форма данных не меняется (T токенов × d чисел), поэтому блоков может быть сколько угодно.",
+    "Путь текста целиком: токены → эмбеддинги + позиции → N блоков → нормализация → выходной слой (вектор → оценка каждого токена) → softmax → вероятности следующего токена."
+  ],
+  sym:[["внимание","общение токенов","«она» узнаёт про «кошку»"],["MLP","размышление каждого токена","d → 4d → d"],["N","число блоков","GPT-2 small — 12"],["выходной слой","вектор → оценки всех токенов","d → словарь"]],
+  ex:{t:"Один блок: T = 4 токена, d = 64", s:[
+    ["вход: 4 × 64","Четыре токена, у каждого вектор из 64 чисел."],
+    ["внимание → 4 × 64","Токены обменялись информацией, форма та же."],
+    ["MLP: 64 → 256 → 64","Каждый токен отдельно расширяется, проходит активацию и сжимается обратно."],
+    ["выход: 4 × 64","Готово для следующего блока."]]},
+  analog:"Совещание и работа: сначала все обсуждают (внимание), потом каждый думает над своей частью (MLP). Повторить так 12 раз — и у команды сложится глубокое понимание.",
+  src:"Карпатый, «Let's build GPT» (внимание как общение, MLP как вычисление). Рашка, гл. 4 (блок трансформера). Принс, гл. 12.",
+  tasks:[
+    {t:"order", q:"Соберите путь текста через трансформер", items:["Токены","Эмбеддинги + позиции","Блоки × N","Выходной слой","Вероятности следующего токена"], why:"Блоки одинаковые и стоят стопкой."},
+    {t:"mc", q:"Что делает MLP внутри блока?", o:["Каждый токен отдельно обдумывает собранную информацию","Токены обмениваются информацией","Режет текст на токены","Выбирает следующее слово"], a:0, hint:"Общение — это внимание. А MLP?", why:"Общение — внимание, размышление — MLP."},
+    {t:"match", q:"Соедините часть модели и её роль", pairs:[["внимание","общение токенов"],["MLP","размышление каждого токена"],["выходной слой","оценки всех токенов словаря"]], why:"Вместе они превращают текст в вероятности следующего токена."},
+    {t:"num", q:"d = 64. Сколько нейронов в расширенном слое MLP, если он в 4 раза шире?", a:256, hint:"4 × d.", why:"4 × 64 = 256."},
+    {t:"tf", q:"Блок меняет форму данных, поэтому блоки нельзя ставить подряд.", a:false, hint:"Сравните форму на входе и выходе.", why:"Форма не меняется (T × d), поэтому блоки ставят стопкой сколько угодно."}
+  ]},
+
+{ stage:4, g:"+", title:"+ — остаточная связь", short:"Два трюка, которые делают глубокую сеть обучаемой",
+  intro:[
+    "Если просто поставить 50 блоков подряд, сигнал и градиенты будут затухать или взрываться, и сеть не научится.",
+    "<b>Остаточная связь</b>: x = x + блок(x). Блок не заменяет вход, а добавляет к нему поправку. Информация и градиенты текут по «скоростной трассе» напрямую, в обход блоков.",
+    "<b>Нормализация</b> (LayerNorm): перед каждой частью блока числа вектора приводят к среднему 0 и разбросу 1. Так значения не уплывают в огромные или крошечные.",
+    "Внутри блока: x = x + внимание(норм(x)), затем x = x + MLP(норм(x))."
+  ],
+  sym:[["x + блок(x)","вход + поправка","[1; 2] + [0,5; −1] = [1,5; 1]"],["LayerNorm","среднее 0, разброс 1","[2; 4; 6] → [−1,22; 0; 1,22]"]],
+  ex:{t:"Почему сумма помогает", s:[
+    ["блок(x) = 0","Даже если блок пока ничего не умеет, выход = x: информация не теряется."],
+    ["градиент проходит через «+»","Сложение передаёт градиент как есть (урок ∂), и он доходит до первых слоёв."],
+    ["норм([2, 4, 6]) = [−1,22; 0; 1,22]","Вычли среднее 4, поделили на разброс."],
+    ["итог","Глубокие стопки блоков учатся стабильно."]]},
+  analog:"Остаточная связь — как правка документа в режиме рецензирования: исходный текст остаётся, а поверх добавляются исправления. Плохая правка не уничтожает оригинал.",
+  src:"Принс, гл. 11 (остаточные сети) и гл. 12. Рашка, гл. 4 (shortcut-соединения, LayerNorm).",
+  tasks:[
+    {t:"num", q:"x = [1; 2], блок(x) = [0,5; −1]. Чему равна вторая координата x + блок(x)?", a:1, hint:"2 + (−1).", why:"2 − 1 = 1."},
+    {t:"mc", q:"Зачем нужна остаточная связь?", o:["Информация и градиенты проходят напрямую, и глубокую сеть легче обучать","Чтобы модель занимала меньше места","Чтобы удалить старую информацию","Чтобы перемешать токены"], a:0, hint:"Вспомните «скоростную трассу».", why:"Без неё сигнал в глубокой сети затухает."},
+    {t:"num", q:"LayerNorm сначала вычитает среднее. Чему равно среднее вектора [2; 4; 6]?", a:4, hint:"(2 + 4 + 6) / 3.", why:"12 / 3 = 4."},
+    {t:"tf", q:"Если блок выдаёт нули, остаточная связь всё равно передаёт вход дальше.", a:true, hint:"x + 0 = ?", why:"x + 0 = x: информация не теряется."},
+    {t:"fill", q:"Допишите блок трансформера", code:"x = x [[0]] self.attn(self.ln1(x))\nx = x [[1]] self.mlp(self.[[2]](x))", blanks:["+","+","ln2"], pool:["*","ln1","-"], hint:"Обе части — с остаточной связью, у каждой своя нормализация.", why:"x = x + внимание(ln1(x)); x = x + MLP(ln2(x))."}
+  ]},
+
+{ stage:4, g:"N", title:"N — масштаб", short:"Сильнее = больше, при том же устройстве",
+  intro:[
+    "Чтобы модель стала умнее, её устройство менять не нужно. Крутят ручки масштаба: число блоков <b>N</b> (глубина), длину векторов <b>d</b> (ширина), длину контекста, объём данных.",
+    "Параметры — это все обучаемые числа. Почти все они в блоках: примерно <b>12 · N · d²</b> (внимание даёт 4·d², MLP — 8·d²). Плюс таблица эмбеддингов: словарь × d.",
+    "GPT-2 small: 12 блоков, d = 768, словарь 50 257 — около 124 млн параметров. GPT-2 XL: 48 блоков, d = 1600 — около 1,5 млрд.",
+    "Правило практики: сначала добиться, чтобы маленькая модель училась, потом увеличивать по одной ручке и проверять ошибку."
+  ],
+  sym:[["N","число блоков","12"],["d","ширина: длина векторов","768"],["12 · N · d²","параметры в блоках","≈ 85 млн"],["словарь × d","параметры эмбеддингов","≈ 39 млн"]],
+  ex:{t:"Считаем GPT-2 small", s:[
+    ["12 · 12 · 768² ≈ 84,9 млн","Все блоки."],
+    ["50 257 · 768 ≈ 38,6 млн","Таблица эмбеддингов токенов."],
+    ["сумма ≈ 124 млн","Совпадает с настоящей GPT-2 small."],
+    ["удвоить d → блоки × 4","Ширина входит в квадрате: самая «дорогая» ручка."]]},
+  analog:"Как город: можно добавлять этажи (глубина), расширять дома (ширина), строить дальние дороги (контекст) и звать больше жителей (данные). План города тот же — меняется масштаб.",
+  src:"Рашка, гл. 4 (подсчёт параметров GPT-2). Карпатый, nanoGPT. Принс, гл. 12.",
+  tasks:[
+    {t:"params", q:"Подберите число блоков и ширину, чтобы получилось от 100 до 150 млн параметров при словаре из частей слов.", hint:"Начните с ширины 768 и подберите блоки.", why:"Например, 12 блоков × 768 — это как раз GPT-2 small, 124 млн.", sol:"12 блоков, ширина 768, словарь ~50 000"},
+    {t:"num", q:"Посчитайте 12 · N · d² при N = 2, d = 10.", a:2400, hint:"d² = 100.", why:"12 · 2 · 100 = 2400."},
+    {t:"mc", q:"Ширину d увеличили в 2 раза. Во сколько раз выросли параметры блоков?", o:["В 4 раза","В 2 раза","В 8 раз","Не изменились"], a:0, hint:"d входит в квадрате.", why:"(2d)² = 4d²."},
+    {t:"mc", q:"Как правильно масштабировать модель?", o:["Добиться, чтобы маленькая училась, потом увеличивать по одной ручке","Сразу сделать самую большую","Увеличить всё в 100 раз одновременно","Убрать проверочные данные"], a:0, hint:"Как понять, какая ручка помогла?", why:"По одной ручке — видно, что помогает, а что ломает."},
+    {t:"tf", q:"Чтобы сделать GPT сильнее, обязательно нужно придумать новое устройство блоков.", a:false, hint:"Чем отличаются GPT-2 small и XL?", why:"Устройство то же, растёт размер."}
+  ]},
+
+{ stage:4, g:"P", title:"P — обучение в PyTorch", short:"Данные со сдвигом и цикл из четырёх строк",
+  intro:[
+    "Данные для GPT готовят просто: берут кусок текста длиной ctx — это вход <b>x</b>. Тот же кусок, сдвинутый на один токен вперёд, — правильные ответы <b>y</b>. Модель учится угадывать следующий токен сразу во всех позициях.",
+    "Ошибка — <b>кросс-энтропия</b>: −log(вероятность правильного токена). Модель дала правильному токену 100% — ошибка 0. Дала 1% — ошибка большая (≈ 4,6).",
+    "Цикл в PyTorch: logits, loss = model(x, y) → optimizer.zero_grad() → loss.backward() → optimizer.step(). Это тот же цикл из этапа 1.",
+    "Оптимизатор <b>AdamW</b> — улучшенный спуск: он сам подстраивает длину шага для каждой ручки и помнит направление прошлых шагов, как мяч с инерцией."
+  ],
+  sym:[["x","вход: кусок текста","«приве»"],["y","ответы: сдвиг на 1","«ривет»"],["cross_entropy","−log P(правильного)","P = 50% → 0,69"],["AdamW","оптимизатор","lr = 0,001"]],
+  ex:{t:"Пары из слова «привет», ctx = 5", s:[
+    ["x = «приве»","5 токенов на вход."],
+    ["y = «ривет»","Для каждой позиции — следующая буква."],
+    ["по «п» угадать «р» … по «приве» угадать «т»","5 заданий из одного куска."],
+    ["loss = среднее −log P","Обратный проход и шаг AdamW."]]},
+  analog:"Тренировка с карточками: на лицевой стороне начало фразы, на обороте — следующее слово. Из одной книги получаются миллионы таких карточек.",
+  src:"Рашка, гл. 5 (предобучение, кросс-энтропия, цикл обучения). Карпатый, «Let's build GPT» (get_batch со сдвигом).",
+  tasks:[
+    {t:"mc", q:"Текст «кошка», ctx = 4. Вход x = «кошк». Каким будет y?", o:["«ошка»","«кошк»","«кошка»","«к»"], a:0, hint:"Сдвиг на один токен вперёд.", why:"Каждая буква x должна угадать следующую: к→о, о→ш, ш→к, к→а."},
+    {t:"order", q:"Шаг обучения в PyTorch: расставьте по порядку", items:["model(x, y) — прогноз и ошибка","zero_grad() — стереть старые градиенты","loss.backward() — новые градиенты","step() — сдвинуть ручки"], why:"Тот же цикл, что в этапе 1, только детали делает PyTorch."},
+    {t:"num", q:"Модель дала правильному токену вероятность 100%. Чему равна кросс-энтропия?", a:0, hint:"log(1) = ?", why:"−log(1) = 0: модель была полностью уверена и права."},
+    {t:"mc", q:"Модель A дала правильному токену 90%, модель B — 10%. У кого ошибка меньше?", o:["У A","У B","Одинаковая","Зависит от температуры"], a:0, hint:"Чем увереннее в правильном, тем меньше −log P.", why:"−log(0,9) ≈ 0,1, а −log(0,1) ≈ 2,3."},
+    {t:"fill", q:"Допишите сдвиг в get_batch", code:"x = torch.stack([src[i : i + ctx] for i in ix])\ny = torch.stack([src[i + [[0]] : i + ctx + [[1]]] for i in ix])", blanks:["1","1"], pool:["0","2","ctx"], hint:"Ответы — тот же кусок на один токен правее.", why:"y начинается на 1 позже и заканчивается на 1 позже."}
+  ]},
+
+{ stage:4, g:"GPT", title:"GPT — сборка и запуск", short:"Всё вместе: обучаем, проверяем, генерируем",
+  intro:[
+    "Финал. В коде этого урока — всё пройденное: токенизация, эмбеддинги и позиции, блоки с вниманием и маской, остаточные связи, выходной слой, кросс-энтропия, AdamW, генерация с температурой.",
+    "Следите за двумя ошибками: на обучающих данных (train) и на отложенных 10% (val), которых модель не видела. Если первая падает, а вторая растёт, модель зубрит. Это <b>переобучение</b>: нужно больше данных или модель поменьше.",
+    "Сначала добейтесь, чтобы маленькая версия училась (ctx = 32, d = 64, 2 блока). Потом увеличивайте по одной ручке.",
+    "Запускать удобно в Google Colab: бесплатный Python с видеокартой прямо в браузере."
+  ],
+  sym:[["train / val","обучающие и проверочные данные","90% / 10%"],["переобучение","train ↓, val ↑","модель зубрит"],["generate()","цикл «угадай следующий»","с температурой"]],
+  ex:{t:"Как понять, что всё работает", s:[
+    ["шаг 0: ошибка ≈ ln(словарь)","Для 60 букв это ≈ 4,1: модель угадывает наугад."],
+    ["ошибка падает до ≈ 2","Модель выучила частые буквы и сочетания."],
+    ["val близка к train","Модель обобщает, а не зубрит."],
+    ["генерация похожа на текст","Слова и пробелы на местах — модель работает."]]},
+  analog:"Как экзамен: train — задачи из учебника, которые ученик решал; val — новые задачи на экзамене. Если учебник решён на «пять», а экзамен на «два», ученик зазубрил ответы.",
+  src:"Карпатый, «Let's build GPT» и nanoGPT. Рашка, гл. 4–5.",
+  tasks:[
+    {t:"train", q:"Обучите модель имён до ошибки ниже 1,9. Модель видит столько букв назад, сколько выбрано в «контексте».", hint:"С контекстом в одну букву ошибка застревает около 2,1. Добавьте контекст.", why:"Больше контекста — модель точнее угадывает следующую букву.", sol:"Контекст 2 буквы, «Обучать» до конца."},
+    {t:"mc", q:"Ошибка на train падает, а на val растёт. Что это?", o:["Переобучение: модель зубрит","Модель идеально обучилась","Сломался компьютер","Слишком мало параметров"], a:0, hint:"Экзамен против учебника.", why:"Модель запоминает обучающие примеры вместо общих закономерностей."},
+    {t:"mc", q:"С контекстом 3 модель имён часто выдаёт имена «из списка». Почему?", o:["Модель зазубрила обучающие имена: данных мало для такого контекста","Модель сломалась","Температура слишком низкая","Так и должно быть у хорошей модели"], a:0, hint:"124 имени — это много или мало?", why:"При большом контексте и малых данных модель просто вспоминает примеры."},
+    {t:"num", q:"Словарь из 60 букв. Ошибка необученной модели ≈ ln(60). Сколько это? Одна цифра после запятой.", a:4.1, tol:0.051, hint:"ln(60) — между ln(54,6) = 4 и ln(148) = 5.", why:"ln(60) ≈ 4,09: модель угадывает наугад."},
+    {t:"colab", q:"Финал: скопируйте полную мини-GPT, запустите в Google Colab и дождитесь сгенерированного текста.", srcId:"code-gpt", hint:"В Colab: «Создать блокнот» → вставьте код → Shift+Enter. Для скорости: «Среда выполнения» → «Сменить среду» → GPU.", why:"Вы собрали и обучили свою GPT. Дальше — увеличивать её по одной ручке."}
+  ]}
+];
+LESSONS.forEach((L,i) => { L.id = i+1; L.tasks.forEach((t,k) => { t.id = "L"+L.id+"T"+(k+1); t.lesson = L.id; }); });
+const TMAP = {}; LESSONS.forEach(L => L.tasks.forEach(t => TMAP[t.id] = t));
+function num(s, re){ const m = s.match(re); return m ? parseFloat(m[1]) : null; }
+
+/* ================= Состояние ================= */
+const KEY = "nn-from-scratch-v2", OLDKEY = "nn-from-scratch-v1";
+const DAY = 864e5, IV = [0,1,3,7,16,35];
+const REVIEWABLE = new Set(["mc","tf","num","order","match","fill"]);
+let S, LV = {id:null, view:"theory", ti:0};
+const TS = {}; // состояние задач в этом сеансе (ползунки, код и т. п.)
+function defaults(){ return {v:2, xp:0, solved:{}, srs:{}}; }
+function loadLS(k){ try { return JSON.parse(localStorage.getItem(k)) || null; } catch(e){ return null; } }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+function grade(id, ok){
+  const r = S.srs[id] || {box:0};
+  r.box = ok ? Math.min(5, r.box + 1) : 1;
+  r.due = Date.now() + (ok ? IV[r.box]*DAY : 10*60*1000);
+  S.srs[id] = r;
+}
+function dueList(){ const now = Date.now(); return Object.keys(S.srs).filter(id => S.srs[id].due <= now && TMAP[id] && REVIEWABLE.has(TMAP[id].t)); }
+const lessonDone = L => L.tasks.every(t => S.solved[t.id]);
+const lessonUnlocked = L => L.id === 1 || lessonDone(LESSONS[L.id-2]);
+const currentLesson = () => LESSONS.find(L => !lessonDone(L)) || null;
+const solvedCount = L => L.tasks.filter(t => S.solved[t.id]).length;
+const taskOpen = (L,k) => k === 0 || !!S.solved[L.tasks[k-1].id];
+
+/* ================= Утилиты ================= */
+const app = document.getElementById("app");
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt = (x, d=1) => Number(x).toLocaleString("ru-RU", {maximumFractionDigits:d, minimumFractionDigits:0}).replace(/ /g," ");
+function shuffle(a){ a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function rng(seed){ return function(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed>>>15, 1|seed); t = t + Math.imul(t ^ t>>>7, 61|t) ^ t; return ((t ^ t>>>14) >>> 0) / 4294967296; }; }
+function plural(n,a,b,c){ n = Math.abs(n); const m10=n%10, m100=n%100; if (m10===1&&m100!==11) return a; if (m10>=2&&m10<=4&&(m100<10||m100>=20)) return b; return c; }
+let alive = 0;
+function stopAll(){ alive++; }
+function canvas(cv, hCss){
+  const dpr = window.devicePixelRatio || 1, w = cv.clientWidth || 320;
+  cv.width = Math.round(w*dpr); cv.height = Math.round(hCss*dpr); cv.style.height = hCss+"px";
+  const ctx = cv.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx, w, h:hCss};
+}
+const xpBar = () => `<span class="xp">${S.xp} XP</span>`;
+const KIND = {mc:"Выбор ответа", tf:"Верно или нет", num:"Посчитайте", order:"По порядку", match:"Соедините пары", fill:"Допишите код", code:"Код на Python", colab:"Запуск в Colab",
+  fit:"Подгоните линию", xread:"Найдите вход", wfit:"Подберите веса", slope:"Спуск по наклону", lrrun:"Подберите шаг", gd:"Обучите модель", relu:"Поставьте излом", circle:"Обучите сеть",
+  chain:"Градиенты по цепочке", tokgoal:"Токенизатор", emb:"Карта смыслов", softmax:"Настройте softmax", temp:"Температура", gen:"Генерация", attn:"Куда смотрит слово", mask:"Нарисуйте маску", params:"Соберите модель", train:"Обучите мини-модель"};
+const glyphCls = g => g.length > 2 ? " g3" : g.length > 1 ? " g2" : "";
+
+/* ================= Маршруты ================= */
+function route(){
+  stopAll(); exitFS();
+  const m = location.hash.match(/^#lesson-(\d+)$/);
+  if (m && LESSONS[+m[1]-1]) renderLesson(+m[1]);
+  else if (location.hash === "#review") renderReview();
+  else renderHome();
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange", route);
+function go(h){ if (location.hash === h) route(); else location.hash = h; }
+
+/* ================= Главная ================= */
+let mapSel = null;
+function mapSVG(){
+  const colX = [52,140,228,314], top = 122, bot = 474, H = 532;
+  const pos = {};
+  STAGES.forEach((st,si) => {
+    const ls = LESSONS.filter(l => l.stage === st.n), n = ls.length;
+    const gap = Math.min(58, (bot-top)/(n-1)), y0 = (top+bot)/2 - gap*(n-1)/2;
+    ls.forEach((l,k) => pos[l.id] = [colX[si], y0 + k*gap]);
+  });
+  const cur = currentLesson();
+  let h = "";
+  STAGES.forEach((st,si) => {
+    const ls = LESSONS.filter(l => l.stage === st.n), d = ls.filter(lessonDone).length;
+    const isCur = cur && cur.stage === st.n, full = d === ls.length;
+    h += `<rect class="band${isCur?" cur":""}" x="${colX[si]-41}" y="6" width="82" height="${H-12}" rx="16"/>
+      <g class="shead${full?" done":isCur?" cur":""}"><circle cx="${colX[si]}" cy="32" r="14"/><text x="${colX[si]}" y="32">${st.n}</text></g>
+      <text class="sname" x="${colX[si]}" y="64">${esc(st.name)}</text>
+      <text class="sprog" x="${colX[si]}" y="80">${d}/${ls.length}</text>`;
+  });
+  for (let si=0; si<3; si++){
+    const A = LESSONS.filter(l => l.stage === si+1), B = LESSONS.filter(l => l.stage === si+2);
+    for (const a of A) for (const b of B){
+      const on = lessonDone(a) && lessonDone(b);
+      h += `<line class="e${on?" on":""}" x1="${pos[a.id][0]}" y1="${pos[a.id][1]}" x2="${pos[b.id][0]}" y2="${pos[b.id][1]}"/>`;
+    }
+  }
+  for (let i=1; i<LESSONS.length; i++){
+    const a = LESSONS[i-1], b = LESSONS[i], on = lessonDone(a) && lessonDone(b);
+    h += `<line class="p${on?" on":""}" x1="${pos[a.id][0]}" y1="${pos[a.id][1]}" x2="${pos[b.id][0]}" y2="${pos[b.id][1]}"/>`;
+  }
+  LESSONS.forEach(L => {
+    const [x,y] = pos[L.id], done = lessonDone(L), open = lessonUnlocked(L), isCur = cur && cur.id === L.id;
+    const cls = done ? "done" : isCur ? "cur" : open ? "open" : "lock";
+    h += `<g class="node ${cls}${mapSel===L.id?" sel":""}" data-id="${L.id}" role="button" tabindex="0" aria-label="Урок ${L.id}: ${esc(L.title)}">
+      ${isCur ? `<circle class="pulse" cx="${x}" cy="${y}" r="19"/>` : ""}
+      <circle class="c" cx="${x}" cy="${y}" r="19"/><text class="${glyphCls(L.g).trim()}" x="${x}" y="${y}">${esc(L.g)}</text></g>`;
+  });
+  return `<svg viewBox="0 0 360 ${H}" role="img" aria-label="Карта курса: 4 этапа, 24 урока">${h}</svg>`;
+}
+function nodeInfo(id){
+  const L = LESSONS[id-1], st = STAGES[L.stage-1], done = lessonDone(L), open = lessonUnlocked(L);
+  const status = done ? `<span class="pill ok">пройден</span>` : open ? `<span class="pill cur">${solvedCount(L)}/${L.tasks.length}</span>` : `<span class="pill">закрыт</span>`;
+  const prev = LESSONS[id-2];
+  return `<span class="glyph${glyphCls(L.g)}">${esc(L.g)}</span>
+    <div class="ni-t"><small>Этап ${st.n} · ${esc(st.name)} · урок ${id}</small><b>${esc(L.title)}</b><span>${open ? esc(L.short) : "Откроется после урока «" + esc(prev.title) + "»"}</span></div>
+    ${status}${open ? `<button class="btn sm" data-open="${id}">Открыть</button>` : ""}`;
+}
+function renderHome(){
+  const cur = currentLesson(), doneN = LESSONS.filter(lessonDone).length, due = dueList().length;
+  if (mapSel == null) mapSel = cur ? cur.id : 24;
+  let now = "";
+  if (cur){
+    const st = STAGES[cur.stage-1], n = solvedCount(cur);
+    now = `<section class="now">
+      <div class="eyebrow">Сейчас изучаем · этап ${st.n} «${esc(st.name)}»</div>
+      <div class="now-t"><span class="glyph big${glyphCls(cur.g)}">${esc(cur.g)}</span><div><h2>${esc(cur.title)}</h2><p>${esc(cur.short)}</p></div></div>
+      <div class="prog"><i style="width:${n/cur.tasks.length*100}%"></i></div>
+      <div class="prog-l">${n} из ${cur.tasks.length} ${plural(cur.tasks.length,"задачи","задач","задач")} решено. Следующий урок откроется, когда решите все.</div>
+      <ol class="tlist">${cur.tasks.map((t,k) => {
+        const s = S.solved[t.id] ? "done" : taskOpen(cur,k) ? "cur" : "lock";
+        const q = t.q.length > 64 ? t.q.slice(0,62).replace(/\s+\S*$/,"") + "…" : t.q;
+        return `<li><button class="ti ${s}" data-task="${k}" ${s==="lock"?"disabled":""}><span class="tn">${s==="done"?"✓":k+1}</span><span class="tl"><b>${KIND[t.t]}</b>${esc(q)}</span></button></li>`;
+      }).join("")}</ol>
+      <div class="row"><button class="btn" id="go">${n ? "Продолжить" : "Начать с теории"}</button>${n ? `<button class="btn ghost" id="th">Теория</button>` : ""}</div>
+    </section>`;
+  } else {
+    now = `<section class="now"><div class="eyebrow">Курс пройден</div><h2>Все 24 урока решены</h2><p>Возвращайтесь в повторение, чтобы знания держались. Любой урок можно открыть на карте.</p></section>`;
+  }
+  app.innerHTML = `
+  <div class="topbar"><span>${doneN} из 24 уроков</span>${xpBar()}</div>
+  <header class="hero"><h1>Градиент<span>.</span></h1>
+    <p>Нейросеть с нуля: 4 этапа от одной формулы до своей GPT. Каждый урок — один параметр и несколько разных задач. Следующий урок открывается, когда решены все задачи текущего.</p></header>
+  <div class="map">${mapSVG()}</div>
+  <div class="nodeinfo" id="ni">${nodeInfo(mapSel)}</div>
+  ${now}
+  <div class="review-card"><div><div class="rc-l">Повторение</div><b>${due ? due + " " + plural(due,"вопрос","вопроса","вопросов") : "Пока нечего"}</b></div><button id="rv" ${due?"":"disabled"}>Повторить</button></div>
+  <details class="srcs"><summary>Откуда материал</summary>
+    <p>Курс — выжимка общей базы из книг и курсов: Принс «Understanding Deep Learning», Траск «Грокаем глубокое обучение», Рашка «Build a Large Language Model from Scratch», Гудфеллоу и соавторы «Глубокое обучение», Аламмар и Грутендорст «Hands-On Large Language Models», лекции Андрея Карпатого «Zero to Hero». Объяснения пересказаны своими словами; в каждом уроке указано, откуда взят приём.</p>
+    ${STAGES.map(s => `<div class="srow"><b>${s.n}. ${esc(s.name)}</b><span>${esc(s.src)}</span></div>`).join("")}
+  </details>
+  <p class="foot">Прогресс хранится в этом браузере.</p>`;
+  bindMap();
+  if (cur){
+    $("#go").onclick = () => openLesson(cur.id, solvedCount(cur) ? "tasks" : "theory");
+    if ($("#th")) $("#th").onclick = () => openLesson(cur.id, "theory");
+    $$(".ti").forEach(b => b.onclick = () => openLesson(cur.id, "tasks", +b.dataset.task));
+  }
+  $("#rv").onclick = () => go("#review");
+}
+function bindMap(){
+  $$(".map .node").forEach(g => {
+    const pick = () => { mapSel = +g.dataset.id; $$(".map .node").forEach(x => x.classList.toggle("sel", x === g)); $("#ni").innerHTML = nodeInfo(mapSel); bindNI(); };
+    g.onclick = pick; g.onkeydown = e => { if (e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(); } };
+  });
+  bindNI();
+}
+function bindNI(){ const b = $("#ni [data-open]"); if (b) b.onclick = () => openLesson(+b.dataset.open); }
+function openLesson(id, view, ti){ LV = {id, view: view || null, ti: ti ?? null}; go("#lesson-"+id); }
+
+/* ================= Урок ================= */
+function renderLesson(id){
+  const L = LESSONS[id-1];
+  if (!lessonUnlocked(L)) { go("#home"); return; }
+  if (LV.id !== id) LV = {id, view:null, ti:null};
+  if (!LV.view) LV.view = solvedCount(L) ? "tasks" : "theory";
+  if (LV.ti == null){ const k = L.tasks.findIndex(t => !S.solved[t.id]); LV.ti = k < 0 ? L.tasks.length : k; }
+  const st = STAGES[L.stage-1];
+  app.innerHTML = `
+  <div class="topbar"><button class="back" id="bk">← Карта</button>${xpBar()}</div>
+  <div class="lhead"><span class="glyph big${glyphCls(L.g)}">${esc(L.g)}</span><div><small>Этап ${st.n} · ${esc(st.name)} · урок ${id} из 24</small><h1>${esc(L.title)}</h1></div></div>
+  <nav class="seg2" role="tablist"><button data-v="theory" role="tab">Теория</button><button data-v="tasks" role="tab">Задачи <span class="mono" id="tc">${solvedCount(L)}/${L.tasks.length}</span></button></nav>
+  <section id="pane"></section>`;
+  $("#bk").onclick = () => go("#home");
+  $$(".seg2 button").forEach(b => b.onclick = () => { LV.view = b.dataset.v; showView(L); });
+  showView(L);
+}
+function showView(L){
+  stopAll(); exitFS();
+  $$(".seg2 button").forEach(b => { b.classList.toggle("on", b.dataset.v === LV.view); b.setAttribute("aria-selected", b.dataset.v === LV.view); });
+  const pane = $("#pane");
+  if (LV.view === "theory") renderTheory(L, pane); else renderTasks(L, pane);
+}
+function symTable(L){ return `<div class="symtab">${L.sym.map(([s,m,e]) => `<div class="sr"><span class="sy">${esc(s)}</span><span class="sm">${esc(m)}</span><span class="se">${esc(e)}</span></div>`).join("")}</div>`; }
+function renderTheory(L, pane){
+  pane.innerHTML = `<div class="intro">${L.intro.map(p => `<p>${p}</p>`).join("")}</div>
+    <h3 class="blk">Что значат буквы</h3>${symTable(L)}
+    <h3 class="blk">Разбор примера: ${esc(L.ex.t)}</h3>
+    <ol class="steps">${L.ex.s.map(([f,e]) => `<li><code>${esc(f)}</code><p>${esc(e)}</p></li>`).join("")}</ol>
+    <div class="analog"><b>Аналогия</b>${esc(L.analog)}</div>
+    <p class="src"><b>Откуда:</b> ${esc(L.src)}</p>
+    <div class="next"><button class="btn" id="tt">К задачам →</button></div>`;
+  $("#tt").onclick = () => { LV.view = "tasks"; showView(L); window.scrollTo(0,0); };
+}
+function renderTasks(L, pane){
+  const all = lessonDone(L);
+  if (LV.ti >= L.tasks.length && !all){ LV.ti = L.tasks.findIndex(t => !S.solved[t.id]); }
+  const dots = () => `<div class="tdots">${L.tasks.map((t,k) => {
+      const s = S.solved[t.id] ? "done" : "", open = taskOpen(L,k);
+      return `<button class="${s}${k===LV.ti?" cur":""}" data-k="${k}" ${open?"":"disabled"} aria-label="Задача ${k+1}">${S.solved[t.id]?"✓":k+1}</button>`;
+    }).join("")}${all ? `<button class="fin${LV.ti>=L.tasks.length?" cur":""}" data-k="${L.tasks.length}" aria-label="Итог">★</button>` : ""}</div>`;
+  pane.innerHTML = dots() + `<section class="task" id="task"></section>`;
+  const bindDots = () => $$(".tdots button", pane).forEach(b => b.onclick = () => { LV.ti = +b.dataset.k; renderTasks(L, pane); });
+  bindDots();
+  const card = $("#task");
+  if (LV.ti >= L.tasks.length){ lessonComplete(L, card); return; }
+  const t = L.tasks[LV.ti];
+  mountTask(card, t, {mode:"lesson", L, k:LV.ti, onSolved: () => {
+      $("#tc").textContent = solvedCount(L) + "/" + L.tasks.length;
+      $(".topbar .xp").outerHTML = xpBar();
+      const d = $(".tdots", pane); d.outerHTML = dots(); bindDots();
+    },
+    onNext: () => {
+      const k = L.tasks.findIndex((x,i) => i > LV.ti && !S.solved[x.id]);
+      const k0 = L.tasks.findIndex(x => !S.solved[x.id]);
+      LV.ti = k >= 0 ? k : k0 >= 0 ? k0 : L.tasks.length;
+      renderTasks(L, pane); $(".seg2").scrollIntoView({block:"start"});
+    }});
+}
+function lessonComplete(L, card){
+  const next = LESSONS[L.id], newStage = next && next.stage !== L.stage;
+  card.innerHTML = `<div class="result"><span class="glyph huge${glyphCls(L.g)}">${esc(L.g)}</span>
+    <h2>Урок «${esc(L.title)}» пройден</h2>
+    <p>Все задачи решены. Вопросы урока будут возвращаться в повторение: через 1, 3, 7, 16 и 35 дней.</p>
+    ${next ? `<div class="unl">${newStage ? `<small>Открыт этап ${next.stage} «${esc(STAGES[next.stage-1].name)}»</small>` : `<small>Открыт следующий урок</small>`}<span class="glyph${glyphCls(next.g)}">${esc(next.g)}</span><b>${esc(next.title)}</b></div>` : `<p><b>Это был последний урок. Курс пройден!</b></p>`}
+    <div class="row">${next ? `<button class="btn" id="nx">Следующий урок →</button>` : ""}<button class="btn ghost" id="hm">На карту</button></div></div>`;
+  if (next) $("#nx").onclick = () => openLesson(next.id, "theory");
+  $("#hm").onclick = () => go("#home");
+}
+
+/* ================= Окно задачи ================= */
+let taskTok = 0, fsCard = null;
+function exitFS(){ if (fsCard){ fsCard.classList.remove("fs"); fsCard = null; } document.documentElement.classList.remove("noscroll"); }
+function solText(t){
+  if (t.t === "mc") return t.o[t.a];
+  if (t.t === "tf") return t.a ? "Верно" : "Неверно";
+  if (t.t === "num") return fmt(t.a, 3);
+  if (t.t === "order") return t.items.join(" → ");
+  if (t.t === "match") return t.pairs.map(([a,b]) => a + " — " + b).join("; ");
+  if (t.t === "fill") return t.blanks.join(", ");
+  return t.sol || "";
+}
+function mountTask(card, t, ctx){
+  const L = LESSONS[t.lesson-1];
+  const st = TS[t.id] || (TS[t.id] = {});
+  const wasSolved = ctx.mode === "lesson" && !!S.solved[t.id];
+  let attempts = 0, done = false, checker = null, panel = null;
+  const label = ctx.mode === "review" ? `Урок ${L.id} · ${esc(L.title)}` : `Задача ${ctx.k+1}/${L.tasks.length} · ${KIND[t.t]}`;
+  card.innerHTML = `<div class="thead"><span class="tlabel">${label}${wasSolved ? ` <span class="pill ok">решено</span>` : ""}</span>
+      <div class="tools"><button data-tool="hint">Подсказка</button><button data-tool="sym">Буквы</button><button data-tool="fs" aria-label="Во весь экран">⤢</button></div></div>
+    <div class="tq">${esc(t.q)}</div><div class="tpanel" hidden></div>
+    <div class="tbody"></div><div class="tfb" aria-live="polite"></div><div class="tact"></div>`;
+  const body = $(".tbody", card), fb = $(".tfb", card), act = $(".tact", card), pnl = $(".tpanel", card);
+  let myTok = 0;
+  const api = {
+    st, mode: ctx.mode,
+    check(fn){ checker = fn; actions(); },
+    answer, alive: tok => tok === taskTok && tok === myTok && document.body.contains(body),
+    tok: () => myTok, isFS: () => card.classList.contains("fs"), plotH: () => card.classList.contains("fs") ? Math.max(240, Math.min(380, innerHeight*0.42)) : 220,
+    note(msg, cls){ fb.innerHTML = msg ? `<div class="fbx ${cls||""}">${msg}</div>` : ""; }
+  };
+  function renderBody(){ myTok = ++taskTok; checker = null; body.innerHTML = ""; R[t.t](body, t, api); actions(); }
+  function actions(){
+    const h = [];
+    if (!done && attempts >= 2 && ctx.mode === "lesson") h.push(`<button class="btn ghost" data-a="sol">Показать решение</button>`);
+    if (!done && checker) h.push(`<button class="btn" data-a="check">Проверить</button>`);
+    if (done || wasSolved) h.push(`<button class="btn" data-a="next">${ctx.mode==="review" ? "Дальше →" : "Дальше →"}</button>`);
+    act.innerHTML = h.join("");
+    $$("button", act).forEach(b => b.onclick = async () => {
+      const a = b.dataset.a;
+      if (a === "next") { exitFS(); ctx.onNext(); }
+      if (a === "sol") showSolution();
+      if (a === "check" && checker){ b.disabled = true; const r = await checker(); b.disabled = false; if (r) answer(r.ok, r.msg, r.noCount); }
+    });
+  }
+  function answer(ok, msg, noCount){
+    if (done) return;
+    if (ok){
+      done = true;
+      if (ctx.mode === "lesson"){
+        if (!S.solved[t.id]){ S.solved[t.id] = {h:0}; S.xp += 10; if (REVIEWABLE.has(t.t)) grade(t.id, true); }
+      } else { grade(t.id, true); S.xp += 5; }
+      save();
+      fb.innerHTML = `<div class="fbx ok"><b>Верно!</b>${esc(t.why || "")}</div>`;
+      ctx.onSolved && ctx.onSolved(true);
+    } else {
+      if (noCount){ fb.innerHTML = `<div class="fbx">${esc(msg)}</div>`; return; }
+      attempts++;
+      if (ctx.mode === "review"){
+        done = true; grade(t.id, false); save();
+        fb.innerHTML = `<div class="fbx no"><b>Не совсем.</b>Ответ: ${esc(solText(t))}. ${esc(t.why || "")}</div>`;
+        ctx.onSolved && ctx.onSolved(false);
+      } else {
+        fb.innerHTML = `<div class="fbx no"><b>Не совсем.</b>${esc(msg || ("Подсказка: " + (t.hint || "перечитайте теорию урока.")))}</div>`;
+      }
+    }
+    actions();
+  }
+  function showSolution(){
+    done = true;
+    if (!S.solved[t.id]){ S.solved[t.id] = {h:1}; if (REVIEWABLE.has(t.t)) grade(t.id, false); save(); }
+    fb.innerHTML = `<div class="fbx sol"><b>Решение</b>${esc(solText(t))}${t.why ? ". " + esc(t.why) : ""}<br><small>Задача засчитана. Вопрос вернётся в повторение раньше обычного.</small></div>`;
+    ctx.onSolved && ctx.onSolved(true);
+    actions();
+  }
+  $$(".tools button", card).forEach(b => b.onclick = () => {
+    const tool = b.dataset.tool;
+    if (tool === "fs"){
+      const on = !card.classList.contains("fs");
+      exitFS();
+      if (on){ card.classList.add("fs"); fsCard = card; document.documentElement.classList.add("noscroll"); }
+      b.textContent = on ? "⤡" : "⤢"; b.setAttribute("aria-label", on ? "Свернуть" : "Во весь экран");
+      renderBody(); return;
+    }
+    if (panel === tool){ panel = null; pnl.hidden = true; $$(".tools button", card).forEach(x => x.classList.remove("on")); return; }
+    panel = tool; pnl.hidden = false;
+    $$(".tools button", card).forEach(x => x.classList.toggle("on", x === b));
+    pnl.innerHTML = tool === "hint" ? `<b>Подсказка.</b> ${esc(t.hint || "Перечитайте разбор примера в теории.")}` : `<b>Что значат буквы в уроке «${esc(L.title)}»</b>${symTable(L)}`;
+  });
+  renderBody();
+}
+document.addEventListener("keydown", e => { if (e.key === "Escape" && fsCard){ const b = $('[data-tool="fs"]', fsCard); b && b.click(); } });
+
+/* ================= Повторение ================= */
+function renderReview(){
+  const due = shuffle(dueList()).slice(0, 10).map(id => TMAP[id]);
+  app.innerHTML = `<div class="topbar"><button class="back" id="bk">← Карта</button>${xpBar()}</div>
+    <div class="lhead"><span class="glyph big">↻</span><div><small>Интервальное повторение</small><h1>Повторение</h1></div></div><section id="pane"></section>`;
+  $("#bk").onclick = () => go("#home");
+  const pane = $("#pane");
+  if (!due.length){
+    const fut = Object.values(S.srs).map(r => r.due).filter(d => d > Date.now()).sort((a,b) => a-b)[0];
+    pane.innerHTML = `<div class="result"><p>Сейчас повторять нечего.${fut ? " Следующее повторение " + whenText(fut) + "." : " Решите задачи любого урока, и они появятся здесь."}</p><div class="row"><button class="btn" id="hm">На карту</button></div></div>`;
+    $("#hm").onclick = () => go("#home"); return;
+  }
+  let i = 0, right = 0;
+  const step = () => {
+    if (i >= due.length){
+      pane.innerHTML = `<div class="result"><div class="score">${right}/${due.length}</div><p>Верные ответы уходят на более длинный интервал. Ошибки вернутся через 10 минут.</p><div class="row"><button class="btn" id="hm">На карту</button></div></div>`;
+      $("#hm").onclick = () => go("#home"); $(".topbar .xp").outerHTML = xpBar(); return;
+    }
+    pane.innerHTML = `<div class="tdots">${due.map((_,k) => `<button class="${k<i?"done":""}${k===i?" cur":""}" disabled>${k+1}</button>`).join("")}</div><section class="task" id="task"></section>`;
+    const t = due[i];
+    delete TS[t.id];
+    mountTask($("#task"), t, {mode:"review", onSolved: ok => { if (ok) right++; $(".topbar .xp").outerHTML = xpBar(); }, onNext: () => { i++; step(); window.scrollTo(0,0); }});
+  };
+  step();
+}
+function whenText(t){
+  const m = Math.round((t - Date.now())/60000);
+  if (m < 60) return "через " + Math.max(1,m) + " мин";
+  const h = Math.round(m/60); if (h < 24) return "через " + h + " ч";
+  const d = Math.round(h/24); return "через " + d + " " + plural(d,"день","дня","дней");
+}
+
+/* ================= Python в браузере ================= */
+const PY = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+let pyPromise = null;
+function getPy(){
+  if (!pyPromise){
+    pyPromise = new Promise((res, rej) => {
+      const s = document.createElement("script"); s.src = PY + "pyodide.js";
+      s.onload = () => loadPyodide({indexURL: PY}).then(async py => { await py.loadPackage("numpy"); res(py); }).catch(rej);
+      s.onerror = () => rej(new Error("load"));
+      document.head.appendChild(s);
+    }).catch(e => { pyPromise = null; throw e; });
+  }
+  return pyPromise;
+}
+async function runPy(code){
+  let py;
+  try { py = await getPy(); } catch(e){ return {loaded:false, out:""}; }
+  const lines = [];
+  py.setStdout({batched: s => lines.push(s)}); py.setStderr({batched: s => lines.push(s)});
+  const g = py.globals.get("dict")();
+  try { await py.runPythonAsync(code, {globals: g}); }
+  catch(e){ const msg = String(e.message || e).trim().split("\n").filter(Boolean); lines.push("Ошибка: " + msg[msg.length-1]); }
+  finally { g.destroy && g.destroy(); }
+  return {loaded:true, out: lines.join("\n")};
+}
+
+/* ================= Общие виджеты ================= */
+function keypad(el, st, onChange){
+  st.v = st.v || "";
+  el.innerHTML = `<div class="numbox"><span class="numv">${st.v ? esc(st.v) : '<span class="ph">ответ</span>'}</span></div>
+    <div class="keypad">${["7","8","9","⌫","4","5","6","−","1","2","3",",","0","C"].map(k => `<button type="button" data-k="${k}" class="${k==="0"||k==="C"?"wide":""}" aria-label="${k==="⌫"?"Стереть":k==="C"?"Очистить":k}">${k}</button>`).join("")}</div>`;
+  const show = () => { $(".numv", el).innerHTML = st.v ? esc(st.v) : '<span class="ph">ответ</span>'; onChange && onChange(); };
+  const press = k => {
+    if (/^\d$/.test(k)){ if (st.v.replace(/[−,-]/g,"").length < 9) st.v = (st.v === "0" ? "" : st.v === "−0" ? "−" : st.v) + k; }
+    else if (k === "," || k === "." ){ if (!st.v.includes(",")) st.v = (st.v === "" || st.v === "−" ? st.v + "0" : st.v) + ","; }
+    else if (k === "−" || k === "-"){ st.v = st.v.startsWith("−") ? st.v.slice(1) : "−" + st.v; }
+    else if (k === "⌫" || k === "Backspace"){ st.v = st.v.slice(0,-1); }
+    else if (k === "C"){ st.v = ""; }
+    show();
+  };
+  $$(".keypad button", el).forEach(b => b.onclick = () => press(b.dataset.k));
+  return press;
+}
+const parseNum = v => parseFloat(String(v).replace("−","-").replace(",","."));
+function bindKeys(api, press){
+  const tok = api.tok();
+  const h = e => {
+    if (!api.alive(tok)){ document.removeEventListener("keydown", h); return; }
+    if (e.target.closest && e.target.closest("input,textarea")) return;
+    if (/^[\d,.\-]$/.test(e.key) || e.key === "Backspace"){ e.preventDefault(); press(e.key); }
+  };
+  document.addEventListener("keydown", h);
+}
+function orderWidget(el, items, onComplete, retry){
+  let pool = shuffle(items.map((t,i) => ({t,i})));
+  if (pool.every((p,k) => p.i === k)) pool.reverse();
+  let picked = [], finished = false;
+  function render(){
+    const ok = finished && picked.every((p,k) => p.i === k);
+    el.innerHTML = `<ol class="ord-ans">${items.map((_,k) => { const p = picked[k]; if (!p) return `<li></li>`;
+        return `<li class="${finished ? (p.i === k ? "right" : "wrong") : "f"}">${esc(p.t)}</li>`; }).join("")}</ol>
+      ${finished ? (ok ? "" : retry ? `<div class="row"><button class="btn ghost" id="ordr">Ещё раз</button></div>` : "") :
+      `<div class="ord-pool">${pool.map((p,k) => `<button class="chip" data-k="${k}" ${picked.includes(p)?"disabled":""}>${esc(p.t)}</button>`).join("")}</div>
+       <div class="row"><button class="btn ghost sm" id="ordr" ${picked.length?"":"disabled"}>Стереть</button><span class="legend">Нажимайте по порядку</span></div>`}`;
+    const r = $("#ordr", el); if (r) r.onclick = () => { picked = []; finished = false; pool = shuffle(pool); render(); };
+    if (finished) return;
+    $$(".chip", el).forEach(b => b.onclick = () => {
+      picked.push(pool[+b.dataset.k]);
+      if (picked.length === items.length){ finished = true; render(); onComplete(picked.every((p,k) => p.i === k)); } else render();
+    });
+  }
+  render();
+}
+function axes(cv, o){
+  const {ctx, w:W, h:H} = canvas(cv, o.h || 220);
+  const p = {l:44, r:12, t:14, b:30};
+  const sx = x => p.l + (x-o.xr[0])/(o.xr[1]-o.xr[0])*(W-p.l-p.r);
+  const sy = y => H-p.b - (y-o.yr[0])/(o.yr[1]-o.yr[0])*(H-p.t-p.b);
+  ctx.font = "11px " + cssv("--f-mono"); ctx.fillStyle = cssv("--muted"); ctx.strokeStyle = cssv("--line"); ctx.lineWidth = 1;
+  for (let x = Math.ceil(o.xr[0]/o.xt)*o.xt; x <= o.xr[1] + 1e-9; x += o.xt){ ctx.beginPath(); ctx.moveTo(sx(x), p.t); ctx.lineTo(sx(x), H-p.b); ctx.stroke(); ctx.textAlign="center"; ctx.fillText(fmt(x,2) + (o.xu||""), sx(x), H-p.b+14); }
+  for (let y = Math.ceil(o.yr[0]/o.yt)*o.yt; y <= o.yr[1] + 1e-9; y += o.yt){ ctx.beginPath(); ctx.moveTo(p.l, sy(y)); ctx.lineTo(W-p.r, sy(y)); ctx.stroke(); ctx.textAlign="right"; ctx.fillText(fmt(y,2), p.l-6, sy(y)+4); }
+  if (o.zero){ ctx.strokeStyle = cssv("--muted"); ctx.beginPath(); ctx.moveTo(p.l, sy(0)); ctx.lineTo(W-p.r, sy(0)); ctx.stroke(); }
+  ctx.textAlign = "center"; if (o.xlab) ctx.fillText(o.xlab, (p.l+W-p.r)/2, H-2);
+  ctx.textAlign = "left"; if (o.ylab){ ctx.fillStyle = cssv("--ink"); ctx.fillText(o.ylab, p.l+4, p.t+10); }
+  return {ctx, sx, sy, W, H, p, clip(){ ctx.save(); ctx.beginPath(); ctx.rect(p.l, p.t, W-p.l-p.r, H-p.t-p.b); ctx.clip(); }, unclip(){ ctx.restore(); }};
+}
+function dot(ctx, x, y, r, fill){ ctx.fillStyle = fill; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.strokeStyle = cssv("--card"); ctx.lineWidth = 1.5; ctx.stroke(); }
+function slider(id, label, min, max, step, val){ return `<label class="slider" for="${id}"><span>${label}</span><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}"><output id="${id}-o"></output></label>`; }
+function drawLoss(cv, hist, linear){
+  const {ctx, w:W, h:H} = canvas(cv, 100);
+  const p = {l:44, r:10, t:10, b:18}, muted = cssv("--muted"), line = cssv("--line"), acc = cssv("--accent");
+  ctx.font = "11px " + cssv("--f-mono"); ctx.fillStyle = muted; ctx.textAlign = "left";
+  const vals = hist.filter(v => isFinite(v) && v > 0);
+  if (vals.length < 2){ ctx.fillText("здесь появится график ошибки", p.l, H/2); return; }
+  const f = linear ? (v => v) : (v => Math.log10(Math.min(v, 1e9)));
+  let lo = Math.min(...vals.map(f)), hi = Math.max(...vals.map(f)); if (hi - lo < 1e-6) hi = lo + 1;
+  const sx = i => p.l + i/(hist.length-1)*(W-p.l-p.r), sy = v => H-p.b - (f(v)-lo)/(hi-lo)*(H-p.t-p.b);
+  ctx.strokeStyle = line; ctx.beginPath(); ctx.moveTo(p.l, H-p.b); ctx.lineTo(W-p.r, H-p.b); ctx.stroke();
+  ctx.textAlign = "right";
+  const lab = v => linear ? fmt(v,2) : (v >= 1e6 ? fmt(v/1e6,0)+" млн" : v >= 1e3 ? fmt(v/1e3,0)+" тыс" : fmt(v, v<10?1:0));
+  ctx.fillText(lab(linear ? hi : Math.pow(10,hi)), p.l-6, p.t+8); ctx.fillText(lab(linear ? lo : Math.pow(10,lo)), p.l-6, H-p.b);
+  ctx.textAlign = "center"; ctx.fillText("ошибка по шагам", (p.l+W-p.r)/2, H-3);
+  const path = () => { ctx.beginPath(); let first = true; hist.forEach((v,i) => { if (!isFinite(v) || v <= 0) return; const x = sx(i), y = Math.max(p.t, sy(v)); if (first){ ctx.moveTo(x,y); first = false; } else ctx.lineTo(x,y); }); };
+  path(); ctx.lineTo(sx(hist.length-1), H-p.b); ctx.lineTo(p.l, H-p.b); ctx.closePath(); ctx.globalAlpha = 0.15; ctx.fillStyle = acc; ctx.fill(); ctx.globalAlpha = 1;
+  path(); ctx.strokeStyle = acc; ctx.lineWidth = 2; ctx.stroke();
+}
+function editor(el, src, st, label){
+  if (st.code == null) st.code = src;
+  if (st.wrap == null) st.wrap = true;
+  el.innerHTML = `<div class="editor${st.wrap?" wrap":""}">
+      <div class="ed-bar"><span>${label}</span><span class="ed-tools"><button data-e="wrap" aria-pressed="${st.wrap}">Перенос</button><button data-e="copy">Копировать</button><button data-e="reset">Сброс</button></span></div>
+      <textarea spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Редактор кода"></textarea>
+      <div class="keys">${["Tab","(",")","[","]",":","=","+","-","*","/","#","\"",".",",","_","←","→"].map(k => `<button type="button" data-k="${esc(k)}">${esc(k)}</button>`).join("")}</div>
+    </div>`;
+  const ta = $("textarea", el);
+  const fit = () => { ta.rows = Math.max(5, Math.min(st.wrap ? 22 : 20, ta.value.split("\n").length + 1)); };
+  ta.value = st.code; fit();
+  ta.oninput = () => { st.code = ta.value; fit(); };
+  ta.onkeydown = e => { if (e.key === "Tab"){ e.preventDefault(); ta.setRangeText("    ", ta.selectionStart, ta.selectionEnd, "end"); st.code = ta.value; } };
+  $$(".keys button", el).forEach(b => {
+    b.addEventListener("pointerdown", e => e.preventDefault());
+    b.addEventListener("mousedown", e => e.preventDefault());
+    b.onclick = () => {
+      const k = b.dataset.k, s = ta.selectionStart, e2 = ta.selectionEnd;
+      if (k === "←"){ ta.setSelectionRange(Math.max(0,s-1), Math.max(0,s-1)); }
+      else if (k === "→"){ ta.setSelectionRange(s+1, s+1); }
+      else { ta.setRangeText(k === "Tab" ? "    " : k, s, e2, "end"); st.code = ta.value; fit(); }
+      ta.focus({preventScroll:true});
+    };
+  });
+  $$(".ed-bar button", el).forEach(b => b.onclick = async () => {
+    const a = b.dataset.e;
+    if (a === "wrap"){ st.wrap = !st.wrap; $(".editor", el).classList.toggle("wrap", st.wrap); b.setAttribute("aria-pressed", st.wrap); fit(); }
+    if (a === "reset"){ st.code = src; ta.value = src; fit(); }
+    if (a === "copy"){ try { await navigator.clipboard.writeText(ta.value); b.textContent = "Скопировано"; } catch(e){ ta.focus(); ta.select(); b.textContent = "Выделено"; } setTimeout(() => b.textContent = "Копировать", 2000); }
+  });
+  return ta;
+}
+
+/* ================= Типы задач ================= */
+const DS = {W: DS_W, B: DS_B};
+const mseOf = (data, w, b) => data.reduce((s,[x,y]) => s + (w*x+b-y)**2, 0) / data.length;
+const R = {
+mc(body, t, api){
+  const order = api.st.order || (api.st.order = shuffle(t.o.map((_,i) => i)));
+  body.innerHTML = `${t.code ? `<pre class="qcode">${esc(t.code)}</pre>` : ""}<div class="opts">${order.map(i => `<button class="opt" data-i="${i}">${esc(t.o[i])}</button>`).join("")}</div>`;
+  $$(".opt", body).forEach(b => b.onclick = () => {
+    const i = +b.dataset.i;
+    if (i === t.a){ b.classList.add("right"); $$(".opt", body).forEach(x => x.disabled = true); api.answer(true); }
+    else { b.classList.add("wrong"); b.disabled = true; if (api.mode === "review"){ $$(".opt", body).forEach(x => { x.disabled = true; if (+x.dataset.i === t.a) x.classList.add("right"); }); } api.answer(false); }
+  });
+},
+tf(body, t, api){
+  body.innerHTML = `<div class="opts two"><button class="opt" data-v="1">Верно</button><button class="opt" data-v="0">Неверно</button></div>`;
+  $$(".opt", body).forEach(b => b.onclick = () => {
+    const v = b.dataset.v === "1";
+    if (v === t.a){ b.classList.add("right"); $$(".opt", body).forEach(x => x.disabled = true); api.answer(true); }
+    else { b.classList.add("wrong"); b.disabled = true; if (api.mode === "review") $$(".opt", body).forEach(x => { x.disabled = true; if ((x.dataset.v === "1") === t.a) x.classList.add("right"); }); api.answer(false); }
+  });
+},
+num(body, t, api){
+  const press = keypad(body, api.st);
+  bindKeys(api, press);
+  api.check(() => {
+    const v = parseNum(api.st.v);
+    if (isNaN(v)) return {ok:false, msg:"Введите число на клавиатуре ниже.", noCount:true};
+    return {ok: Math.abs(v - t.a) <= (t.tol ?? 1e-6)};
+  });
+},
+order(body, t, api){ orderWidget(body, t.items, ok => api.answer(ok, ok ? "" : "Порядок неверный: красным — не на своём месте. Нажмите «Ещё раз»."), api.mode === "lesson"); },
+match(body, t, api){
+  const st = api.st, n = t.pairs.length;
+  st.L = st.L || shuffle([...Array(n).keys()]); st.R = st.R || shuffle([...Array(n).keys()]); st.ok = st.ok || []; st.miss = st.miss || 0;
+  let sel = null;
+  const render = () => {
+    body.innerHTML = `<div class="match"><div class="mcol">${st.L.map(i => `<button class="mbtn${st.ok.includes(i)?" ok":""}" data-s="L" data-i="${i}" ${st.ok.includes(i)?"disabled":""}>${esc(t.pairs[i][0])}</button>`).join("")}</div>
+      <div class="mcol">${st.R.map(i => `<button class="mbtn${st.ok.includes(i)?" ok":""}" data-s="R" data-i="${i}" ${st.ok.includes(i)?"disabled":""}>${esc(t.pairs[i][1])}</button>`).join("")}</div></div>
+      <p class="legend">Нажмите слева, потом справа. Найдено пар: ${st.ok.length} из ${n}.</p>`;
+    $$(".mbtn", body).forEach(b => b.onclick = () => {
+      const s = b.dataset.s, i = +b.dataset.i;
+      if (!sel || sel.s === s){ sel = {s, i}; $$(".mbtn", body).forEach(x => x.classList.toggle("sel", x === b)); return; }
+      if (sel.i === i){ st.ok.push(i); sel = null; render(); if (st.ok.length === n) api.answer(api.mode === "lesson" || st.miss === 0); }
+      else { st.miss++; const a = $(`.mbtn[data-s="${sel.s}"][data-i="${sel.i}"]`, body); [a,b].forEach(x => { x.classList.add("bad"); setTimeout(() => x.classList.remove("bad","sel"), 450); }); sel = null; api.answer(false, "Это не пара. Попробуйте другую."); }
+    });
+  };
+  render();
+},
+fill(body, t, api){
+  const st = api.st, nb = t.blanks.length;
+  st.chips = st.chips || shuffle(t.blanks.concat(t.pool).map((s,i) => ({s, i})));
+  st.f = st.f || Array(nb).fill(null); if (st.sel == null) st.sel = 0;
+  const parts = t.code.split(/\[\[(\d+)\]\]/);
+  const render = (bad) => {
+    let code = "";
+    parts.forEach((p,k) => { if (k % 2 === 0) code += esc(p); else { const b = +p, c = st.f[b]; code += `<button class="blank${st.sel===b?" sel":""}${c!=null?" filled":""}${bad&&bad.includes(b)?" bad":""}" data-b="${b}">${c!=null ? esc(st.chips[c].s) : "&nbsp;&nbsp;?&nbsp;&nbsp;"}</button>`; } });
+    body.innerHTML = `<div class="fillcode">${code}</div><div class="ord-pool">${st.chips.map((c,k) => `<button class="chip mono" data-c="${k}" ${st.f.includes(k)?"disabled":""}>${esc(c.s)}</button>`).join("")}</div>
+      <p class="legend">Нажмите на пропуск, потом на подходящий кусок кода.</p>`;
+    $$(".blank", body).forEach(b => b.onclick = () => { const k = +b.dataset.b; if (st.f[k] != null) st.f[k] = null; st.sel = k; render(); });
+    $$(".chip", body).forEach(b => b.onclick = () => {
+      st.f[st.sel] = +b.dataset.c;
+      const nx = st.f.findIndex(v => v == null); st.sel = nx < 0 ? st.sel : nx; render();
+    });
+  };
+  render();
+  api.check(() => {
+    if (st.f.some(v => v == null)) return {ok:false, msg:"Заполните все пропуски.", noCount:true};
+    const bad = st.f.map((c,k) => st.chips[c].s === t.blanks[k] ? -1 : k).filter(k => k >= 0);
+    render(bad);
+    return {ok: bad.length === 0, msg: bad.length ? "Красным — неверный пропуск. " + (t.hint || "") : ""};
+  });
+},
+code(body, t, api){
+  const src = t.src || document.getElementById(t.srcId).textContent.replace(/^\n/, "");
+  const wrap = document.createElement("div"); body.appendChild(wrap);
+  editor(wrap, src, api.st, "Python · можно править");
+  body.insertAdjacentHTML("beforeend", `<div class="row"><button class="btn ghost" id="run">▶ Запустить</button><span class="legend">«Проверить» тоже запускает код</span></div><pre class="out" hidden></pre>`);
+  const out = $(".out", body), run = $("#run", body);
+  if (api.st.out){ out.hidden = false; out.textContent = api.st.out; }
+  const exec = async () => {
+    out.hidden = false; out.textContent = pyPromise ? "Запускаю…" : "Загружаю Python в браузер (один раз, около 10 МБ)…";
+    const r = await runPy(api.st.code);
+    out.textContent = api.st.out = r.loaded ? (r.out || "(код выполнился, но ничего не напечатал)") : "Python не загрузился в этом окне. Код можно запустить в Google Colab.";
+    return r;
+  };
+  run.onclick = async () => { run.disabled = true; await exec(); run.disabled = false; };
+  api.check(async () => {
+    if (t.check.out){
+      const r = await exec();
+      if (r.loaded) return {ok: t.check.out(r.out), msg: "Результат пока не тот. " + (t.hint || "")};
+      if (t.check.code) return {ok: t.check.code(api.st.code), msg: "Python не загрузился, проверил по тексту кода. " + (t.hint || "")};
+      return {ok:false, msg:"Python не загрузился.", noCount:true};
+    }
+    return {ok: t.check.code(api.st.code), msg: t.hint};
+  });
+},
+colab(body, t, api){
+  const src = document.getElementById(t.srcId).textContent.replace(/^\n/, "");
+  const wrap = document.createElement("div"); body.appendChild(wrap);
+  editor(wrap, src, api.st, "PyTorch · запуск в Google Colab");
+  body.insertAdjacentHTML("beforeend", `<div class="row"><a class="btn" href="https://colab.research.google.com/#create=true" target="_blank" rel="noopener">Открыть Google Colab</a></div>
+    <ol class="howto"><li>В Colab создайте блокнот и вставьте код в ячейку.</li><li>Для скорости: «Среда выполнения» → «Сменить среду выполнения» → GPU.</li><li>Нажмите Shift+Enter. Свой текст можно загрузить как input.txt.</li></ol>
+    <label class="check"><input type="checkbox" id="ran" ${api.st.ran?"checked":""}> Я запустил(а) код и увидел(а) сгенерированный текст</label>`);
+  $("#ran", body).onchange = e => api.st.ran = e.target.checked;
+  api.check(() => api.st.ran ? {ok:true} : {ok:false, msg:"Отметьте галочку, когда запустите код в Colab.", noCount:true});
+},
+
+fit(body, t, api){
+  const st = api.st, data = DS[t.data];
+  if (st.w == null){ st.w = t.init.w; st.b = t.init.b; }
+  const has = k => t.ctrl.includes(k);
+  body.innerHTML = `<canvas class="plot"></canvas>
+    <div class="formula">ŷ = <b class="${has("w")?"":"fixed"}" id="fw"></b> · x + <b class="${has("b")?"":"fixed"}" id="fb"></b></div>
+    ${has("w") ? slider("sw","w — наклон",0,20,0.5,st.w) : ""}${has("b") ? slider("sb","b — сдвиг",-100,250,5,st.b) : ""}
+    <div class="meter"><span>${t.showLoss ? "Ошибка L (MSE)" : "Насколько близко"}</span><b id="ml"></b></div>`;
+  const cv = $("canvas", body);
+  const upd = () => {
+    if (has("w")) st.w = +$("#sw", body).value; if (has("b")) st.b = +$("#sb", body).value;
+    $("#fw", body).textContent = fmt(st.w); $("#fb", body).textContent = fmt(st.b);
+    if (has("w")) $("#sw-o", body).textContent = fmt(st.w); if (has("b")) $("#sb-o", body).textContent = fmt(st.b);
+    const L = mseOf(data, st.w, st.b);
+    $("#ml", body).textContent = t.showLoss ? fmt(L, 1) : (L > 3000 ? "далеко" : L > 600 ? "ближе" : L >= t.goal ? "почти" : "в точку");
+    $("#ml", body).className = L < t.goal ? "good" : "";
+    const A = axes(cv, {xr:[0,40], yr:[0,450], xt:10, yt:100, xu:"°", xlab:"температура, x", ylab:"порций, y", h:api.plotH()});
+    const {ctx, sx, sy} = A; A.clip();
+    if (t.resid){ ctx.strokeStyle = cssv("--accent"); ctx.setLineDash([3,3]); ctx.lineWidth = 1.5; data.forEach(([x,y]) => { ctx.beginPath(); ctx.moveTo(sx(x), sy(y)); ctx.lineTo(sx(x), sy(st.w*x+st.b)); ctx.stroke(); }); ctx.setLineDash([]); }
+    ctx.strokeStyle = cssv("--cool"); ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(sx(0), sy(st.b)); ctx.lineTo(sx(40), sy(st.w*40+st.b)); ctx.stroke();
+    A.unclip();
+    data.forEach(([x,y]) => dot(ctx, sx(x), sy(y), 5, cssv("--accent")));
+  };
+  $$("input", body).forEach(i => i.oninput = upd); upd();
+  api.check(() => { const L = mseOf(data, st.w, st.b); return {ok: L < t.goal, msg: t.showLoss ? `Ошибка ${fmt(L,1)}, а нужно меньше ${t.goal}. ${t.hint}` : `Линия ещё не легла на точки. ${t.hint}`}; });
+},
+xread(body, t, api){
+  const st = api.st; if (st.x == null) st.x = 5;
+  body.innerHTML = `<canvas class="plot"></canvas>${slider("sx","x — вход",0,40,1,st.x)}<div class="formula" id="fx"></div>`;
+  const cv = $("canvas", body);
+  const upd = () => {
+    st.x = +$("#sx", body).value; const y = 10*st.x + 20;
+    $("#sx-o", body).textContent = st.x + "°";
+    $("#fx", body).innerHTML = `ŷ = 10 · <b>${st.x}</b> + 20 = <b>${y}</b> порций`;
+    const A = axes(cv, {xr:[0,40], yr:[0,450], xt:10, yt:100, xu:"°", xlab:"температура, x", ylab:"прогноз ŷ", h:api.plotH()});
+    const {ctx, sx, sy} = A;
+    ctx.strokeStyle = cssv("--good"); ctx.setLineDash([5,4]); ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(sx(0), sy(t.target)); ctx.lineTo(sx(40), sy(t.target)); ctx.stroke();
+    ctx.fillStyle = cssv("--good"); ctx.textAlign = "left"; ctx.fillText("цель " + t.target, sx(1), sy(t.target)-5);
+    ctx.strokeStyle = cssv("--cool"); ctx.setLineDash([]); ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(sx(0), sy(20)); ctx.lineTo(sx(40), sy(420)); ctx.stroke();
+    ctx.strokeStyle = cssv("--accent"); ctx.setLineDash([3,3]); ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(sx(st.x), sy(0)); ctx.lineTo(sx(st.x), sy(y)); ctx.lineTo(sx(0), sy(y)); ctx.stroke(); ctx.setLineDash([]);
+    dot(ctx, sx(st.x), sy(y), 6, cssv("--accent"));
+  };
+  $("#sx", body).oninput = upd; upd();
+  api.check(() => ({ok: Math.abs(10*st.x + 20 - t.target) < 0.5, msg:`Сейчас прогноз ${10*st.x+20}, а нужно ${t.target}. ${t.hint}`}));
+},
+wfit(body, t, api){
+  const st = api.st; if (st.w1 == null){ st.w1 = 4; st.w2 = 1; }
+  body.innerHTML = `<div class="formula">ŷ = <b id="f1"></b>·x₁ + <b id="f2"></b>·x₂ + 20</div>
+    ${slider("s1","w₁ — подготовка",0,12,1,st.w1)}${slider("s2","w₂ — сон",0,6,0.5,st.w2)}
+    <div class="tbl"><table><thead><tr><th>Студент</th><th>x₁ учёба, ч</th><th>x₂ сон, ч</th><th>ŷ прогноз</th><th>y балл</th></tr></thead><tbody id="tb"></tbody></table></div>
+    <div class="meter"><span>Ошибка L (MSE)</span><b id="ml"></b></div>`;
+  const upd = () => {
+    st.w1 = +$("#s1", body).value; st.w2 = +$("#s2", body).value;
+    $("#f1", body).textContent = fmt(st.w1); $("#f2", body).textContent = fmt(st.w2); $("#s1-o", body).textContent = fmt(st.w1); $("#s2-o", body).textContent = fmt(st.w2);
+    let L = 0;
+    $("#tb", body).innerHTML = STUDENTS.map(([a,b,y],i) => { const p = st.w1*a + st.w2*b + 20; L += (p-y)**2; return `<tr class="${Math.abs(p-y)<0.5?"okr":""}"><td>${i+1}</td><td>${a}</td><td>${b}</td><td><b>${fmt(p)}</b></td><td>${y}</td></tr>`; }).join("");
+    L /= STUDENTS.length; st.L = L; $("#ml", body).textContent = fmt(L, 1); $("#ml", body).className = L < 1 ? "good" : "";
+  };
+  $$("input", body).forEach(i => i.oninput = upd); upd();
+  api.check(() => ({ok: st.L < 1, msg:`Ошибка ${fmt(st.L,1)}. ${t.hint}`}));
+},
+slope(body, t, api){
+  const st = api.st, ROUNDS = [6.5, -1.5], MAX = 12, Lf = w => (w-2)**2;
+  if (st.r == null){ st.r = 0; st.w = ROUNDS[0]; st.m = 0; }
+  body.innerHTML = `<canvas class="plot"></canvas>
+    <div class="stats"><span>раунд <b id="rd"></b> из 2</span><span>шагов: <b id="mv"></b> / ${MAX}</span><span>w = <b id="wv"></b></span><span>градиент: <b id="gv"></b></span></div>
+    <div class="row two"><button class="btn ghost" id="dl">← уменьшить w</button><button class="btn ghost" id="dr">увеличить w →</button></div><div class="status" id="ss"></div>`;
+  const cv = $("canvas", body);
+  const draw = () => {
+    const g = 2*(st.w-2);
+    $("#rd", body).textContent = st.r+1; $("#mv", body).textContent = st.m; $("#wv", body).textContent = fmt(st.w,2);
+    $("#gv", body).innerHTML = `<span class="${g>0?"pos":g<0?"neg":""}">${g>0?"+":""}${fmt(g,2)}</span>`;
+    const A = axes(cv, {xr:[-3,7], yr:[0,26], xt:1, yt:5, xlab:"w", ylab:"ошибка L", h:api.plotH()});
+    const {ctx, sx, sy} = A;
+    ctx.fillStyle = cssv("--good"); ctx.globalAlpha = 0.18; ctx.fillRect(sx(1.75), sy(26), sx(2.25)-sx(1.75), sy(0)-sy(26)); ctx.globalAlpha = 1;
+    A.clip(); ctx.strokeStyle = cssv("--cool"); ctx.lineWidth = 2.5; ctx.beginPath(); for (let w=-3; w<=7.001; w+=0.05){ const x = sx(w), y = sy(Lf(w)); w===-3 ? ctx.moveTo(x,y) : ctx.lineTo(x,y); } ctx.stroke();
+    ctx.strokeStyle = cssv("--accent"); ctx.lineWidth = 1.5; ctx.setLineDash([4,3]); ctx.beginPath(); ctx.moveTo(sx(st.w-1.2), sy(Lf(st.w)-1.2*g)); ctx.lineTo(sx(st.w+1.2), sy(Lf(st.w)+1.2*g)); ctx.stroke(); ctx.setLineDash([]); A.unclip();
+    dot(ctx, sx(st.w), sy(Lf(st.w)), 7, cssv("--accent"));
+  };
+  const move = d => {
+    const before = Lf(st.w); st.w += d*0.5; st.m++;
+    const ss = $("#ss", body);
+    if (Math.abs(st.w-2) < 0.26){
+      if (st.r === ROUNDS.length-1){ ss.className = "status good"; ss.textContent = "Дно найдено в обоих раундах!"; draw(); $$("#dl,#dr", body).forEach(b => b.disabled = true); api.answer(true); return; }
+      st.r++; st.w = ROUNDS[st.r]; st.m = 0; ss.className = "status good"; ss.textContent = "Раунд 1 пройден! Теперь стартуем с другой стороны.";
+    } else if (st.m >= MAX){ st.w = ROUNDS[st.r]; st.m = 0; ss.className = "status bad"; ss.textContent = "Шаги закончились — раунд заново."; api.answer(false, "Больше 12 шагов. Смотрите на знак градиента: «+» — уменьшать w, «−» — увеличивать."); }
+    else { ss.className = Lf(st.w) > before ? "status bad" : "status"; ss.textContent = Lf(st.w) > before ? "Ошибка выросла: это был шаг вверх по склону." : "Ошибка уменьшилась."; }
+    draw();
+  };
+  $("#dl", body).onclick = () => move(-1); $("#dr", body).onclick = () => move(1);
+  draw();
+},
+lrrun(body, t, api){
+  const st = api.st, E = [0.01,0.05,0.1,0.2,0.3,0.5,0.8,0.95,1.05,1.2];
+  if (st.ei == null){ st.ei = 0; st.path = null; }
+  body.innerHTML = `<canvas class="plot"></canvas>${slider("se","η — шаг",0,E.length-1,1,st.ei)}
+    <div class="formula">w ← w − <b id="fe"></b> · 2·(w − 3)</div>
+    <div class="row"><button class="btn ghost" id="go">▶ Запустить 10 шагов</button></div><div class="status" id="ss"></div>`;
+  const cv = $("canvas", body), Lf = w => (w-3)**2;
+  const draw = (n) => {
+    $("#se-o", body).textContent = fmt(E[st.ei],2); $("#fe", body).textContent = fmt(E[st.ei],2);
+    const A = axes(cv, {xr:[-3,9], yr:[0,40], xt:1, yt:10, xlab:"w", ylab:"ошибка L", h:api.plotH()});
+    const {ctx, sx, sy} = A;
+    A.clip(); ctx.strokeStyle = cssv("--cool"); ctx.lineWidth = 2.5; ctx.beginPath(); for (let w=-3; w<=9.001; w+=0.05){ const x = sx(w), y = sy(Lf(w)); w===-3 ? ctx.moveTo(x,y) : ctx.lineTo(x,y); } ctx.stroke();
+    if (st.path){ const P = st.path.slice(0, n ?? st.path.length); ctx.strokeStyle = cssv("--accent"); ctx.lineWidth = 1.5; ctx.beginPath(); P.forEach((w,i) => { const x = sx(Math.max(-3.5, Math.min(9.5, w))), y = sy(Math.min(45, Lf(w))); i ? ctx.lineTo(x,y) : ctx.moveTo(x,y); }); ctx.stroke(); P.forEach((w,i) => dot(ctx, sx(Math.max(-3.5, Math.min(9.5, w))), sy(Math.min(45, Lf(w))), i === P.length-1 ? 6 : 3.5, cssv("--accent"))); }
+    A.unclip();
+  };
+  $("#se", body).oninput = e => { st.ei = +e.target.value; st.path = null; $("#ss", body).textContent = ""; draw(); };
+  $("#go", body).onclick = () => {
+    const eta = E[st.ei]; let w = 8; st.path = [w];
+    for (let k=0; k<10; k++){ w = w - eta*2*(w-3); st.path.push(w); }
+    st.final = w; let n = 1; const tok = api.tok(), btn = $("#go", body); btn.disabled = true;
+    const iv = setInterval(() => {
+      if (!api.alive(tok)){ clearInterval(iv); return; }
+      n++; draw(n);
+      if (n >= st.path.length){ clearInterval(iv); btn.disabled = false; const ss = $("#ss", body), d = Math.abs(w-3);
+        if (d > 5){ ss.className = "status bad"; ss.textContent = "Улетели: шаг слишком длинный, каждый прыжок дальше от дна."; }
+        else if (d >= 0.1){ ss.className = "status"; ss.textContent = `Не дошли до дна: w = ${fmt(w,2)}. ` + (eta < 0.2 ? "Шаг слишком мелкий." : "Раскачиваемся вокруг дна — шаг великоват."); }
+        else { ss.className = "status good"; ss.textContent = `Дошли: w = ${fmt(w,3)}. Нажмите «Проверить».`; } }
+    }, 140);
+  };
+  draw();
+  api.check(() => st.path ? {ok: Math.abs(st.final-3) < 0.1, msg:"За 10 шагов дно не достигнуто. " + t.hint} : {ok:false, msg:"Сначала нажмите «Запустить 10 шагов».", noCount:true});
+},
+gd(body, t, api){
+  const st = api.st, XN = DS_B.map(([x]) => (x-22)/10), YN = DS_B.map(([,y]) => y/100), LRS = [0.01,0.03,0.1,0.3,0.6,0.9,1.05,1.2];
+  if (st.wn == null){ st.wn = 0; st.bn = 0; st.li = 2; st.steps = 0; st.hist = []; }
+  const lossN = () => XN.reduce((s,x,i) => s + (st.wn*x+st.bn-YN[i])**2, 0)/XN.length*10000;
+  body.innerHTML = `<canvas class="plot"></canvas>${slider("lr","η — скорость",0,LRS.length-1,1,st.li)}
+    <div class="row"><button class="btn ghost" id="s1">Шаг</button><button class="btn ghost" id="au">▶ Авто</button><button class="btn ghost" id="rs">Сброс</button></div>
+    <div class="stats"><span>шагов: <b id="ns"></b></span><span>w = <b id="wv"></b></span><span>b = <b id="bv"></b></span><span>ошибка: <b id="ls"></b></span></div>
+    <canvas class="plot" id="lc"></canvas><div class="status" id="ss"></div>`;
+  const cv = $("canvas", body);
+  let timer = null; const tok = api.tok();
+  const draw = () => {
+    const L = lossN(), w = 10*st.wn, b = 100*(st.bn - 2.2*st.wn);
+    $("#ns", body).textContent = st.steps; $("#wv", body).textContent = isFinite(w) ? fmt(w,1) : "∞"; $("#bv", body).textContent = isFinite(b) ? fmt(b,0) : "∞";
+    $("#ls", body).textContent = !isFinite(L) || L > 1e6 ? "огромная" : fmt(L,1); $("#lr-o", body).textContent = LRS[st.li];
+    const A = axes(cv, {xr:[0,40], yr:[0,450], xt:10, yt:100, xu:"°", xlab:"температура, x", ylab:"порций, y", h:api.plotH()});
+    const {ctx, sx, sy} = A; A.clip(); ctx.strokeStyle = cssv("--cool"); ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(sx(0), sy(b)); ctx.lineTo(sx(40), sy(w*40+b)); ctx.stroke(); A.unclip();
+    DS_B.forEach(([x,y]) => dot(ctx, sx(x), sy(y), 5, cssv("--accent")));
+    drawLoss($("#lc", body), st.hist);
+    const ss = $("#ss", body);
+    if (!isFinite(L) || L > 1e6){ ss.className = "status bad"; ss.textContent = "Шаг слишком длинный: ошибка растёт. Уменьшите скорость и нажмите «Сброс»."; }
+    else if (L < 30){ ss.className = "status good"; ss.textContent = "Ошибка меньше 30. Нажмите «Проверить»."; }
+    else { ss.className = "status"; ss.textContent = st.steps ? "" : "Нажмите «Шаг» несколько раз или «Авто»."; }
+  };
+  const step = () => { let dw = 0, db = 0; XN.forEach((x,i) => { const e = st.wn*x+st.bn-YN[i]; dw += 2*e*x/XN.length; db += 2*e/XN.length; }); st.wn -= LRS[st.li]*dw; st.bn -= LRS[st.li]*db; st.steps++; st.hist.push(lossN()); };
+  const stopA = () => { if (timer){ clearInterval(timer); timer = null; const b = $("#au", body); if (b) b.textContent = "▶ Авто"; } };
+  $("#lr", body).oninput = e => { st.li = +e.target.value; draw(); };
+  $("#s1", body).onclick = () => { step(); draw(); };
+  $("#au", body).onclick = () => { if (timer) return stopA(); $("#au", body).textContent = "❚❚ Пауза";
+    timer = setInterval(() => { if (!api.alive(tok)){ clearInterval(timer); return; } step(); draw(); const L = st.hist[st.hist.length-1]; if (st.steps >= 300 || !isFinite(L) || L > 1e9 || L < 8) stopA(); }, 90); };
+  $("#rs", body).onclick = () => { stopA(); st.wn = 0; st.bn = 0; st.steps = 0; st.hist = []; draw(); };
+  draw();
+  api.check(() => { const L = lossN(); return {ok: isFinite(L) && L < 30, msg:`Ошибка пока ${isFinite(L) && L < 1e6 ? fmt(L,1) : "огромная"}. ${t.hint}`}; });
+},
+relu(body, t, api){
+  const st = api.st; if (st.w == null){ st.w = 0.5; st.b = 1; }
+  body.innerHTML = `<canvas class="plot"></canvas><div class="formula">y = ReLU(<b id="fw"></b>·x + <b id="fb"></b>)<span class="muted" id="fk"></span></div>
+    ${slider("sw","w — вес",-2,2,0.5,st.w)}${slider("sb","b — сдвиг",-4,4,0.5,st.b)}`;
+  const cv = $("canvas", body);
+  const upd = () => {
+    st.w = +$("#sw", body).value; st.b = +$("#sb", body).value;
+    $("#fw", body).textContent = fmt(st.w); $("#fb", body).textContent = fmt(st.b); $("#sw-o", body).textContent = fmt(st.w); $("#sb-o", body).textContent = fmt(st.b);
+    const k = st.w !== 0 ? -st.b/st.w : null;
+    $("#fk", body).textContent = k == null ? "   излома нет (w = 0)" : `   излом в x = ${fmt(k,2)}`;
+    const A = axes(cv, {xr:[-4,6], yr:[-1,8], xt:1, yt:2, xlab:"x", ylab:"выход нейрона", zero:true, h:api.plotH()});
+    const {ctx, sx, sy} = A;
+    ctx.strokeStyle = cssv("--good"); ctx.setLineDash([5,4]); ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(sx(2), sy(-1)); ctx.lineTo(sx(2), sy(8)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = cssv("--good"); ctx.textAlign = "left"; ctx.fillText("цель: x = 2", sx(2)+4, sy(7.4));
+    A.clip(); ctx.strokeStyle = cssv("--cool"); ctx.lineWidth = 2.8; ctx.beginPath(); for (let x=-4; x<=6.001; x+=0.02){ const y = Math.max(0, st.w*x+st.b); x===-4 ? ctx.moveTo(sx(x), sy(y)) : ctx.lineTo(sx(x), sy(y)); } ctx.stroke(); A.unclip();
+    if (k != null && k >= -4 && k <= 6) dot(ctx, sx(k), sy(0), 6, cssv("--accent"));
+  };
+  $$("input", body).forEach(i => i.oninput = upd); upd();
+  api.check(() => ({ok: st.w > 0 && Math.abs(-st.b/st.w - 2) < 1e-9, msg: st.w <= 0 ? "Справа от излома линия должна идти вверх: нужен w > 0." : `Излом сейчас в x = ${fmt(-st.b/st.w,2)}. ${t.hint}`}));
+},
+circle(body, t, api){
+  const st = api.st;
+  if (!st.pts){ const r = rng(7); st.pts = []; for (let k=0; k<160; k++){ const x = r()*2-1, y = r()*2-1; st.pts.push([x, y, x*x+y*y < 0.42 ? 1 : 0]); } st.H = 0; }
+  const HS = [0,1,2,3,4,6,8], sig = z => 1/(1+Math.exp(-z));
+  const init = () => { const rr = rng(st.H*13+5), n = st.H ? 4*st.H+1 : 3; st.P = new Float64Array(n).map(() => (rr()*2-1)*1.2); st.M = new Float64Array(n); st.V = new Float64Array(n); st.t = 0; st.steps = 0; st.run = false; };
+  if (!st.P) init();
+  const fwd = (x, y) => { const H = st.H, P = st.P; if (!H) return {p: sig(P[0]*x + P[1]*y + P[2])}; const hs = new Array(H); let z = P[4*H]; for (let j=0; j<H; j++){ hs[j] = Math.tanh(P[j]*x + P[H+j]*y + P[2*H+j]); z += hs[j]*P[3*H+j]; } return {p: sig(z), hs}; };
+  const train = n => { const H = st.H, P = st.P; for (let s=0; s<n; s++){ const g = new Float64Array(P.length);
+      for (const [x,y,tt] of st.pts){ const f = fwd(x,y), dz = f.p - tt; if (!H){ g[0]+=dz*x; g[1]+=dz*y; g[2]+=dz; continue; } g[4*H] += dz; for (let j=0; j<H; j++){ g[3*H+j] += dz*f.hs[j]; const d = dz*P[3*H+j]*(1-f.hs[j]*f.hs[j]); g[j]+=d*x; g[H+j]+=d*y; g[2*H+j]+=d; } }
+      st.t++; const lr = 0.05, b1 = 0.9, b2 = 0.999; for (let k=0; k<P.length; k++){ const gk = g[k]/st.pts.length; st.M[k]=b1*st.M[k]+(1-b1)*gk; st.V[k]=b2*st.V[k]+(1-b2)*gk*gk; P[k] -= lr*(st.M[k]/(1-b1**st.t))/(Math.sqrt(st.V[k]/(1-b2**st.t))+1e-8); } st.steps++; } };
+  body.innerHTML = `<div class="legend">Нейронов в скрытом слое:</div><div class="seg" id="hs">${HS.map(h => `<button data-h="${h}">${h}</button>`).join("")}</div>
+    <canvas class="plot sq"></canvas><div class="row"><button class="btn ghost" id="go">▶ Обучать</button><button class="btn ghost" id="rs">Сначала</button></div>
+    <div class="stats"><span>шагов: <b id="ns"></b></span><span>угадано: <b id="acc"></b></span></div><div class="status" id="ss"></div>`;
+  const cv = $("canvas", body), tok = api.tok();
+  const acc = () => st.pts.filter(([x,y,tt]) => (fwd(x,y).p > 0.5) === (tt === 1)).length / st.pts.length;
+  const draw = () => {
+    const size = Math.min(cv.clientWidth || 320, api.isFS() ? 480 : 360);
+    cv.style.width = size + "px"; const {ctx, w:W} = canvas(cv, size), Hh = size;
+    const ac = cssv("--accent"), co = cssv("--cool"), N = 40, cw = W/N, ch = Hh/N;
+    for (let i=0; i<N; i++) for (let j=0; j<N; j++){ const x = (i+.5)/N*2-1, y = 1-(j+.5)/N*2, p = fwd(x,y).p; ctx.globalAlpha = 0.08 + 0.32*Math.abs(p-0.5)*2; ctx.fillStyle = p > 0.5 ? ac : co; ctx.fillRect(i*cw, j*ch, cw+0.5, ch+0.5); }
+    ctx.globalAlpha = 1; st.pts.forEach(([x,y,tt]) => dot(ctx, (x+1)/2*W, (1-y)/2*Hh, 4, tt ? ac : co));
+    const a = acc(); st.acc = a;
+    $("#ns", body).textContent = st.steps; $("#acc", body).textContent = Math.round(a*100) + "%";
+    $$("#hs button", body).forEach(b => b.classList.toggle("on", +b.dataset.h === st.H));
+    const ss = $("#ss", body);
+    if (a >= 0.95){ ss.className = "status good"; ss.textContent = "95% и больше! Нажмите «Проверить»."; }
+    else if (!st.H && st.steps > 150){ ss.className = "status bad"; ss.textContent = "Прямая не обведёт круг, сколько ни учи. Добавьте нейроны."; }
+    else if (st.H && st.H < 3 && st.steps > 400){ ss.className = "status"; ss.textContent = "Мало нейронов: границе не хватает изломов."; }
+    else { ss.className = "status"; ss.textContent = ""; }
+  };
+  const loop = () => { if (!st.run || !api.alive(tok)) return; train(8); draw(); if (st.steps >= 1500){ st.run = false; $("#go", body).textContent = "▶ Обучать"; return; } requestAnimationFrame(loop); };
+  $$("#hs button", body).forEach(b => b.onclick = () => { st.H = +b.dataset.h; init(); $("#go", body).textContent = "▶ Обучать"; draw(); });
+  $("#go", body).onclick = () => { st.run = !st.run; $("#go", body).textContent = st.run ? "❚❚ Пауза" : "▶ Обучать"; if (st.run) loop(); };
+  $("#rs", body).onclick = () => { init(); $("#go", body).textContent = "▶ Обучать"; draw(); };
+  draw(); if (st.run){ $("#go", body).textContent = "❚❚ Пауза"; loop(); }
+  api.check(() => ({ok: st.acc >= 0.95, msg:`Сейчас угадано ${Math.round(st.acc*100)}%. ${t.hint}`}));
+},
+chain(body, t, api){
+  const st = api.st, N = {a:{x:40,y:40,v:2}, b:{x:40,y:120,v:-3}, e:{x:135,y:80,v:-6,op:"a × b"}, c:{x:135,y:178,v:10}, d:{x:230,y:128,v:4,op:"e + c"}, f:{x:230,y:212,v:-2}, L:{x:316,y:170,v:-8,op:"d × f"}};
+  const G = {L:1, d:-2, f:4, e:-2, c:-2, a:6, b:-4}, ORD = ["d","f","e","c","a","b"];
+  const HINT = {d:"L = d × f: d получает градиент L (это 1), умноженный на соседа f.", f:"L = d × f: f получает 1, умноженное на соседа d.", e:"d = e + c — сложение: e получает градиент d как есть.", c:"d = e + c — сложение: c получает градиент d как есть.", a:"e = a × b: a получает градиент e, умноженный на соседа b.", b:"e = a × b: b получает градиент e, умноженный на соседа a."};
+  const E = [["a","e"],["b","e"],["e","d"],["c","d"],["d","L"],["f","L"]];
+  if (st.k == null) st.k = 0;
+  body.innerHTML = `<div class="graph"><svg viewBox="0 0 360 240" role="img" aria-label="Граф вычислений"></svg></div><div class="explain" id="ex"></div><div id="kp"></div><div class="row"><button class="btn" id="cn">Проверить узел</button></div>`;
+  const draw = () => {
+    const cur = ORD[st.k]; let h = E.map(([u,v]) => `<line class="gedge" x1="${N[u].x}" y1="${N[u].y}" x2="${N[v].x}" y2="${N[v].y}"/>`).join("");
+    for (const k in N){ const n = N[k], known = k === "L" || ORD.indexOf(k) < st.k, w = 74, hh = 52;
+      h += `<g class="gnode${k===cur?" lit":""}${known?" has":""}"><rect x="${n.x-w/2}" y="${n.y-hh/2}" width="${w}" height="${hh}" rx="8"/><text class="nm" x="${n.x-w/2+7}" y="${n.y-hh/2+14}">${k}${n.op?" = "+n.op:""}</text><text class="vl" x="${n.x-w/2+7}" y="${n.y+5}">${fmt(n.v)}</text><text class="gr" x="${n.x-w/2+7}" y="${n.y+hh/2-7}">град: ${known ? fmt(G[k]) : k===cur ? "?" : "…"}</text></g>`; }
+    $("svg", body).innerHTML = h;
+    $("#ex", body).innerHTML = st.k < ORD.length ? `Узел <b>${cur}</b>: какой у него градиент? Градиент L уже известен: 1.` : "Все градиенты найдены.";
+  };
+  const press = keypad($("#kp", body), st, null); bindKeys(api, press);
+  $("#cn", body).onclick = () => {
+    if (st.k >= ORD.length) return;
+    const v = parseNum(st.v), cur = ORD[st.k];
+    if (isNaN(v)){ api.note("Введите число на клавиатуре.", ""); return; }
+    if (Math.abs(v - G[cur]) < 1e-9){ st.k++; st.v = ""; press("C"); draw(); api.note(`Верно: градиент ${cur} = ${fmt(G[cur])}.`, "ok");
+      if (st.k >= ORD.length){ $("#cn", body).disabled = true; api.answer(true); } }
+    else api.answer(false, HINT[cur]);
+  };
+  draw();
+},
+tokgoal(body, t, api){
+  const st = api.st; if (st.text == null) st.text = "";
+  body.innerHTML = `<input class="txt" id="tx" placeholder="Напишите текст" autocapitalize="off" autocomplete="off" aria-label="Текст"><div class="tokens" id="tk"></div><div class="stats"><span>токенов: <b id="nt"></b></span><span>разных (словарь): <b id="nv"></b></span></div>`;
+  const tx = $("#tx", body); tx.value = st.text;
+  const upd = () => { st.text = tx.value; const parts = [...st.text], vocab = [...new Set(parts)].sort((a,b) => a.localeCompare(b,"ru"));
+    $("#tk", body).innerHTML = parts.map(p => `<span class="tok"><span>${p===" "?"␣":esc(p)}</span><small>${vocab.indexOf(p)}</small></span>`).join("");
+    $("#nt", body).textContent = parts.length; $("#nv", body).textContent = vocab.length; st.nv = vocab.length; };
+  tx.oninput = upd; upd();
+  api.check(() => st.text.length < 6 ? {ok:false, msg:"Нужно хотя бы 6 символов.", noCount:true} : {ok: st.nv === t.n, msg:`Сейчас разных токенов ${st.nv}, а нужно ${t.n}. ${t.hint}`});
+},
+emb(body, t, api){
+  const W = {"король":[48,52],"королева":[48,150],"принц":[92,78],"принцесса":[92,176],"мужчина":[178,62],"женщина":[178,160],"Москва":[282,40],"Париж":[318,72],"Берлин":[270,92],"кот":[250,222],"собака":[300,240],"лошадь":[320,200]};
+  let solved = false;
+  body.innerHTML = `<div class="graph"><svg viewBox="0 0 360 270" class="emap" role="img" aria-label="Карта смыслов"></svg></div><p class="legend">Упрощённая карта на плоскости: у настоящих эмбеддингов сотни координат.</p>`;
+  const draw = (pick) => {
+    const ac = cssv("--accent"); let h = `<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="${ac}"/></marker></defs>`;
+    if (t.arrow){ const [mx,my] = W["мужчина"], [wx,wy] = W["женщина"]; h += `<line x1="${mx}" y1="${my+8}" x2="${wx}" y2="${wy-12}" stroke="${ac}" stroke-width="2" marker-end="url(#ah)"/>`;
+      if (solved){ const [kx,ky] = W["король"]; h += `<line x1="${kx}" y1="${ky+8}" x2="${kx+wx-mx}" y2="${ky+wy-my-12}" stroke="${ac}" stroke-width="2" marker-end="url(#ah)"/>`; } }
+    for (const k in W){ const hi = k === t.from || (t.arrow && (k==="король"||k==="мужчина"||k==="женщина")) || (solved && k === t.target), bad = pick && pick === k && k !== t.target;
+      h += `<g class="${hi?"hi":""}${bad?" bad":""}" data-w="${k}"><circle cx="${W[k][0]}" cy="${W[k][1]}" r="6"/><text x="${W[k][0]+9}" y="${W[k][1]+4}">${k}</text><rect x="${W[k][0]-10}" y="${W[k][1]-14}" width="${k.length*8+24}" height="28" fill="transparent"/></g>`; }
+    $("svg", body).innerHTML = h;
+    $$("svg g[data-w]", body).forEach(g => g.onclick = () => { if (solved) return; const k = g.dataset.w; if (k === t.target){ solved = true; draw(); api.answer(true); } else { draw(k); api.answer(false, `«${k}» — не то. ${t.hint}`); } });
+  };
+  draw();
+},
+softmax(body, t, api){
+  const st = api.st, WD = ["кот","пёс","дом"]; if (!st.z) st.z = t.goal === "equal" ? [3,-1,0] : [0,0,0];
+  body.innerHTML = WD.map((w,i) => slider("z"+i, "оценка «"+w+"»", -3, 3, 0.5, st.z[i])).join("") + `<div class="bars" id="br"></div><div class="formula" id="fx"></div>`;
+  const P = () => { const e = st.z.map(Math.exp), s = e.reduce((a,b) => a+b, 0); return e.map(x => x/s); };
+  const upd = () => { st.z = WD.map((_,i) => +$("#z"+i, body).value); WD.forEach((_,i) => $("#z"+i+"-o", body).textContent = fmt(st.z[i])); const p = P();
+    $("#br", body).innerHTML = WD.map((w,i) => `<div class="bar"><span>${w}</span><div class="tr"><div class="fl${i?" cool":""}" style="width:${(p[i]*100).toFixed(1)}%"></div></div><span>${fmt(p[i]*100,0)}%</span></div>`).join("");
+    $("#fx", body).innerHTML = `e^z: ${st.z.map(z => fmt(Math.exp(z),2)).join(" · ")} → сумма ${fmt(st.z.reduce((s,z) => s+Math.exp(z),0),2)}`; st.p = p; };
+  $$("input", body).forEach(i => i.oninput = upd); upd();
+  api.check(() => {
+    if (t.goal === "cat") return {ok: st.p[0] > 0.7, msg:`У «кота» сейчас ${fmt(st.p[0]*100,0)}%. ${t.hint}`};
+    const okEq = st.p.every(x => x >= 0.30 && x <= 0.37), okMin = st.z.every(z => z >= 2);
+    return {ok: okEq && okMin, msg: !okMin ? "Все оценки должны быть не меньше 2." : `Доли ещё не равны. ${t.hint}`};
+  });
+},
+temp(body, t, api){
+  const st = api.st; if (st.T == null) st.T = 1;
+  const B = bigram(), row = B.ix["а"];
+  body.innerHTML = slider("tp","T — температура",0.2,2,0.1,st.T) + `<p class="legend">Что модель допишет после буквы «а»:</p><div class="bars" id="br"></div>`;
+  const upd = () => { st.T = +$("#tp", body).value; $("#tp-o", body).textContent = fmt(st.T,1);
+    const p = B.probs(row, st.T), top = [...p.keys()].sort((a,b) => p[b]-p[a]).slice(0,6); st.top = p[top[0]];
+    $("#br", body).innerHTML = top.map(k => `<div class="bar"><span>${B.chars[k]==="."?"конец":B.chars[k]}</span><div class="tr"><div class="fl${k===top[0]?"":" cool"}" style="width:${(p[k]*100).toFixed(1)}%"></div></div><span>${fmt(p[k]*100,0)}%</span></div>`).join(""); };
+  $("#tp", body).oninput = upd; upd();
+  api.check(() => t.goal === "low" ? {ok: st.top > 0.8, msg:`Сейчас у лидера ${fmt(st.top*100,0)}%. ${t.hint}`} : {ok: st.top < 0.25, msg:`Сейчас у лидера ${fmt(st.top*100,0)}%. ${t.hint}`});
+},
+gen(body, t, api){
+  const st = api.st, B = bigram(); st.samples = st.samples || [];
+  body.innerHTML = `<div class="formula">начало: <b>ма</b></div><div class="row"><button class="btn ghost" id="gn">Дописать 6 раз</button></div><div class="names" id="nm"></div><p class="legend">Зелёным — новые имена, серым — имена из обучающего списка.</p>`;
+  const show = () => $("#nm", body).innerHTML = st.samples.map(s => `<span class="nm-chip ${NAMESET.has(s)?"copy":"new"}">${esc(s)}</span>`).join("");
+  $("#gn", body).onclick = () => { const out = []; for (let n=0; n<6; n++){ let s = "ма", r = B.ix["а"]; for (let k=0; k<12; k++){ const nx = B.sample(B.probs(r, 1)); if (nx === 0) break; s += B.chars[nx]; r = nx; } out.push(s); } st.samples = out; show(); };
+  show();
+  api.check(() => st.samples.length ? {ok: st.samples.some(s => !NAMESET.has(s) && s.length >= 4), msg:"Новых имён пока нет. Нажмите «Дописать» ещё раз."} : {ok:false, msg:"Сначала нажмите «Дописать 6 раз».", noCount:true});
+},
+attn(body, t, api){
+  const Wd = ["Кошка","не","прыгнула","на","забор,","потому","что","она","устала"], SC = {0:4,1:0,2:1,3:0,4:2.3,5:0,6:0,7:0.3};
+  let solved = false;
+  const render = (bad) => {
+    const sc = Wd.slice(0,8).map((_,j) => SC[j]), mx = Math.max(...sc), ex = sc.map(s => Math.exp(s-mx)), sum = ex.reduce((a,b) => a+b, 0), p = ex.map(e => e/sum);
+    body.innerHTML = `<div class="words">${Wd.map((w,i) => `<button data-i="${i}" class="${i===7?"src":""}${solved&&i===0?" on":""}${bad===i?" bad":""}">${esc(w)}</button>`).join("")}</div>
+      ${solved ? `<div class="bars">${Wd.map((w,j) => j > 7 ? `<div class="bar off"><span>${esc(w)}</span><div class="tr"></div><span>маска</span></div>` : `<div class="bar"><span>${esc(w)}</span><div class="tr"><div class="fl${j===0?"":" cool"}" style="width:${(p[j]*100).toFixed(1)}%"></div></div><span>${fmt(p[j]*100,0)}%</span></div>`).join("")}</div><p class="legend">Числа придуманы для наглядности, механизм — как в настоящей модели.</p>` : `<p class="legend">Слово «она» выделено: оно задаёт запрос Q.</p>`}`;
+    $$(".words button", body).forEach(b => b.onclick = () => { if (solved) return; const i = +b.dataset.i;
+      if (i === 0){ solved = true; render(); api.answer(true); } else render(i), api.answer(false, i === 7 ? "Это само слово «она». На кого оно смотрит?" : i > 7 ? "Это слово после «она» — оно закрыто маской." : "Не самое сильное совпадение. " + t.hint); });
+  };
+  render();
+},
+mask(body, t, api){
+  const st = api.st, T = ["Кот","ест","свою","кашу"]; st.sel = st.sel || [];
+  const render = (bad) => {
+    body.innerHTML = `<div class="mgrid"><span></span>${T.map(w => `<span class="mh">${w}</span>`).join("")}${T.map((w,r) => `<span class="mh r">${w}</span>` + T.map((_,c) => { const k = r+","+c, on = st.sel.includes(k); return `<button class="mc${on?" on":""}${c===r?" diag":""}${bad&&bad.includes(k)?" bad":""}" data-k="${k}" aria-label="${w} смотрит на ${T[c]}">${on?"✕":""}</button>`; }).join("")).join("")}</div>
+      <p class="legend">Строка — кто смотрит, столбец — на кого. ✕ — запрещено. Отмечено: ${st.sel.length}.</p>`;
+    $$(".mc", body).forEach(b => b.onclick = () => { const k = b.dataset.k; st.sel = st.sel.includes(k) ? st.sel.filter(x => x !== k) : st.sel.concat(k); render(); });
+  };
+  render();
+  api.check(() => { const need = []; for (let r=0;r<4;r++) for (let c=r+1;c<4;c++) need.push(r+","+c);
+    const miss = need.filter(k => !st.sel.includes(k)), extra = st.sel.filter(k => !need.includes(k)); render(extra);
+    return {ok: !miss.length && !extra.length, msg: extra.length ? `Лишние запреты (красным): токену можно смотреть на себя и назад.` : `Не хватает запретов: ${miss.length}. ${t.hint}`}; });
+},
+params(body, t, api){
+  const st = api.st, DS2 = [64,128,256,384,512,768,1024,1280,1600,2048]; if (st.L == null){ st.L = 4; st.di = 1; st.V = 100; }
+  body.innerHTML = slider("nl","N — блоков",1,48,1,st.L) + slider("nd","d — ширина",0,DS2.length-1,1,st.di) + `
+    <div class="seg" id="vs"><button data-v="100">словарь: буквы (~100)</button><button data-v="50257">части слов (~50 000)</button></div>
+    <div class="meter"><span>Параметров</span><b id="pc"></b></div><div class="formula" id="fx"></div>
+    <div class="seg" id="pr"><button data-p="4,1,100">мини-GPT</button><button data-p="12,5,50257">GPT-2 small</button><button data-p="48,8,50257">GPT-2 XL</button></div>`;
+  const upd = () => { st.L = +$("#nl", body).value; st.di = +$("#nd", body).value; const d = DS2[st.di]; $("#nl-o", body).textContent = st.L; $("#nd-o", body).textContent = d;
+    const blocks = 12*st.L*d*d, emb = st.V*d, n = blocks + emb; st.n = n;
+    const f = v => v < 1e6 ? fmt(v/1e3,0) + " тыс." : v < 1e9 ? fmt(v/1e6, v<1e7?1:0) + " млн" : fmt(v/1e9,2) + " млрд";
+    $("#pc", body).textContent = f(n); $("#pc", body).className = n >= 1e8 && n <= 1.5e8 ? "good" : "";
+    $("#fx", body).textContent = `12·${st.L}·${d}² = ${f(blocks)}  +  ${fmt(st.V,0)}·${d} = ${f(emb)}`;
+    $$("#vs button", body).forEach(b => b.classList.toggle("on", +b.dataset.v === st.V)); };
+  $("#nl", body).oninput = upd; $("#nd", body).oninput = upd;
+  $$("#vs button", body).forEach(b => b.onclick = () => { st.V = +b.dataset.v; upd(); });
+  $$("#pr button", body).forEach(b => b.onclick = () => { const [l,di,v] = b.dataset.p.split(",").map(Number); $("#nl", body).value = l; $("#nd", body).value = di; st.V = v; upd(); });
+  upd();
+  api.check(() => st.V !== 50257 ? {ok:false, msg:"Выберите словарь из частей слов (~50 000)."} : {ok: st.n >= 1e8 && st.n <= 1.5e8, msg:`Нужно от 100 до 150 млн. ${t.hint}`});
+},
+train(body, t, api){
+  const st = api.st, B = bigram(), chars = B.chars, ix = B.ix, V = chars.length;
+  const init = K => { st.K = K; st.Wt = new Float32Array(Math.pow(V,K)*V); st.steps = 0; st.hist = []; st.samples = []; st.run = false; st.pairs = [];
+    NAMES.forEach(n => { const s = ".".repeat(K) + n + "."; for (let i=K; i<s.length; i++){ let r = 0; for (let j=i-K; j<i; j++) r = r*V + ix[s[j]]; st.pairs.push([r, ix[s[i]]]); } }); st.hist.push(evalL()); };
+  const soft = r => { const o = r*V, p = new Float64Array(V); let mx = -1e9; for (let j=0;j<V;j++) mx = Math.max(mx, st.Wt[o+j]); let s = 0; for (let j=0;j<V;j++){ p[j] = Math.exp(st.Wt[o+j]-mx); s += p[j]; } for (let j=0;j<V;j++) p[j] /= s; return p; };
+  const evalL = () => { let L = 0; for (const [r,tt] of st.pairs) L -= Math.log(soft(r)[tt] + 1e-12); return L/st.pairs.length; };
+  const stepOnce = () => { for (let b=0; b<32; b++){ const [r,tt] = st.pairs[(Math.random()*st.pairs.length)|0], p = soft(r), o = r*V; for (let j=0; j<V; j++) st.Wt[o+j] -= 0.5*(p[j] - (j===tt?1:0)); } st.steps++; };
+  const gen = () => { const out = []; for (let n=0; n<8; n++){ let c = new Array(st.K).fill(0), s = ""; for (let k=0; k<14; k++){ let r = 0; for (const x of c) r = r*V + x; const nx = B.sample(soft(r)); if (nx === 0) break; s += chars[nx]; c = c.slice(1).concat(nx); } out.push(s); } return out; };
+  if (!st.Wt) init(1);
+  body.innerHTML = `<div class="row"><span class="legend">Контекст:</span><div class="seg" id="kk">${[1,2,3].map(k => `<button data-k="${k}">${k} ${plural(k,"буква","буквы","букв")}</button>`).join("")}</div></div>
+    <div class="row"><button class="btn ghost" id="go">▶ Обучать</button><button class="btn ghost" id="rs">Сначала</button></div>
+    <div class="stats"><span>шагов: <b id="ns"></b></span><span>ошибка: <b id="ls"></b></span><span>параметров: <b id="pc"></b></span></div>
+    <canvas class="plot" id="lc"></canvas><div class="names" id="nm"></div><div class="status" id="ss"></div>
+    <p class="legend">Зелёным — новые имена, серым — заученные из обучающего списка.</p>`;
+  const tok = api.tok();
+  const draw = () => { const L = st.hist[st.hist.length-1]; $("#ns", body).textContent = st.steps; $("#ls", body).textContent = fmt(L,3); $("#ls", body).className = L < 1.9 ? "good" : "";
+    $("#pc", body).textContent = fmt(Math.pow(V,st.K)*V,0); drawLoss($("#lc", body), st.hist, true);
+    $("#nm", body).innerHTML = st.samples.map(s => `<span class="nm-chip ${NAMESET.has(s)?"copy":"new"}">${esc(s||"—")}</span>`).join("");
+    $$("#kk button", body).forEach(b => b.classList.toggle("on", +b.dataset.k === st.K));
+    const ss = $("#ss", body);
+    if (L < 1.9){ ss.className = "status good"; ss.textContent = "Ошибка ниже 1,9. Нажмите «Проверить»."; }
+    else if (st.steps >= 1500){ ss.className = "status bad"; ss.textContent = "Обучение закончилось, а ошибка не опустилась. С одной буквой контекста модель упирается в ≈ 2,1."; }
+    else { ss.className = "status"; ss.textContent = st.steps ? "" : "Нажмите «Обучать». Сначала модель выдаёт мешанину букв."; } };
+  const loop = () => { if (!st.run || !api.alive(tok)) return; for (let k=0; k<10; k++) stepOnce(); if (st.steps % 30 === 0 || st.steps >= 1500) st.hist.push(evalL()); if (st.steps % 100 === 0 || st.steps >= 1500) st.samples = gen(); draw();
+    if (st.steps >= 1500){ st.run = false; $("#go", body).textContent = "▶ Обучать"; return; } requestAnimationFrame(loop); };
+  $$("#kk button", body).forEach(b => b.onclick = () => { init(+b.dataset.k); st.samples = gen(); $("#go", body).textContent = "▶ Обучать"; draw(); });
+  $("#go", body).onclick = () => { if (st.steps >= 1500) return; st.run = !st.run; $("#go", body).textContent = st.run ? "❚❚ Пауза" : "▶ Обучать"; if (st.run) loop(); };
+  $("#rs", body).onclick = () => { init(st.K); st.samples = gen(); $("#go", body).textContent = "▶ Обучать"; draw(); };
+  if (!st.samples.length) st.samples = gen();
+  draw(); if (st.run){ $("#go", body).textContent = "❚❚ Пауза"; loop(); }
+  api.check(() => ({ok: st.hist[st.hist.length-1] < 1.9, msg:`Ошибка сейчас ${fmt(st.hist[st.hist.length-1],2)}. ${t.hint}`}));
+}
+};
+let _bigram = null;
+function bigram(){
+  if (_bigram) return _bigram;
+  const chars = ["."].concat([...new Set(NAMES.join(""))].sort((a,b) => a.localeCompare(b,"ru")));
+  const ix = Object.fromEntries(chars.map((c,i) => [c,i])), V = chars.length;
+  const C = Array.from({length:V}, () => new Float64Array(V).fill(0.05));
+  NAMES.forEach(n => { const s = "."+n+"."; for (let i=0; i<s.length-1; i++) C[ix[s[i]]][ix[s[i+1]]]++; });
+  const probs = (row, T) => { const p = C[row].map(c => Math.pow(c, 1/T)); const s = p.reduce((a,b) => a+b, 0); return p.map(x => x/s); };
+  const sample = p => { let u = Math.random(), j = 0; for (; j<p.length-1; j++){ u -= p[j]; if (u <= 0) break; } return j; };
+  return (_bigram = {chars, ix, probs, sample});
+}
+
+/* ================= Старт ================= */
+function start(data){
+  const old = loadLS(OLDKEY);
+  S = Object.assign(defaults(), loadLS(KEY) || {xp: old && old.xp || 0}, (data && data.S) || {});
+  if (data && data.LV) LV = data.LV;
+  if (!location.hash) { try { history.replaceState(null, "", "#home"); } catch(e){} }
+  route();
+}
+window.claude?.hot?.snapshot?.(() => ({S, LV}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+
+</script>
+</body>
+</html>
