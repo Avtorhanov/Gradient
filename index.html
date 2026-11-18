@@ -925,6 +925,29 @@ const LESSONS = [
     ["η = 1,5 → w = 5 − 6 = −1","С длинным шагом перелетели дно: теперь стоим дальше, чем были."]]},
   analog:"Спуск по лестнице в темноте. Крошечные шажки — дойдёте к утру. Прыжки через пять ступенек — пролетите площадку. Нужен шаг размером со ступеньку.",
   src:"Траск, гл. 4 (коэффициент α и расходимость, когда шаг «перелетает»). Принс, гл. 6 (скорость обучения).",
+  stand:{scene:"valley", mode:"eta", steps:[
+    {t:"Градиент говорит, куда идти, но не говорит, как далеко. Длину шага выбираем сами — это скорость обучения <b style=\"color:var(--good)\">η</b> («эта», в коде <b>lr</b> — learning rate). Путник стоит на w = 5, наклон под ногами <b style=\"color:var(--accent)\">∇</b> = +4: дно левее. Зелёная стрелка — будущий шаг: чем больше η, тем она длиннее.",
+     go:[{w:5, eta:0.25}, "pause", {eta:0.5}, "pause", {eta:1}, "pause", {eta:0.25}], tan:true,
+     ex:[["Траск, гл. 4","Самый простой способ не перестараться с поправкой, по словам автора, — умножать её на маленькое число α от 0 до 1. Так в правиле шага и появляется скорость обучения: у автора это α, у нас η, в коде lr."]]},
+    {t:"Правило шага: <b style=\"color:var(--sw)\">w</b> − <b style=\"color:var(--good)\">η</b>·<b style=\"color:var(--accent)\">∇</b>. Минус — потому что идём против наклона, вниз. Сам шаг — <b style=\"color:var(--good)\">η·∇</b>: длина, умноженная на наклон. При η = 0,25: η·∇ = 0,25 · 4 = 1, новое w = 5 − 1 = 4. Там склон положе, и следующий шаг сам выходит короче: 0,25 · 2 = 0,5.",
+     go:[{w:5, eta:0.25}, "pause", "jump"],
+     ex:[["Принс, гл. 6","Правило шага у автора то же самое: из параметров вычитают градиент, умноженный на число α. Это число он называет размером шага, или скоростью обучения (learning rate), — два имени одной вещи."]]},
+    {t:"Как в разборе примера: при η = 0,5 шаг 0,5 · 4 = 2, и w = 5 − 2 = 3 — путник одним прыжком попал ровно на дно. Это удача именно этой долины: обычно до дна идут многими шагами.",
+     go:[{w:5, eta:0.5}, "pause", "jump"]},
+    {t:"Маленькая <b style=\"color:var(--good)\">η</b> — шаги крошечные. При η = 0,05 первый шаг всего 0,05 · 4 = 0,2, а дальше ещё короче: склон всё положе. За 10 шагов путник так и не дошёл до дна — w ≈ 3,7. Спуск займёт вечность.",
+     go:[{w:5, eta:0.05}, "run"]},
+    {t:"Слишком большая <b style=\"color:var(--good)\">η</b> — перелёт. При η = 1,5 шаг 1,5 · 4 = 6: w = 5 − 6 = −1. Путник перепрыгнул дно и стоит выше, чем был: ошибка <b style=\"color:var(--cool)\">L</b> выросла с 4 до 16. Следующий прыжок ещё длиннее — за край долины: w = 11, L = 64.",
+     go:[{w:5, eta:1.5}, "pause", "jump", "pause", "jump"],
+     ex:[["Траск, гл. 4","Автор нарочно ломает свой спуск: берёт вход побольше, и поправка веса выходит такой большой, что вес перелетает нужное значение. На следующем шаге промах больше прошлого, поправка ещё больше — и ошибка растёт без конца. Такое поведение называют расходимостью."]]},
+    {t:"Хорошую <b style=\"color:var(--good)\">η</b> подбирают пробами: делают несколько шагов и смотрят, как падает <b style=\"color:var(--cool)\">L</b>. Падает медленно — η увеличивают, скачет или растёт — уменьшают. Обычно пробуют 0,1, 0,01, 0,001. Здесь η = 0,1 ползёт, 0,9 скачет через дно, а 0,4 за три шага почти на дне.",
+     go:[{w:5, eta:0.1}, "run", "pause", {w:5, eta:0.9}, "run", "pause", {w:5, eta:0.4}, "run"],
+     ex:[["Траск, гл. 4","Как выбрать α? Автор признаётся, что даже в серьёзных сетях её часто подбирают на глаз — следят за ошибкой. Начала расти — α слишком большая, её уменьшают. Падает слишком медленно — маленькая, её увеличивают."]]},
+    {look:true, t:"Новичок за рулём: машину чуть повело вправо — он резко выкручивает руль влево, машина уходит влево, он ещё резче вправо, и виляние только растёт. Опытный водитель подруливает понемногу и едет ровно. Резкий руль — это слишком большая <b style=\"color:var(--good)\">η</b>: каждая поправка перелетает нужное положение.",
+     go:[{w:5, eta:1.1}, "run", "pause", {w:5, eta:0.3}, "run"]},
+    {look:true, t:"Покрутите ползунок <b style=\"color:var(--good)\">η</b> и следите за следом прыжков. До 0,5 путник спускается, не перепрыгивая дно. От 0,5 до 1 перепрыгивает, но качается всё меньше. Больше 1 — каждый прыжок длиннее прошлого. Граница 1 — только у этой долины: у крутой она ниже, у пологой выше. Поэтому η и подбирают пробами.",
+     go:[{w:5, eta:0.75}, "path"],
+     ex:[["Принс, гл. 6","Одну скорость на всё обучение часто не держат. Автор описывает расписание скорости: в начале её делают большой — модель смело прыгает и находит подходящую область, — а потом по ходу обучения раз за разом уменьшают, чтобы аккуратно спуститься к дну."]]}
+  ]},
   tasks:[
     {t:"num", q:"w = 5, градиент = 4, η = 0,25. Какое новое w?", a:4, hint:"w − η · градиент = 5 − 0,25 · 4.", why:"0,25 · 4 = 1, и 5 − 1 = 4.", steps:["Правило шага: новое w = w − η · градиент.", "Длина шага: η · градиент = 0,25 · 4 = 1.", "Новое w: 5 − 1 = 4. Мы шагнули влево, к дну (оно в w = 3)."], idea:"Минус в формуле — это «против градиента», а η — насколько смело мы шагаем."},
     {t:"lrrun", q:"Подберите η, чтобы за 10 шагов спуститься на дно (w ≈ 3) и не улететь.", hint:"0,01 — слишком мелко. 1,05 — уже разлёт. Ищите посередине.", why:"При η от 0,2 до 0,8 спуск укладывается в 10 шагов.", steps:["η = 0,01: шаги крошечные — за 10 шагов почти не сдвинулись.", "η больше 1: шаг перелетает дно, и каждый прыжок уносит всё дальше.", "η около 0,3–0,5: несколько уверенных шагов — и мы на дне."], idea:"Слишком медленно — плохо, слишком быстро — ещё хуже. Хорошую η подбирают пробами, как вы сейчас.", sol:"η = 0,3 или 0,5"},
@@ -949,6 +972,30 @@ const LESSONS = [
     ["Шаг","w = w − η·dw, b = b − η·db. И снова к прогнозу."]]},
   analog:"Стрелок пристреливает винтовку: выстрел (прогноз), смотрит, насколько мимо (ошибка), понимает, куда подкрутить прицел (градиент), подкручивает чуть-чуть (шаг). Через десяток выстрелов он попадает в центр.",
   src:"Траск, гл. 4–5 («прогноз, сравнение, обучение»). Принс, гл. 6. Карпатый, лекция про micrograd (цикл обучения в коде).",
+  stand:{scene:"range", steps:[
+    {t:"Обучение — это четыре действия по кругу: прогноз <b style=\"color:var(--syh)\">ŷ</b>, ошибка <b style=\"color:var(--cool)\">L</b>, градиенты для каждой ручки, шаг. Так стрелок пристреливает винтовку: выстрел → промах → поправка → подкрутить прицел — и снова выстрел. У прицела две ручки, как у нашей модели: барабаны <b style=\"color:var(--sw)\">w</b> и <b style=\"color:var(--sb)\">b</b>.",
+     go:[{eta:0.25}, "start", "pause", "cycle"],
+     ex:[["Принс, гл. 6","У автора градиентный спуск — повтор двух действий: посчитать, как ошибка зависит от каждого параметра, и сдвинуть все параметры против этого. Прогноз и ошибка спрятаны внутри первого действия: чтобы найти производные, сначала прогоняют через модель примеры. И так снова и снова."]]},
+    {t:"Действие 1 — прогноз. Стрелок даёт серию из 7 выстрелов — по одному на каждый день данных. Каждая пуля — прогноз <b style=\"color:var(--syh)\">ŷ</b> для своего дня, центр мишени — правильный ответ <b style=\"color:var(--sy)\">y</b>. В модели это ŷ = w·x + b для каждого из 7 дней. Прицел пока сбит (w = 6, b = 23): кучка легла левее и выше центра.",
+     go:[{eta:0.25}, "start", "pause", "shoot"]},
+    {t:"Действие 2 — ошибка. Промахи всех семи пуль сводят в одно число — <b style=\"color:var(--cool)\">L</b>, среднее квадратов промахов, как в уроке L: здесь L = 25,5. Пунктир — промах кучки в целом: в среднем она ушла на 4 левее и на 3 выше центра.",
+     go:[{eta:0.25}, "start", "shot", "pause", "miss"]},
+    {t:"Действие 3 — градиенты, для каждой ручки свой. <b style=\"color:var(--accent)\">dw</b> — как изменится L, если чуть подкрутить w, <b style=\"color:var(--accent)\">db</b> — то же для b. У такой мишени градиент — промах кучки по своей оси, умноженный на 2, как 2·(w − 3) в уроке ∇: dw = 2·(−4) = −8, db = 2·3 = +6. Знак подсказывает: w увеличить, b уменьшить.",
+     go:[{eta:0.25}, "start", "shot", "missI", "pause", "grad"],
+     ex:[["Траск, гл. 5","В сети с тремя входами промах у автора один на всех, а поправка у каждого веса своя: тот же промах, умноженный на свой вход. Вес при большом входе меняется сильнее, а при нулевом входе не меняется вовсе."]]},
+    {t:"Действие 4 — шаг: каждую ручку сдвигаем против её градиента на <b style=\"color:var(--good)\">η</b> из прошлого урока. При η = 0,25: w = 6 − 0,25·(−8) = 8, b = 23 − 0,25·6 = 21,5. Барабаны повернулись — и следующая серия легла вдвое ближе к центру: L = 6,75.",
+     go:[{eta:0.25}, "start", "shot", "missI", "gradI", "pause", "turn", "pause", "shoot", "miss"],
+     ex:[["Карпатый, лекция про micrograd","В лекции сеть из 41 ручки учится на четырёх примерах. Шаг в коде — короткий цикл по всем ручкам: каждую сдвигают на маленькое число против её градиента. Минус автор объясняет так же: градиент показывает, куда ошибка растёт, а нам нужно туда, где она падает."]]},
+    {t:"Один проход по всем обучающим примерам называют <b>эпохой</b>: здесь это серия из 7 выстрелов — все 7 дней данных. Обычно нужно много эпох: ошибка падает постепенно. Смотрите: L = 25,5 → 6,75 → 2,06 → 0,89 → 0,6…, и кучка сползает к центру.",
+     go:[{eta:0.25}, "train"],
+     ex:[["Принс, гл. 6","Обычно примеры берут небольшими пачками: шаг делают после каждой пачки, а эпоха — это когда пройдены все примеры. Пачку выбирают случайно, поэтому способ называют стохастическим градиентным спуском. У нас пачка одна — все 7 дней, поэтому эпоха и шаг совпадают."],
+         ["Траск, гл. 4","Автор запускает свой цикл несколько раз подряд и печатает ошибку после каждого круга: прогноз раз за разом подходит к цели, ошибка падает. Весь цикл — несколько строк: прогноз, ошибка, поправка, сдвиг веса."]]},
+    {t:"Правильные <b style=\"color:var(--sw)\">w</b> и <b style=\"color:var(--sb)\">b</b> никто не сообщает: стрелок не знает, где «верный» прицел, — он видит только промахи. За шесть шагов барабаны сами пришли к w ≈ 10 и b ≈ 20. В ноль L не уйдёт: пули серии всё равно ложатся кучкой. Так же учится и линия кафе — 7 дней вместо 7 пуль, — и GPT с миллиардами ручек.",
+     go:[{eta:0.25}, "path"],
+     ex:[["Принс, гл. 6","Автор обучает прямую из гл. 2 и рисует две картинки рядом: на карте ошибки — дорожку шагов к дну, на графике с точками — как прямая после каждого шага ложится на них всё лучше. Правильные параметры заранее никто не знает: их находит сам спуск."]]},
+    {look:true, t:"Готовите суп. Попробовали — это прогноз. Недосолено — ошибка. Ясно, что подкрутить: соль добавить, перец не трогать — градиенты по каждой «ручке». Всыпали щепотку — шаг, и снова пробуете. Сыпанёте сразу ложку — пересолите, как стрелок с η = 1,05: кучка скачет через центр всё дальше и уходит мимо колец. Покрутите ползунок <b style=\"color:var(--good)\">η</b>: при 0,5 хватает одного круга.",
+     go:[{eta:1.05}, "train"]}
+  ]},
   tasks:[
     {t:"order", q:"Расставьте один круг обучения по порядку", items:["Сделать прогноз ŷ","Посчитать ошибку L","Найти градиенты dw и db","Сдвинуть w и b на шаг"], why:"Прогноз → ошибка → градиенты → шаг, и снова по кругу.", steps:["Сначала нужен прогноз — без него нечего сравнивать.", "Сравниваем прогноз с правдой — получаем ошибку.", "По ошибке считаем градиенты: куда двигать w и b.", "Двигаем ручки — и начинаем новый круг уже с новыми w и b."], idea:"Этот круг — сердце машинного обучения. Большие модели отличаются только размером: больше ручек, данных и кругов."},
     {t:"gd", q:"Нажимайте «Шаг» или «Авто», пока ошибка не станет меньше 30. Ручки двигает сама модель.", hint:"Если ошибка растёт — уменьшите скорость и нажмите «Сброс».", why:"Модель сама нашла w и b, видя только ошибку.", steps:["Каждое нажатие «Шаг» — один полный круг: прогноз, ошибка, градиенты, сдвиг ручек.", "Вы не двигали w и b — модель двигала их сама, глядя на градиенты.", "Если ошибка росла, скорость была слишком большой — как в прошлом уроке."], idea:"Это и есть «машинное обучение»: человек задаёт правило и данные, а числа внутри модели подбираются сами.", sol:"Скорость 0,3 и «Авто»."},
@@ -1691,11 +1738,19 @@ function renderStand(L, host){
   show(0);
 }
 
-/* ---------- Сцена «Долина в тумане»: ошибка L(w) = (w − 3)², путник = ручка w ---------- */
+/* ---------- Сцена «Долина в тумане»: ошибка L(w) = (w − 3)², путник = ручка w ----------
+   Без режима — урок ∇: путник идёт по склону за ручкой w, треугольник наклона, стрелка «куда шагать», туман.
+   Режим eta — урок η: путник прыгает по правилу w − η·∇ (ручка η), на склоне след прыжков, сверху табличка с расчётом шага;
+   долина ниже (5,2 единицы картинки на единицу L вместо 6,4), чтобы прыжки до края (|w − 3| ≤ 4,5) не задевали табличку. */
 SCENES.valley = {
   vals: [["w","где стоим","--sw"],["L","высота = ошибка","--cool"],["dL/dw","наклон","--accent"],["→","куда шагать","--good",1]],
   ctrl: {k:"w", min:-1.5, max:7.5},
   acts: [["step","Один шаг"],["run","▶ Спуститься"]],
+  modes: {
+    eta: {vals: [["η","длина шага","--good"],["η · ∇","сдвиг w","--good"],["w − η·∇","новое w","--sw"],["L","ошибка сейчас","--cool"]],
+          ctrl: {k:"η", min:0.05, max:1.5, step:0.05, col:"--good"},
+          acts: [["jump","Один шаг"],["run","▶ 10 шагов"]], camMin: 290}
+  },
   svg: `<svg viewBox="0 -18 360 262" role="img" aria-label="Путник на склоне долины в тумане. Высота — ошибка L, положение — ручка w, наклон — градиент dL/dw.">
 <defs><marker id="v-ah" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="3.2" markerHeight="3.2" orient="auto"><path d="M0 0L10 5L0 10Z" style="fill:var(--good)"/></marker></defs>
 <path d="M-300 214L-300 110L-200 70L-120 108L-60 80L-5 118L38 86L70 112L118 64L160 104L200 76L246 112L292 60L330 96L365 80L420 108L480 70L560 104L660 84L660 214Z" style="fill:var(--mount)"/>
@@ -1717,6 +1772,12 @@ SCENES.valley = {
 <line x1="-400" y1="214" x2="760" y2="214" stroke-width="1" style="stroke:var(--axis)"/>
 <g id="v-ticks" style="fill:var(--muted);font-size:11px" text-anchor="middle"></g>
 <text id="v-lax" x="11" y="112" transform="rotate(-90 11 112)" text-anchor="middle" class="lb" style="fill:var(--cool);font-size:11px">высота L = ошибка</text>
+<g id="v-eta" fill="none" display="none">
+  <g id="v-trail"></g>
+  <path id="v-exit" stroke-width="1.8" stroke-dasharray="5 4" style="stroke:var(--good)"/>
+  <line id="v-ldrop" stroke-width="1.3" stroke-dasharray="2 3" style="stroke:var(--good)"/>
+  <circle id="v-lring" r="3.6" stroke-width="2" style="fill:var(--card);stroke:var(--good)"/>
+</g>
 <line id="v-Lm" stroke-width="2.5" stroke-linecap="round" style="stroke:var(--cool)"/>
 <line id="v-Lt" stroke-width="2" style="stroke:var(--cool)"/>
 <text id="v-Ll" class="lb" style="fill:var(--cool);font-size:12px;font-weight:600"></text>
@@ -1732,7 +1793,7 @@ SCENES.valley = {
   <text id="v-lab2a" class="lb" style="fill:var(--accent);font-size:11px">dL/dw</text>
   <text id="v-lab2b" class="lb" style="fill:var(--accent);font-size:13px;font-weight:600"></text>
 </g>
-<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+<g id="v-man" fill="none" stroke-linecap="round" stroke-linejoin="round">
   <rect id="v-pack" width="6.5" height="11" rx="2" stroke="none" style="fill:var(--pack)"/>
   <path id="v-legB" stroke-width="4" style="stroke:var(--pants)"/>
   <path id="v-legA" stroke-width="4" style="stroke:var(--pants)"/>
@@ -1746,15 +1807,27 @@ SCENES.valley = {
   <line id="v-arr" stroke-width="3.5" stroke-linecap="round" marker-end="url(#v-ah)" style="stroke:var(--good)"/>
   <text id="v-arrL" text-anchor="middle" class="lb" style="fill:var(--good);font-size:12px;font-weight:600;font-family:var(--f-body)"></text>
 </g>
+<text id="v-landL" class="lb" style="fill:var(--sw);font-size:11px;font-weight:600" display="none"></text>
+<g id="v-bd" display="none">
+  <rect id="v-bdo" rx="4" style="fill:var(--woodtop)"/><rect id="v-bdi" rx="2" style="fill:var(--board)"/>
+  <text id="v-b1" style="font-size:10.5px"></text><text id="v-b2" style="font-size:11px;font-weight:600"></text>
+</g>
 </svg>`,
   init(E){
-    const q = id => E.svg.getElementById ? E.svg.getElementById("v-"+id) : E.svg.querySelector("#v-"+id);
+    const QC = {}, q = id => QC[id] || (QC[id] = E.svg.getElementById ? E.svg.getElementById("v-"+id) : E.svg.querySelector("#v-"+id));
     const sa = (id, o) => { const e = q(id); for (const k in o) e.setAttribute(k, o[k]); };
-    const X = w => 34 + (w + 2) * 27, Y = L => 200 - L * 6.4, Lf = w => (w - 3) ** 2, G = w => 2 * (w - 3);
-    const gy = w => Y(Lf(w)), cw = w => Math.min(8, Math.max(-2, w)), KX = 6.4 / 27, BOT = X(3);
+    const tx = (id, t) => { const e = q(id); if (e.textContent !== t) e.textContent = t; };
+    const ETA = E.mode === "eta", KY = ETA ? 5.2 : 6.4;
+    const X = w => 34 + (w + 2) * 27, Xi = x => (x - 34) / 27 - 2, Y = L => 200 - L * KY, Lf = w => (w - 3) ** 2, G = w => 2 * (w - 3);
+    const gy = w => Y(Lf(w)), cw = w => Math.min(8, Math.max(-2, w)), KX = KY / 27, BOT = X(3);
     const P = (x, y) => x.toFixed(1) + " " + y.toFixed(1);
     const sg1 = v => (v > 0.05 ? "+" : v < -0.05 ? "−" : "") + fmt(Math.abs(v), 1).replace(/^(\d+)$/, "$1,0");
     const n1 = v => (v < -0.05 ? "−" : "") + fmt(Math.abs(v), 1).replace(/^(\d+)$/, "$1,0");
+    // урок η: до двух знаков после запятой, без лишних нулей — как в разборе (5 − 0,25 · 4 = 4)
+    // свой формат вместо toLocaleString: ползунок перерисовывает десятки чисел за кадр
+    const f2 = v => { const r = Math.round(v * 100), a = Math.abs(r), d = a % 100;
+      return (r < 0 ? "−" : "") + Math.floor(a / 100) + (d ? "," + (d % 10 ? String(d).padStart(2, "0") : d / 10) : ""); };
+    const s2 = v => (Math.round(v * 100) > 0 ? "+" : "") + f2(v);
     const curve = off => { let d = ""; for (let i = 0; i <= 600; i++){ const w = -14 + i * 0.05, y = Math.min(Math.max(gy(w), 22) + off, 214); d += (i ? "L" : "M") + P(X(w), y); } return d; };
     sa("terr", {d: curve(0) + "L700 214L-400 214Z"}); sa("surf", {d: curve(0)}); sa("st1", {d: curve(16)}); sa("st2", {d: curve(34)});
     q("trees").innerHTML = [[-1.45,1],[-.75,.8],[1.3,.72],[4.9,.78],[6.85,1],[7.6,.85]].map(([tw, s]) => { const x = X(tw), y = gy(tw) + 1;
@@ -1762,14 +1835,27 @@ SCENES.valley = {
     const TK = [0, 3, 6];
     q("ticks").innerHTML = TK.map(t => `<text id="v-tk${t}" x="${X(t)}" y="238">${t}</text>`).join("");
     const st = {w: 7.4, f: -1, ph: 0, moving: 0, tan: false, arr: false, fog: true};
+    if (ETA){
+      // урок η: без тумана, свои подписи; исчезающие подписи — без плавного затухания
+      Object.assign(st, {w: 5, eta: 0.25, trail: [5], jump: null, exitU: 0, fog: false});
+      ["eta", "landL", "bd"].forEach(id => q(id).removeAttribute("display"));
+      q("arrG").classList.remove("st-fade"); q("tri").classList.remove("st-fade");
+      tx("lab2a", "∇");
+      // след: 10 дуг и 10 точек заготовлены заранее — ползунок только меняет их атрибуты
+      q("trail").innerHTML = Array.from({length: 10}, (_, i) => `<path id="v-ta${i}" stroke-width="1.6" stroke-dasharray="3 3" style="stroke:var(--good)"/>`).join("")
+        + Array.from({length: 10}, (_, i) => `<circle id="v-td${i}" r="2.6" stroke-width="1" style="fill:var(--good);stroke:var(--card)"/>`).join("");
+      // табличка: тексты в готовых кусочках
+      const T = (c, w) => `<tspan style="fill:var(${c})${w ? ";font-weight:600" : ""}"></tspan>`;
+      q("b1").innerHTML = T("--good", 1) + T("--muted") + T("--cool");
+      q("b2").innerHTML = T("--sw", 1) + T("--muted") + T("--good", 1) + T("--muted") + T("--accent", 1) + T("--muted") + T("--ink");
+      const set = (id, a) => [...q(id).children].forEach((e, i) => { e.textContent = a[i]; });
+      set("b2", ["w", " − ", "η", "·", "∇", " = ", ""]);
+      st.bset = set;
+    }
 
-    function draw(fromSlider){
-      const w = st.w, x = X(w), y = gy(w), g = G(w), L = Lf(w);
-      const [x0, vr] = E.view(x);
-      sa("lz", {x: (vr - 6).toFixed(1)}); sa("lax", {x: (x0 + 11).toFixed(1), transform: `rotate(-90 ${(x0 + 11).toFixed(1)} 112)`});
-      if (!st.moving && Math.abs(g) > 0.15) st.f = -Math.sign(g);
-      const f = st.f;
-      // путник: ноги на склоне, шаг по фазе ph
+    // путник: ноги на склоне, шаг по фазе ph; air — высота прыжка над склоном
+    function hero(w, air){
+      const x = X(w), f = st.f;
       const s = 0.15 * Math.sin(st.ph), fa = cw(w + s*f), fb = cw(w - s*f), ax = X(fa), ay = gy(fa), bx = X(fb), by = gy(fb);
       const hy = (ay + by) / 2 - 15 + Math.abs(Math.sin(st.ph)) * 1.2;
       const leg = (fx, fy) => "M" + P(x, hy) + "L" + P((x + fx) / 2 + f * 2.5, (hy + fy) / 2) + "L" + P(fx, fy) + "l" + (f * 3.5).toFixed(1) + " 0";
@@ -1779,11 +1865,15 @@ SCENES.valley = {
       sa("pack", {x: (x - f * 5 - 3.25).toFixed(1), y: (hy - 14.5).toFixed(1)});
       const hx = x + f * 2.2, hh = hy - 20.5; sa("head", {cx: hx.toFixed(1), cy: hh.toFixed(1)});
       sa("hat", {d: "M" + P(hx - 5, hh - 0.8) + "A5 5 0 0 1 " + P(hx + 5, hh - 0.8) + "Z"});
-      const tw = cw(w + f * 0.6), tx = X(tw), ty = gy(tw), hx2 = x + f * 7.5, hy2 = hy - 6;
-      sa("stick", {x1: tx.toFixed(1), y1: ty.toFixed(1), x2: (hx2 + (hx2 - tx) * 0.3).toFixed(1), y2: (hy2 + (hy2 - ty) * 0.3).toFixed(1)});
+      const tw = cw(w + f * 0.6), tx2 = X(tw), ty = gy(tw), hx2 = x + f * 7.5, hy2 = hy - 6;
+      sa("stick", {x1: tx2.toFixed(1), y1: ty.toFixed(1), x2: (hx2 + (hx2 - tx2) * 0.3).toFixed(1), y2: (hy2 + (hy2 - ty) * 0.3).toFixed(1)});
       sa("arm", {d: "M" + P(sx, sy + 1) + "L" + P(hx2, hy2)});
-      // L — высота над дном
-      const showL = L > 0.6, lt = "L = " + n1(L), lw = lt.length * 7.3, mid = (y + 200) / 2 + 4;
+      sa("man", {transform: `translate(0 ${(-air).toFixed(1)})`});
+      return hy;
+    }
+    // L — высота над дном: синяя линия и подпись (место подписи зависит от высоты и склона)
+    function lMark(x, y, g, L, x0, show){
+      const showL = show && L > 0.6, lt = "L = " + (ETA ? f2(L) : n1(L)), lw = lt.length * 7.3, mid = (y + 200) / 2 + 4;
       sa("Lm", {x1: x, y1: (y + 3).toFixed(1), x2: x, y2: 200, opacity: showL ? 1 : 0});
       sa("Lt", {x1: x - 4, y1: 200, x2: x + 4, y2: 200, opacity: showL ? 1 : 0});
       let lx, ly = mid, anc;
@@ -1791,15 +1881,23 @@ SCENES.valley = {
       else if (g > 0.05){ lx = x + 7; anc = "start"; }
       else if (x - 7 - lw > x0 + 22){ lx = x - 7; anc = "end"; }   // левее — подпись оси «высота L»
       else { lx = x + 7; anc = "start"; ly = Math.max(mid, y + 27 * Math.abs(g * KX) + 16); }
-      sa("Ll", {x: lx.toFixed(1), y: (L >= 9 ? Math.min(ly, 197) : ly).toFixed(1), "text-anchor": anc});
-      q("Ll").textContent = L < 0.05 ? "L ≈ 0" : lt;
-      // w — метка на оси
+      if (ETA && anc === "start" && lx + lw > E.view(BOT)[1] - 4){ lx = x - 7; anc = "end"; }
+      ly = L >= 9 ? Math.min(ly, 197) : ly;
+      sa("Ll", {x: lx.toFixed(1), y: ly.toFixed(1), "text-anchor": anc});
+      tx("Ll", L < 0.05 ? "L ≈ 0" : lt); q("Ll").style.opacity = show ? 1 : 0;
+      const w2 = (L < 0.05 ? 5 : lt.length) * 7.3;
+      return show ? [anc === "end" ? lx - w2 : lx, ly - 10, anc === "end" ? lx : lx + w2, ly + 2] : null;
+    }
+    // w — метка на оси
+    function wMark(x, w, x0, vr){
       sa("wd", {x1: x, y1: 200, x2: x, y2: 214});
       sa("ptr", {d: "M" + P(x, 215) + "L" + P(x - 5, 223) + "L" + P(x + 5, 223) + "Z"});
       const wx = Math.min(vr - 72, Math.max(x0 + 34, x));
-      sa("wl", {x: wx.toFixed(1), y: 238}); q("wl").textContent = "w = " + n1(w);
+      sa("wl", {x: wx.toFixed(1), y: 238}); tx("wl", "w = " + (ETA ? f2(w) : n1(w)));
       TK.forEach(t => { q("tk" + t).style.opacity = Math.abs(X(t) - wx) < 40 ? 0 : 1; });
-      // dL/dw — треугольник наклона: шаг на 1 вправо и на сколько изменилась высота
+    }
+    // треугольник наклона: шаг на 1 вправо и на сколько изменилась высота
+    function tri(x, y, g){
       const k = g * KX, ty2 = y - 27 * k;
       sa("triP", {d: "M" + P(x, y) + "L" + P(x + 27, y) + "L" + P(x + 27, ty2) + "Z"});
       sa("hleg", {x1: x, y1: y, x2: x + 27, y2: y}); sa("vleg", {x1: x + 27, y1: y, x2: x + 27, y2: ty2});
@@ -1807,17 +1905,29 @@ SCENES.valley = {
       sa("lab1", {x: (x + 13.5).toFixed(1), y: (y + 12).toFixed(1)});
       const vm = y - 13.5 * k;
       sa("lab2a", {x: (x + 31).toFixed(1), y: (vm - 2).toFixed(1)}); sa("lab2b", {x: (x + 31).toFixed(1), y: (vm + 12).toFixed(1)});
-      q("lab2b").textContent = sg1(g);
+      tx("lab2b", sg1(g));
       const big = Math.abs(g) >= 0.4;
       q("lab2a").style.opacity = q("lab2b").style.opacity = big ? 1 : 0;
       q("lab1").style.opacity = g >= 2.5 ? 1 : 0;
+    }
+
+    function draw(fromSlider){
+      if (ETA) return drawEta(fromSlider);
+      const w = st.w, x = X(w), y = gy(w), g = G(w), L = Lf(w);
+      const [x0, vr] = E.view(x);
+      sa("lz", {x: (vr - 6).toFixed(1)}); sa("lax", {x: (x0 + 11).toFixed(1), transform: `rotate(-90 ${(x0 + 11).toFixed(1)} 112)`});
+      if (!st.moving && Math.abs(g) > 0.15) st.f = -Math.sign(g);
+      const hy = hero(w, 0);
+      lMark(x, y, g, L, x0, true);
+      wMark(x, w, x0, vr);
+      tri(x, y, g);
       q("dno").style.opacity = Math.abs(x - BOT) < 70 ? 0 : 1;
       sa("tri", {opacity: st.tan ? 1 : 0});
       // стрелка «куда шагать»: против наклона, длина — по крутизне
       const dir = Math.abs(g) < 0.15 ? 0 : -Math.sign(g), len = Math.min(16 + Math.abs(g) * 5, 62), ay3 = hy - 38;
       sa("arr", {x1: x, y1: ay3, x2: x + dir * len, y2: ay3, opacity: dir ? 1 : 0});
       sa("arrL", {x: Math.min(vr - 60, Math.max(x0 + 60, x + dir * len / 2)).toFixed(1), y: (ay3 - 9).toFixed(1)});
-      q("arrL").textContent = dir > 0 ? "увеличиваем w" : dir < 0 ? "уменьшаем w" : "мы на дне";
+      tx("arrL", dir > 0 ? "увеличиваем w" : dir < 0 ? "уменьшаем w" : "мы на дне");
       sa("arrG", {opacity: st.arr ? 1 : 0});
       // туман: светлое «окно» вокруг путника
       const fy = hy - 6;
@@ -1828,6 +1938,132 @@ SCENES.valley = {
       E.val(3, st.tan ? (Math.abs(g) < 0.15 ? "мы на дне" : g > 0 ? "← уменьшать w" : "увеличивать w →") : "—");
       if (!fromSlider) E.setCtrl("w", w.toFixed(2));
     }
+
+    /* ---- урок η: прыжки по правилу w − η·∇ ---- */
+    const START = 5, EDGE = 4.5;                       // дальше |w − 3| > 4,5 — край долины
+    const far = w => Math.abs(w - 3) > EDGE + 1e-9;
+    const next = () => st.w - st.eta * G(st.w);
+    // прыжок — квадратичная кривая Безье над склоном: по ней летит путник и по ней же рисуется след
+    const arc = (a, b) => { const xa = X(a), ya = gy(a), xb = X(b), yb = gy(b), h = Math.min(4 + 0.12 * Math.abs(xb - xa), 40);
+      return {xa, ya, xb, yb, cx: (xa + xb) / 2, cy: Math.min(ya, yb) - 2 * h}; };
+    const bez = (A, u) => [(1-u)**2 * A.xa + 2*u*(1-u) * A.cx + u*u * A.xb, (1-u)**2 * A.ya + 2*u*(1-u) * A.cy + u*u * A.yb];
+    const arcD = A => "M" + P(A.xa, A.ya) + "Q" + P(A.cx, A.cy) + " " + P(A.xb, A.yb);
+    let trKey = "", bdKey = "";
+    function drawEta(fromSlider){
+      const J = st.jump;
+      let w = st.w, air = 0;
+      if (J){ const [px, py] = bez(J, J.u); w = Xi(px); air = Math.max(0, gy(w) - py); st.f = Math.sign(J.xb - J.xa) || st.f; }
+      else if (Math.abs(G(w)) > 0.15) st.f = -Math.sign(G(w));
+      const x = X(w), y = gy(w), g = G(w), L = Lf(w);
+      const [x0, vr] = E.view(BOT), top = E.cam ? E.vb[1] + E.vb[3] - E.cam.vh : E.vb[1];
+      sa("lz", {x: (vr - 6).toFixed(1)}); sa("lax", {x: (x0 + 11).toFixed(1), transform: `rotate(-90 ${(x0 + 11).toFixed(1)} 112)`});
+      const hy = hero(w, air);
+      const lr = lMark(x, y, g, L, x0, !J);
+      wMark(x, w, x0, vr);
+      tri(x, y, g); sa("tri", {opacity: st.tan && !J ? 1 : 0});
+      // след: дуги прошлых прыжков (свежие ярче) и точки приземлений
+      const tk = st.trail.join();
+      if (tk !== trKey){
+        trKey = tk; const T = st.trail, n = T.length;
+        for (let i = 0; i < 10; i++){
+          const a = q("ta" + i), d = q("td" + i), on = i + 1 < n;
+          if (on){ a.setAttribute("d", arcD(arc(T[i], T[i+1]))); a.setAttribute("opacity", (0.3 + 0.5 * (i + 1) / (n - 1)).toFixed(2));
+            d.setAttribute("cx", X(T[i]).toFixed(1)); d.setAttribute("cy", gy(T[i]).toFixed(1)); d.setAttribute("opacity", 1); }
+          else { a.setAttribute("opacity", 0); d.setAttribute("opacity", 0); }
+        }
+      }
+      // следующий шаг: η·∇ — длина и знак, w − η·∇ — куда приземлимся
+      const step = st.eta * g, wn = w - step, out = far(wn), len = Math.abs(step) * 27, dir = -Math.sign(step), ay3 = hy - 38;
+      const showArr = !J && st.exitU === 0 && len >= 2;
+      sa("arr", {x1: x, y1: ay3, x2: x + dir * len, y2: ay3});
+      const at = "η·∇ = " + s2(step), aw = at.length * 6.9, ax = Math.min(vr - aw / 2 - 4, Math.max(x0 + aw / 2 + 4, x + dir * len / 2));
+      sa("arrL", {x: ax.toFixed(1), y: (ay3 - 9).toFixed(1)}); tx("arrL", at);
+      sa("arrG", {opacity: showArr ? 1 : 0});
+      const occ = [[x - 13, hy - 28, x + 13, y + 2], [ax - aw / 2, ay3 - 20, ax + aw / 2, ay3 + 3]];
+      if (lr) occ.push(lr);
+      // табличка: η и цепочка L по шагам, ниже — расчёт следующего шага
+      const bx = x0 + 8, by = top + 3;
+      const Ls = st.trail.map(v => f2(Lf(v))), chain = (Ls.length > 5 ? "… " : "") + Ls.slice(-5).join(" → ");
+      const gs = g < -0.004 ? "(" + f2(g) + ")" : f2(g), r2 = `${f2(w)} − ${f2(st.eta)} · ${gs} = ${f2(wn)}${out ? " → за край" : ""}`;
+      const l1 = "η = " + f2(st.eta) + "   L: " + chain, l2 = "w − η·∇ = " + r2, bw = Math.max(l1.length * 6.3, l2.length * 6.6) + 16;
+      const key = l1 + l2 + bx + by;
+      if (key !== bdKey){
+        bdKey = key;
+        sa("bdo", {x: bx, y: by, width: bw.toFixed(1), height: 38}); sa("bdi", {x: bx + 3, y: by + 3, width: (bw - 6).toFixed(1), height: 32});
+        sa("b1", {x: bx + 10, y: by + 15}); sa("b2", {x: bx + 10, y: by + 30});
+        st.bset("b1", ["η = " + f2(st.eta), "\u00a0\u00a0 L: ", chain]); q("b2").lastChild.textContent = r2;
+      }
+      occ.push([bx, by, bx + bw, by + 38]);
+      // место приземления: пунктир от конца стрелки вниз и кольцо на склоне; подпись w − η·∇ — где свободно
+      const lx = X(wn), lyy = gy(wn), showL = showArr && !out && len >= 9;
+      sa("ldrop", {x1: lx.toFixed(1), y1: (ay3 + 4).toFixed(1), x2: lx.toFixed(1), y2: (lyy - 4).toFixed(1), opacity: showL ? 1 : 0});
+      const ringOn = (showL || (J && !far(J.b ?? wn)));
+      const rw = J ? J.b : wn;
+      sa("lring", {cx: X(rw).toFixed(1), cy: gy(rw).toFixed(1), opacity: ringOn ? 1 : 0});
+      let landOk = false;
+      if (showL){
+        // сначала у пунктира со стороны, куда прыгаем (подальше от путника), потом у кольца — над склоном
+        const t = "w − η·∇ = " + f2(wn), tw = t.length * 6.6, side = G(wn) <= 0 ? 1 : -1, mid = (ay3 + lyy) / 2 + 4;
+        occ.push([165, 170, 187, 201]);   // флажок «дно»
+        for (const [cx, cy, sd] of [[lx + dir * 6, mid, dir], [lx - dir * 6, mid, -dir], [lx + side * 7, lyy - 6, side], [lx - side * 7, lyy - 6, -side], [lx + side * 7, lyy - 18, side], [lx - side * 7, lyy - 18, -side]]){
+          const r = sd > 0 ? [cx, cy - 10, cx + tw, cy + 2] : [cx - tw, cy - 10, cx, cy + 2];
+          if (r[0] < x0 + 22 || r[2] > vr - 4 || r[3] > 210) continue;
+          if (occ.some(o => r[0] < o[2] + 1 && o[0] < r[2] + 1 && r[1] < o[3] + 1 && o[1] < r[3] + 1)) continue;
+          sa("landL", {x: cx.toFixed(1), y: cy.toFixed(1), "text-anchor": sd > 0 ? "start" : "end"}); tx("landL", t);
+          occ.push(r); landOk = true; break;
+        }
+      }
+      q("landL").style.opacity = landOk ? 1 : 0;
+      // «дно» — только если не мешает подписям
+      const dr = [187, 177, 207, 188];
+      q("dno").style.opacity = Math.abs(x - BOT) < 70 || occ.some(o => dr[0] < o[2] && o[0] < dr[2] && dr[1] < o[3] && o[1] < dr[3]) ? 0 : 1;
+      // улетели: пунктир прыжка уходит за край картинки
+      if (st.exitU > 0){
+        const A = arc(st.w, next()); let d = "M" + P(A.xa, A.ya);
+        for (let i = 1; i <= 30; i++){ const u = st.exitU * i / 30, [px, py] = bez(A, u); d += "L" + P(px, py); if (px < x0 - 20 || px > vr + 20 || py < top - 20) break; }
+        sa("exit", {d, opacity: 1});
+      } else sa("exit", {opacity: 0});
+      // плашки
+      E.val(0, f2(st.eta)); E.val(1, s2(step)); E.val(2, f2(wn)); E.val(3, f2(L));
+      if (!fromSlider) E.setCtrl("η", st.eta);
+    }
+    function anim(ms, id, fn){
+      return new Promise(res => {
+        if (!E.live(id)) return res();
+        const t0 = performance.now();
+        const fr = now => {
+          if (!E.live(id)) return res();
+          const p = Math.min((now - t0) / ms, 1); fn(p < .5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2, p); draw();
+          if (p < 1) requestAnimationFrame(fr); else res();
+        };
+        requestAnimationFrame(fr);
+      });
+    }
+    function reset(){ st.w = START; st.trail = [START]; st.jump = null; st.exitU = 0; }
+    async function jump(id){
+      if (st.exitU > 0 || !E.live(id)) return;
+      const b = next();
+      if (far(b)) return anim(800, id, (e, p) => { st.exitU = Math.max(p, 0.001); });   // следующий прыжок — за край
+      const A = arc(st.w, b);
+      st.jump = Object.assign({a: st.w, b, u: 0}, A);
+      await anim(340 + Math.min(Math.abs(A.xb - A.xa), 200) * 1.5, id, e => { if (st.jump) st.jump.u = e; });
+      if (E.live(id) && st.jump){ st.jump = null; st.w = b; st.trail.push(b); st.ph += 1.3; draw(); }
+    }
+    async function run(id){
+      for (let k = 0; k < 10 && E.live(id); k++){
+        if (Math.abs(st.w - 3) < 0.02 || st.exitU > 0) break;
+        await jump(id); await E.wait(110);
+      }
+    }
+    function path(){   // сразу весь след из 10 шагов — для ползунка η
+      reset();
+      for (let k = 0; k < 10; k++){
+        if (Math.abs(st.w - 3) < 0.02) break;
+        const b = next(); if (far(b)){ st.exitU = 1; break; }
+        st.w = b; st.trail.push(b);
+      }
+    }
+
     function go(to, ms, id){
       const a = st.w; ms = ms || Math.max(500, Math.abs(to - a) * 480);
       return new Promise(res => {
@@ -1847,6 +2083,27 @@ SCENES.valley = {
       while (E.live(id) && Math.abs(G(st.w)) > 0.1){ await stepOnce(id); await E.wait(120); }
       if (E.live(id)){ st.w = 3; draw(); }
     }
+    if (ETA) return {
+      draw,
+      async step(s, id){
+        st.tan = !!s.tan; st.jump = null; draw();
+        for (const p of [].concat(s.go == null ? [] : s.go)){
+          if (!E.live(id)) return;
+          if (p === "pause") await E.wait(1300);
+          else if (p === "jump") await jump(id);
+          else if (p === "run") await run(id);
+          else if (p === "path"){ path(); draw(); }
+          else if (p.w != null){ reset(); st.w = st.trail[0] = p.w; if (p.eta != null) st.eta = p.eta; draw(); }
+          else { const a = st.eta; await anim(650, id, e => { st.eta = a + (p.eta - a) * e; }); st.eta = p.eta; draw(); }
+        }
+      },
+      slide(v){ st.eta = v; st.tan = false; path(); draw(true); },
+      action(a, id){
+        st.tan = false; st.jump = null;
+        if (a === "run" || st.exitU > 0 || Math.abs(st.w - 3) < 0.02){ reset(); draw(); }
+        if (a === "run") run(id); else jump(id);
+      }
+    };
     return {
       draw,
       async step(s, id){
@@ -2606,6 +2863,318 @@ SCENES.darts = {
       step(s, id){ st.fly = null; st.arm = 0; draw(); return run([].concat(s.go == null ? [] : s.go), id); },
       slide(v, k){ st[k] = v; st.fly = null; st.arm = 0; st.ph = 5; st.g = 1; draw(true); },
       action(a, id){ if (a === "throw") run(["throw", "pause", "miss", "sq", "L"], id); else run(["hot"], id); }
+    };
+  }
+};
+
+/* ---------- Сцена «Тир»: урок ↻ ----------
+   Стрелок пристреливает винтовку — круг обучения: серия из 7 выстрелов, по одному на каждый день данных (прогнозы ŷ) →
+   промах кучки (ошибка L) → поправки по двум барабанам прицела (градиенты dw, db) → поворот барабанов (шаг −η·dw, −η·db).
+   Центр мишени — «правильный» прицел w = 10, b = 20, стрелок его не знает. Пуля дня i ложится в (w − 10, b − 20) + разброс
+   этого дня; разброс в среднем 0, его средний квадрат 0,5. Отсюда L = (w − 10)² + (b − 20)² + 0,5, dw = 2·(w − 10),
+   db = 2·(b − 20). 1 единица = 10 единиц картинки. От w = 6, b = 23 при η = 0,25: L = 25,5 → 6,75 → 2,06 → 0,89 → 0,6 … */
+SCENES.range = {
+  vb: [0, 0, 360, 262], camMin: 360,
+  vals: [["эпоха","проход по данным","--sy"],["L","средний промах²","--cool"],["dw, db","градиенты","--accent",1],["шаг","сдвиг w и b","--good",1]],
+  ctrl: {k:"η", min:0.05, max:1.1, step:0.05, col:"--good"},
+  acts: [["cycle","Круг"],["train","▶ Обучить"]],
+  svg: `<svg viewBox="0 0 360 262" role="img" aria-label="Тир. Стрелок пристреливает винтовку: серия выстрелов — прогнозы ŷ, центр мишени — правда y, промах кучки — ошибка L, поправки по барабанам прицела w и b — градиенты, поворот барабанов — шаг. Одна серия — одна эпоха.">
+<defs><marker id="s-ah" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="3.4" markerHeight="3.4" orient="auto"><path d="M0 0L10 5L0 10Z" style="fill:var(--good)"/></marker>
+<marker id="s-ah2" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4.4" markerHeight="4.4" orient="auto"><path d="M0 0L10 5L0 10Z" style="fill:var(--good)"/></marker></defs>
+<rect x="-400" y="-400" width="1160" height="636" style="fill:var(--wall)"/>
+<rect x="-400" y="236" width="1160" height="426" style="fill:var(--floor)"/>
+<path d="M100 -400V-34M276 -400V-34" stroke-width="1.2" style="stroke:var(--muted)"/>
+<path d="M87 -22a13 12 0 0 1 26 0ZM263 -22a13 12 0 0 1 26 0Z" style="fill:var(--woodtop)"/>
+<circle cx="100" cy="-20" r="4" style="fill:var(--sun)"/><circle cx="276" cy="-20" r="4" style="fill:var(--sun)"/>
+<text x="180" y="-52" text-anchor="middle" class="deco" style="fill:var(--woodtop);font-family:var(--f-display);font-size:15px;font-weight:700;letter-spacing:.04em">ТИР</text>
+<rect x="8" y="4" width="344" height="48" rx="4" style="fill:var(--woodtop)"/>
+<rect x="12" y="8" width="336" height="40" rx="2" style="fill:var(--board)"/>
+<text id="s-r1" x="180" y="23" text-anchor="middle" style="font-size:10.5px"></text>
+<text id="s-r2" x="180" y="40" text-anchor="middle" style="font-size:11px;font-weight:600"></text>
+<path d="M226 204V236M330 204V236" stroke-width="5" style="stroke:var(--woodtop)"/>
+<rect x="210" y="68" width="136" height="136" rx="3" style="fill:var(--wood)"/>
+<rect x="216" y="74" width="124" height="124" style="fill:var(--dbc)"/>
+<g id="s-rings"></g>
+<path id="s-trl" fill="none" stroke-width="1.4" stroke-dasharray="2 3" style="stroke:var(--syh)"/>
+<g id="s-trd"></g>
+<g id="s-old" opacity=".3"></g>
+<line id="s-ml" stroke-width="2.2" stroke-dasharray="4 3" style="stroke:var(--cool)"/>
+<g stroke-width="2.6" stroke-linecap="round" style="stroke:var(--accent)"><line id="s-gw"/><line id="s-gb"/></g>
+<g id="s-holes"></g>
+<path id="s-gc" fill="none" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--syh)"/>
+<line id="s-st" stroke-width="3" stroke-linecap="round" marker-end="url(#s-ah)" style="stroke:var(--good)"/>
+<path d="M28 196H62" stroke-width="5" stroke-linecap="round" style="stroke:var(--woodtop)"/>
+<path d="M33 198L30 236M57 198L60 236" stroke-width="3.5" style="stroke:var(--woodtop)"/>
+<rect x="96" y="159" width="88" height="5" rx="1.5" style="fill:var(--woodtop)"/>
+<path d="M104 164V236M176 164V236" stroke-width="4" style="stroke:var(--woodtop)"/>
+<path d="M150 159c0-6 3-8 8-8h6c5 0 8 2 8 8Z" style="fill:var(--pc3)"/>
+<g id="s-man" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M46 191L80 193L83 232M46 191L74 198L72 232" stroke-width="6.5" style="stroke:var(--pants)"/>
+  <path d="M83 233h8M72 233h8" stroke-width="4.5" style="stroke:var(--tyre)"/>
+  <path d="M46 190L58 158" stroke-width="13" style="stroke:var(--pc1)"/>
+  <path d="M56 161L71 175L87 156" stroke-width="5" style="stroke:var(--pc1)"/>
+  <g id="s-rif">
+    <path d="M53 147L90 148.5L91 155L83 156L77 152.5L54 154.5Z" stroke="none" style="fill:var(--wood)"/>
+    <path d="M90 148H158L160 153H98L92 156Z" stroke="none" style="fill:var(--wood)"/>
+    <rect x="86" y="145.5" width="46" height="4.5" rx="1.5" stroke="none" style="fill:var(--tyre)"/>
+    <path d="M132 147.6H199" stroke-width="2.8" style="stroke:var(--tyre)"/>
+    <path d="M84 140H130" stroke-width="7.5" style="stroke:var(--tyre)"/>
+    <path d="M130 135.5L139 134V146L130 144.5Z" stroke="none" style="fill:var(--tyre)"/>
+    <path d="M78 137.5h5v5h-5Z" stroke="none" style="fill:var(--tyre)"/>
+    <path d="M91 144V146M124 144V146" stroke-width="2.4" style="stroke:var(--tyre)"/>
+    <rect x="102" y="129.5" width="10" height="7" rx="1.6" stroke="none" style="fill:var(--sb)"/>
+    <circle cx="116" cy="140" r="3.6" stroke-width="1.2" style="fill:var(--sw);stroke:var(--card)"/>
+  </g>
+  <circle cx="66" cy="141" r="8" stroke="none" style="fill:var(--skin)"/>
+  <path d="M58.3 139.5a7.8 7.8 0 0 1 15.4 -1.8l5.2 .8l-.8 1.6Z" stroke="none" style="fill:var(--apron)"/>
+  <rect x="59" y="138.5" width="6" height="8.5" rx="2.6" stroke="none" style="fill:var(--dbr)"/>
+  <circle cx="71.5" cy="141.5" r="1.1" stroke="none" style="fill:var(--ink)"/>
+  <path id="s-arm" stroke-width="5" style="stroke:var(--pc1)"/>
+  <circle id="s-hand" r="3" stroke="none" style="fill:var(--skin)"/>
+</g>
+<line id="s-trc" stroke-width="1.4" stroke-linecap="round" style="stroke:var(--sun)"/>
+<path id="s-fl" d="M201 147.6l7-4l-2.5 3.6l8 .4l-8 1.4l3 3.8l-7.5-3.4Z" style="fill:var(--sun)" opacity="0"/>
+<path d="M98 124L108 129.5L112 124Z" style="fill:var(--board);stroke:var(--line)" stroke-width="1"/>
+<rect x="8" y="58" width="124" height="66.5" rx="8" style="fill:var(--board);stroke:var(--line)" stroke-width="1"/>
+<path d="M98.6 124H111.4" stroke-width="1.6" style="stroke:var(--board)"/>
+<text x="70" y="69" text-anchor="middle" class="deco" style="fill:var(--muted);font-size:8.5px">барабаны прицела</text>
+<g id="s-dials"></g>
+<g id="s-tags" style="font-size:11px;font-weight:600"></g>
+</svg>`,
+  init(E){
+    const QC = {}, q = id => QC[id] || (QC[id] = E.svg.querySelector("#s-" + id));
+    const sa = (id, o) => { const e = q(id); for (const k in o) e.setAttribute(k, o[k]); };
+    const tx = (id, t) => { const e = q(id); if (e.textContent !== t) e.textContent = t; };
+    const P = (x, y) => x.toFixed(1) + " " + y.toFixed(1);
+    // свой формат вместо toLocaleString: ползунок перерисовывает десятки чисел за кадр
+    const f2 = v => { const r = Math.round(v * 100), a = Math.abs(r), d = a % 100;
+      return (r < 0 ? "−" : "") + Math.floor(a / 100) + (d ? "," + (d % 10 ? String(d).padStart(2, "0") : d / 10) : ""); };
+    const s2 = v => (Math.round(v * 100) > 0 ? "+" : "") + f2(v);
+    let tdKey = "";
+    const pr = v => Math.round(v * 100) < 0 ? "(" + f2(v) + ")" : f2(v);   // отрицательное — в скобках
+    const TX = 278, TY = 136, U = 10, W0 = 10, B0 = 20, START = [6, 23], OUT = 6.2;
+    // разброс семи дней: в среднем 0, средний квадрат 0,5
+    const N = [[0.8, 0.3], [-0.6, 0.6], [0.2, -0.8], [-0.8, -0.1], [0.4, 0.5], [-0.3, -0.3], [0.3, -0.2]];
+    const Lf = (w, b) => (w - W0) ** 2 + (b - B0) ** 2 + 0.5;
+    const hole = (g, i) => [TX + (g[0] + N[i][0]) * U, TY - (g[1] + N[i][1]) * U];
+    // мишень: кольца 1…6 единиц, чёрное яблочко — 2 единицы
+    { let s = `<circle cx="${TX}" cy="${TY}" r="${2 * U}" style="fill:var(--dbk)"/>`;
+      for (let k = 1; k <= 6; k++) s += `<circle cx="${TX}" cy="${TY}" r="${k * U}" fill="none" stroke-width="${k === 6 ? 1.4 : 0.9}" style="stroke:var(${k <= 1 ? "--dbc" : "--dbk"})"/>`;
+      s += `<circle cx="${TX}" cy="${TY}" r="1.6" style="fill:var(--dbc)"/>`;
+      q("rings").innerHTML = s; }
+    q("holes").innerHTML = N.map((_, i) => `<circle id="s-h${i}" r="2.7" stroke-width="1.1" style="fill:var(--syh);stroke:var(--card)"/>`).join("");
+    q("old").innerHTML = N.map((_, i) => `<circle id="s-o${i}" r="2.5" style="fill:var(--syh)"/>`).join("");
+    // барабаны: w (по горизонтали) и b (по вертикали); риски поворачиваются, метка сверху неподвижна
+    const DC = {w: [46, 94, "--sw"], b: [102, 94, "--sb"]};
+    { let s = "";
+      for (const k of ["w", "b"]){ const [cx, cy, col] = DC[k];
+        let ticks = ""; for (let i = 0; i < 12; i++){ const a = i * Math.PI / 6, r1 = i ? 8.5 : 6, c = Math.cos(a), sn = Math.sin(a);
+          ticks += `<line x1="${(cx + sn * r1).toFixed(2)}" y1="${(cy - c * r1).toFixed(2)}" x2="${(cx + sn * 11).toFixed(2)}" y2="${(cy - c * 11).toFixed(2)}" stroke-width="${i ? 1.2 : 2.2}" style="stroke:var(--ink)"/>`; }
+        s += `<circle cx="${cx}" cy="${cy}" r="13" stroke-width="2.6" style="fill:var(--card);stroke:var(${col})"/><g id="s-k${k}">${ticks}</g>
+          <path d="M${cx} ${cy - 15}l-3 -4.5h6Z" style="fill:var(--ink)"/>
+          <text x="${cx - 18}" y="${cy + 5}" text-anchor="end" style="fill:var(${col});font-size:14px;font-weight:700">${k}</text>
+          <text id="s-v${k}" x="${cx}" y="${cy + 26}" text-anchor="middle" style="fill:var(${col});font-size:11px;font-weight:600"></text>
+          <path id="s-a${k}" fill="none" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--good)"/>`; }
+      q("dials").innerHTML = s; }
+    // подписи на мишени — на подложке, место выбирается так, чтобы не задевать кучку и друг друга
+    const TAGS = {y: "--sy", yh: "--syh", m: "--cool", dw: "--accent", db: "--accent", st: "--good", out: "--bad"};
+    q("tags").innerHTML = Object.entries(TAGS).map(([id, c]) => `<g id="s-t${id}" opacity="0"><rect rx="3" height="14" style="fill:var(--board)" opacity=".94"/><text text-anchor="middle" style="fill:var(${c})"></text></g>`).join("");
+
+    // stage: 0 — прицел готов, 1 — серия, 2 — промах, 3 — градиенты, 4 — поворот барабанов
+    const st = {w: START[0], b: START[1], eta: 0.25, ep: 1, stage: 0, n: 0, prev: null, trail: [], out: false, ls: null,
+                mg: 1, gg: 1, hand: 0, rc: 0, fly: null, turn: null};
+    let rk = "";
+    const gv = () => [st.w - W0, st.b - B0];
+
+    function draw(fromSlider){
+      E.view(180);
+      const g = st.turn ? st.turn.g : gv(), ph = st.stage, L = (g[0] ** 2 + g[1] ** 2) + 0.5;
+      // стрелок: отдача и рука, которая тянется к барабанам
+      sa("rif", {transform: `translate(${(-2.5 * st.rc).toFixed(2)} ${(0.6 * st.rc).toFixed(2)})`});
+      const h = st.hand, hx = 146 + (122 - 146) * h, hy = 153 + (141 - 153) * h, ex = 102 + (95 - 102) * h, ey = 172 + (160 - 172) * h;
+      sa("arm", {d: "M60 160L" + P(ex, ey) + "L" + P(hx, hy)}); sa("hand", {cx: hx.toFixed(1), cy: hy.toFixed(1)});
+      // пули текущей серии и прошлая серия бледно
+      const H = N.map((_, i) => hole(g, i));
+      H.forEach(([x, y], i) => sa("h" + i, {cx: x.toFixed(1), cy: y.toFixed(1), opacity: i < st.n ? 1 : 0}));
+      const showOld = st.prev && ph <= 1;
+      N.forEach((_, i) => { const o = st.prev ? hole(st.prev, i) : [0, 0]; sa("o" + i, {cx: o[0].toFixed(1), cy: o[1].toFixed(1), opacity: showOld ? 1 : 0}); });
+      // трассер и вспышка
+      if (st.fly){ const [x, y] = H[st.fly.i]; sa("trc", {x1: 201, y1: 147.6, x2: x.toFixed(1), y2: y.toFixed(1), opacity: st.fly.o}); sa("fl", {opacity: st.fly.o}); }
+      else { sa("trc", {opacity: 0}); sa("fl", {opacity: 0}); }
+      // центр кучки и след прошлых серий
+      const has = st.n >= 7, gc = [TX + g[0] * U, TY - g[1] * U];
+      sa("gc", {d: has ? `M${P(gc[0] - 4, gc[1])}h8M${P(gc[0], gc[1] - 4)}v8` : "", opacity: has ? 1 : 0});
+      const tp = st.trail.map(t => [TX + t[0] * U, TY - t[1] * U]); if (has) tp.push(gc);
+      sa("trl", {d: tp.length > 1 ? "M" + tp.map(p => P(p[0], p[1])).join("L") : ""});
+      const tdk = st.trail.join("|"); if (tdk !== tdKey){ tdKey = tdk; q("trd").innerHTML = st.trail.map(t => `<circle cx="${(TX + t[0] * U).toFixed(1)}" cy="${(TY - t[1] * U).toFixed(1)}" r="2.3" stroke-width="1.3" style="fill:var(--card);stroke:var(--syh)"/>`).join(""); }
+      // промах кучки (от центра до центра кучки) и его части по осям — градиенты
+      const dist = Math.hypot(g[0], g[1]) * U;
+      sa("ml", {x1: TX, y1: TY, x2: (TX + (gc[0] - TX) * st.mg).toFixed(1), y2: (TY + (gc[1] - TY) * st.mg).toFixed(1), opacity: (ph === 2 || ph === 3) && has && dist > 4 ? (ph === 3 ? 0.45 : 1) : 0});
+      const gw = ph === 3 && Math.abs(g[0]) * U > 2, gb = ph === 3 && Math.abs(g[1]) * U > 2, kx = TX + g[0] * U * st.gg;
+      sa("gw", {x1: TX, y1: TY, x2: kx.toFixed(1), y2: TY, opacity: gw ? 1 : 0});
+      sa("gb", {x1: gc[0].toFixed(1), y1: TY, x2: gc[0].toFixed(1), y2: (TY + (gc[1] - TY) * st.gg).toFixed(1), opacity: gb && st.gg > 0.99 ? 1 : 0});
+      // шаг: куда сдвинется кучка после поворота барабанов
+      const f = 1 - 2 * st.eta, nc = [TX + g[0] * f * U, TY - g[1] * f * U], slen = dist * Math.abs(1 - f);
+      sa("st", {x1: gc[0].toFixed(1), y1: gc[1].toFixed(1), x2: nc[0].toFixed(1), y2: nc[1].toFixed(1), opacity: ph === 4 && has && slen > 8 ? 1 : 0});
+      // барабаны
+      const wv = st.turn ? st.turn.w : st.w, bv = st.turn ? st.turn.b : st.b;
+      sa("kw", {transform: `rotate(${(wv * 30).toFixed(1)} ${DC.w[0]} ${DC.w[1]})`}); sa("kb", {transform: `rotate(${(bv * 30).toFixed(1)} ${DC.b[0]} ${DC.b[1]})`});
+      tx("vw", f2(wv)); tx("vb", f2(bv));
+      const dW = -st.eta * 2 * g[0], dB = -st.eta * 2 * g[1];
+      for (const [k, d] of [["w", dW], ["b", dB]]){ const [cx, cy] = DC[k], on = ph === 4 && Math.abs(d) > 0.004;
+        // дуга справа от барабана: по часовой — прибавляем, против — убавляем
+        const a0 = -50 * Math.PI / 180, a1 = 50 * Math.PI / 180, R = 17.5, A = d > 0 ? [a0, a1] : [a1, a0];
+        const px = a => cx + R * Math.cos(a), py = a => cy + R * Math.sin(a);
+        sa("a" + k, {d: `M${P(px(A[0]), py(A[0]))}A${R} ${R} 0 0 ${d > 0 ? 1 : 0} ${P(px(A[1]), py(A[1]))}`, "marker-end": "url(#s-ah2)", opacity: on ? 1 : 0}); }
+      // табло: круг обучения и расчёт текущего действия
+      const S = ["прогноз ŷ", "ошибка L", "градиенты dw, db", "шаг"], SC = ["--syh", "--cool", "--accent", "--good"];
+      const r1 = S.map((t, i) => ph === i + 1 && !st.out ? `<tspan style="fill:var(${SC[i]});font-weight:700">${t}</tspan>` : `<tspan style="fill:var(--muted)">${t}</tspan>`).join(`<tspan style="fill:var(--muted)"> → </tspan>`) + `<tspan style="fill:var(--muted)"> ↻</tspan>`;
+      const C = (c, t) => `<tspan style="fill:var(${c})">${t}</tspan>`, I = t => `<tspan style="fill:var(--ink)">${t}</tspan>`, M = t => `<tspan style="fill:var(--muted)">${t}</tspan>`;
+      const ep = M(`эпоха ${st.ep} · `), dw = 2 * g[0], db = 2 * g[1];
+      let r2, n2;
+      if (st.out){ n2 = `эпоха ${st.ep} · мимо колец: шаг η слишком велик`; r2 = ep + C("--bad", "мимо колец") + I(": шаг ") + C("--good", "η") + I(" слишком велик"); }
+      else if (ph === 0){ n2 = `эпоха ${st.ep} · прицел: w = ${f2(st.w)}, b = ${f2(st.b)}`; r2 = ep + I("прицел: ") + C("--sw", "w = " + f2(st.w)) + I(", ") + C("--sb", "b = " + f2(st.b)); }
+      else if (ph === 1){ n2 = `эпоха ${st.ep} · 7 пуль = прогнозы ŷ для 7 дней`; r2 = ep + I("7 пуль = ") + C("--syh", "прогнозы ŷ") + I(" для 7 дней"); }
+      else if (ph === 2){ n2 = `эпоха ${st.ep} · L = среднее промахов² = ${f2(L)}`; r2 = ep + C("--cool", "L") + I(" = среднее промахов² = " + f2(L)); }
+      else if (ph === 3){ const a = `dw = 2·${pr(g[0])} = ${s2(dw)}`, c = `db = 2·${pr(g[1])} = ${s2(db)}`; n2 = a + "; " + c; r2 = C("--accent", "dw") + I(a.slice(2) + ";\u00a0\u00a0") + C("--accent", "db") + I(c.slice(2)); }
+      else { const t0 = st.turn ? st.turn.w0 : st.w, b0 = st.turn ? st.turn.b0 : st.b, a = ` = ${f2(t0)} − ${f2(st.eta)}·${pr(dw)} = ${f2(t0 - st.eta * dw)}`, c = ` = ${f2(b0)} − ${f2(st.eta)}·${pr(db)} = ${f2(b0 - st.eta * db)}`;
+        n2 = "w" + a + "; b" + c; r2 = C("--sw", "w") + I(a + ";\u00a0\u00a0") + C("--sb", "b") + I(c); }
+      if (r1 + r2 !== rk){ rk = r1 + r2; q("r1").innerHTML = r1; q("r2").innerHTML = r2; q("r2").style.fontSize = Math.min(11, 326 / (n2.length * 0.6)).toFixed(2) + "px"; }
+      // подписи на мишени
+      const occ = [[TX - 4, TY - 4, TX + 4, TY + 4]];
+      if (has){ const xs = H.map(p => p[0]), ys = H.map(p => p[1]); occ.push([Math.min(...xs) - 3.5, Math.min(...ys) - 3.5, Math.max(...xs) + 3.5, Math.max(...ys) + 3.5]); }
+      if (ph === 4 && has && slen > 8) occ.push([nc[0] - 5, nc[1] - 5, nc[0] + 5, nc[1] + 5]);   // остриё стрелки шага
+      function tag(id, text, cands){
+        const G_ = q("t" + id), w = text.length * 6.6 + 8;
+        if (text) for (const [x, y, an] of cands){
+          const x0 = an === "end" ? x - w : an === "middle" ? x - w / 2 : x, r = [x0, y - 7, x0 + w, y + 7];
+          if (r[0] < 204 || r[2] > 356 || r[1] < 56 || r[3] > 234) continue;
+          if (occ.some(o => r[0] < o[2] + 1 && o[0] < r[2] + 1 && r[1] < o[3] + 1 && o[1] < r[3] + 1)) continue;
+          occ.push(r);
+          const R = G_.firstChild, T = G_.lastChild;
+          R.setAttribute("x", x0.toFixed(1)); R.setAttribute("y", (y - 7).toFixed(1)); R.setAttribute("width", w.toFixed(1));
+          T.setAttribute("x", (x0 + w / 2).toFixed(1)); T.setAttribute("y", (y + 4).toFixed(1)); if (T.textContent !== text) T.textContent = text;
+          G_.setAttribute("opacity", 1); return;
+        }
+        G_.setAttribute("opacity", 0);
+      }
+      const sx = g[0] <= 0 ? 1 : -1, sy = g[1] >= 0 ? 1 : -1, an = s => s > 0 ? "start" : "end";
+      if (has && st.out) tag("out", "мимо колец!", [[TX, 64, "middle"], [TX, 226, "middle"]]); else tag("out", "", []);
+      // y — центр мишени: со стороны, противоположной кучке
+      tag("y", "y", [[TX + sx * 7, TY + sy * 12, an(sx)], [TX + sx * 7, TY - sy * 12, an(sx)], [TX - sx * 7, TY + sy * 12, an(-sx)], [TX - sx * 7, TY - sy * 12, an(-sx)]]);
+      if (has){ const b = occ[1], cy = (b[1] + b[3]) / 2, cx = (b[0] + b[2]) / 2;
+        tag("yh", "ŷ", [[b[0] - 2, cy, "end"], [b[2] + 2, cy, "start"], [cx, b[1] - 8, "middle"], [cx, b[3] + 8, "middle"]]); }
+      else tag("yh", "", []);
+      // «промах» — у середины пунктира, сбоку
+      if (ph === 2 && has && dist > 14 && !st.out){ const mx = (TX + gc[0]) / 2, my = (TY + gc[1]) / 2, nx = -(gc[1] - TY) / dist, ny = (gc[0] - TX) / dist;
+        tag("m", "промах", [[mx + nx * 14, my + ny * 14, "middle"], [mx - nx * 14, my - ny * 14, "middle"], [mx + nx * 24, my + ny * 24, "middle"], [mx - nx * 24, my - ny * 24, "middle"]]); }
+      else tag("m", "", []);
+      if (ph === 3 && has){
+        if (gw) tag("dw", "dw", [[(TX + kx) / 2, TY + sy * 11, "middle"], [(TX + kx) / 2, TY - sy * 11, "middle"], [TX + (kx - TX) * 0.75, TY + sy * 11, "middle"]]); else tag("dw", "", []);
+        if (gb && st.gg > 0.99) tag("db", "db", [0.5, 0.25, 0.75].flatMap(t => [[gc[0] - sx * 5, TY + (gc[1] - TY) * t, an(-sx)], [gc[0] + sx * 5, TY + (gc[1] - TY) * t, an(sx)]])); else tag("db", "", []);
+      } else { tag("dw", "", []); tag("db", "", []); }
+      if (ph === 4 && has && slen > 8){ const mx = (gc[0] + nc[0]) / 2, my = (gc[1] + nc[1]) / 2, l = Math.hypot(nc[0] - gc[0], nc[1] - gc[1]), nx = -(nc[1] - gc[1]) / l, ny = (nc[0] - gc[0]) / l;
+        const ux = (nc[0] - gc[0]) / l, uy = (nc[1] - gc[1]) / l;
+        tag("st", "шаг", [[mx + nx * 13, my + ny * 13, "middle"], [mx - nx * 13, my - ny * 13, "middle"], [mx + nx * 22, my + ny * 22, "middle"], [mx - nx * 22, my - ny * 22, "middle"],
+          [nc[0] + ux * 22, nc[1] + uy * 16, "middle"], [mx + nx * 32, my + ny * 32, "middle"], [mx - nx * 32, my - ny * 32, "middle"]]); }
+      else tag("st", "", []);
+      // плашки
+      E.val(0, String(st.ep)); E.val(1, ph >= 2 && has ? f2(L) : "?");
+      E.val(2, ph >= 3 && !st.out ? f2(dw) + " и " + s2(db) : "?");
+      E.val(3, ph === 4 ? s2(dW) + " и " + s2(dB) : st.ls || "—");
+      if (!fromSlider) E.setCtrl("η", st.eta);
+    }
+
+    function anim(ms, id, fn){
+      return new Promise(res => {
+        if (!E.live(id)) return res();
+        const t0 = performance.now();
+        const fr = now => {
+          if (!E.live(id)) return res();
+          const p = Math.min((now - t0) / ms, 1); fn(p < .5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2, p); draw();
+          if (p < 1) requestAnimationFrame(fr); else res();
+        };
+        requestAnimationFrame(fr);
+      });
+    }
+    function reset(){ Object.assign(st, {w: START[0], b: START[1], ep: 1, stage: 0, n: 0, prev: null, trail: [], out: false, ls: null, mg: 1, gg: 1, hand: 0, rc: 0, fly: null, turn: null}); }
+    const done = () => Math.hypot(...gv()) < 0.1;
+    async function shoot(id, fast){
+      st.stage = 1; st.n = 0; st.out = false; draw();
+      for (let i = 0; i < 7; i++){
+        if (!E.live(id)) return;
+        st.fly = {i, o: 1}; st.rc = 1;
+        await anim(fast ? 70 : 150, id, (e, p) => { st.rc = 1 - p; st.fly.o = 1 - p; if (p > 0.3) st.n = i + 1; });
+        st.fly = null; st.rc = 0; st.n = i + 1;
+      }
+      if (Math.hypot(...gv()) > OUT) st.out = true;
+      draw();
+    }
+    async function turn(id, fast){
+      const g = gv(), w0 = st.w, b0 = st.b, w1 = w0 - st.eta * 2 * g[0], b1 = b0 - st.eta * 2 * g[1];
+      st.stage = 4; st.turn = {g, w: w0, b: b0, w0, b0}; draw();
+      if (!fast) await anim(260, id, e => { st.hand = e; });
+      await anim(fast ? 380 : 750, id, e => { st.turn.w = w0 + (w1 - w0) * e; st.turn.b = b0 + (b1 - b0) * e; });
+      if (!fast) await anim(260, id, e => { st.hand = 1 - e; });
+      if (!E.live(id)) { st.turn = null; return; }
+      next(w1, b1);
+      draw();
+    }
+    function next(w1, b1){   // эпоха закончена: запоминаем кучку, барабаны на новых местах
+      const g = gv();
+      st.ls = s2(w1 - st.w) + " и " + s2(b1 - st.b);
+      st.trail.push(g); st.prev = g; st.w = w1; st.b = b1; st.ep++; st.stage = 0; st.n = 0; st.turn = null; st.hand = 0;
+    }
+    async function cycle(id){
+      if (st.out || st.ep > 10 || (done() && st.stage >= 2)) reset();
+      if (st.stage === 0 || st.stage === 1){ await shoot(id); if (st.out || !E.live(id)) return; await E.wait(450); }
+      if (st.stage <= 2){ st.mg = 0; st.stage = 2; await anim(450, id, e => { st.mg = e; }); await E.wait(650); }
+      if (!E.live(id)) return;
+      if (st.stage <= 3){ st.gg = 0; st.stage = 3; await anim(500, id, e => { st.gg = e; }); await E.wait(800); }
+      if (E.live(id)) await turn(id);
+    }
+    async function train(id){
+      reset(); draw();
+      while (E.live(id)){
+        await shoot(id, true); if (!E.live(id)) return;
+        st.stage = 2; st.mg = 1; draw(); await E.wait(st.out ? 0 : 260);
+        if (st.out || done() || st.ep >= 10) return;
+        await turn(id, true); await E.wait(120);
+      }
+    }
+    function path(){   // сразу результат: эпохи до попадания в центр, до 10-й или пока не уйдём мимо мишени
+      reset();
+      for (;;){
+        const g = gv();
+        if (Math.hypot(...g) > OUT){ st.out = true; break; }
+        if (done() || st.ep >= 10) break;
+        next(st.w - st.eta * 2 * g[0], st.b - st.eta * 2 * g[1]);
+      }
+      st.stage = 2; st.n = 7; st.mg = 1;
+    }
+    async function run(plan, id){
+      for (const p of plan){
+        if (!E.live(id)) return;
+        if (p === "pause") await E.wait(1300);
+        else if (p === "start"){ reset(); draw(); }
+        else if (p === "shoot") await shoot(id);
+        else if (p === "shot"){ st.stage = 1; st.n = 7; st.out = Math.hypot(...gv()) > OUT; draw(); }
+        else if (p === "miss"){ st.stage = 2; st.mg = 0; await anim(450, id, e => { st.mg = e; }); }
+        else if (p === "missI"){ st.stage = 2; st.mg = 1; draw(); }
+        else if (p === "grad"){ st.stage = 3; st.gg = 0; await anim(500, id, e => { st.gg = e; }); }
+        else if (p === "gradI"){ st.stage = 3; st.gg = 1; draw(); }
+        else if (p === "turn") await turn(id);
+        else if (p === "cycle") await cycle(id);
+        else if (p === "train") await train(id);
+        else if (p === "path"){ path(); draw(); }
+        else if (typeof p === "object"){ st.eta = p.eta; draw(); }
+      }
+    }
+    return {
+      draw,
+      step(s, id){ st.fly = null; st.rc = 0; st.hand = 0; st.turn = null; draw(); return run([].concat(s.go == null ? [] : s.go), id); },
+      slide(v){ st.eta = v; st.fly = null; st.rc = 0; st.hand = 0; st.turn = null; path(); draw(true); },
+      action(a, id){ st.fly = null; st.rc = 0; st.hand = 0; if (st.turn){ st.turn = null; st.stage = 0; } if (a === "cycle") cycle(id); else train(id); }
     };
   }
 };
