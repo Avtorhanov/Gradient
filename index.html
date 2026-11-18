@@ -25,6 +25,7 @@
   --sx:#47708F; --sb:#C2398A; --syh:#06767F; --sy:#687180;
   --wall:#EFE7DB; --floor:#DCCFBD; --wood:#B5865B; --woodtop:#946641; --frame:#FBFCFD; --sky:#BFE2F5; --dusk:#2F3A66; --sun:#F5B83D; --cloud:#FFFFFF;
   --board:#FFFFFF; --glass:rgba(150,200,228,.26); --reg:#CBD3DD; --lcd:#E4F4EF; --apron:#4E6E60; --shirt:#FFFFFF; --pc1:#C67C5E; --pc2:#7E9A57; --pc3:#C9A23F; --scoop:#F2A7BA; --scoop2:#F1D9A0; --cup:#FFFFFF; --tea:#B7652E;
+  --car:#F2B630; --carw:#BFD9EA; --road:#B9C1CB; --lane:#F8FAFC; --tyre:#2B313A; --dbk:#2B313A; --dbc:#F1E3C2; --dbr:#D6453D; --dbg:#3E9A5B;
   --f-display:'Unbounded','Golos Text',system-ui,sans-serif;
   --f-body:'Golos Text',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --f-mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
@@ -40,6 +41,7 @@
     --sx:#8DB3D6; --sb:#F07BC0; --syh:#3CC7D2; --sy:#A6AFBB;
     --wall:#212935; --floor:#181E27; --wood:#5E4530; --woodtop:#755639; --frame:#3A4656; --sky:#3B6E92; --dusk:#121830; --sun:#F2B544; --cloud:rgba(228,236,244,.85);
     --board:#121923; --glass:rgba(120,170,210,.15); --reg:#3A4656; --lcd:#0E1A1B; --apron:#7FA393; --shirt:#C9D3DD; --pc1:#D99376; --pc2:#93B06B; --pc3:#D8B456; --scoop:#E79AAE; --scoop2:#E6CF97; --cup:#D5DDE6; --tea:#E08A4F;
+    --car:#E0A92E; --carw:#4A6F8C; --road:#2A3340; --lane:#7C8594; --tyre:#0B0F14; --dbk:#0B0F14; --dbc:#D9CBA8; --dbr:#E0605A; --dbg:#55B072;
     color-scheme:dark;
   }
 }
@@ -52,6 +54,7 @@
   --sx:#8DB3D6; --sb:#F07BC0; --syh:#3CC7D2; --sy:#A6AFBB;
   --wall:#212935; --floor:#181E27; --wood:#5E4530; --woodtop:#755639; --frame:#3A4656; --sky:#3B6E92; --dusk:#121830; --sun:#F2B544; --cloud:rgba(228,236,244,.85);
   --board:#121923; --glass:rgba(120,170,210,.15); --reg:#3A4656; --lcd:#0E1A1B; --apron:#7FA393; --shirt:#C9D3DD; --pc1:#D99376; --pc2:#93B06B; --pc3:#D8B456; --scoop:#E79AAE; --scoop2:#E6CF97; --cup:#D5DDE6; --tea:#E08A4F;
+  --car:#E0A92E; --carw:#4A6F8C; --road:#2A3340; --lane:#7C8594; --tyre:#0B0F14; --dbk:#0B0F14; --dbc:#D9CBA8; --dbr:#E0605A; --dbg:#55B072;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -773,6 +776,27 @@ const LESSONS = [
     ["ŷ = 270","Итоговый прогноз. При 0° модель сказала бы ŷ = b = 20."]]},
   analog:"Такси: цена = 30 ₽ за километр × расстояние + 100 ₽ за посадку. 30 — это вес w, 100 — сдвиг b: его платят, даже если проехать 0 км.",
   src:"Принс, гл. 2 (параметр φ₀ — пересечение с осью). Гудфеллоу и соавторы, «Глубокое обучение», гл. 5 (линейная регрессия и смещение).",
+  stand:{scene:"taxi", steps:[
+    {t:"Сдвиг <b style=\"color:var(--sb)\">b</b> — число, которое модель прибавляет в самом конце: <b style=\"color:var(--syh)\">ŷ</b> = <b style=\"color:var(--sw)\">w</b>·<b style=\"color:var(--sx)\">x</b> + <b style=\"color:var(--sb)\">b</b>. Это вся модель целиком. В такси <b style=\"color:var(--sx)\">x</b> — километры, <b style=\"color:var(--sw)\">w</b> = 30 ₽ за каждый, <b style=\"color:var(--sb)\">b</b> = 100 ₽ за посадку. Поездка на 5 км: 30·5 + 100 = 250 ₽.",
+     go:[{b:100, w:30}, "start", {km:5}],
+     ex:[["Принс, гл. 2","Самая простая модель у автора — прямая y = φ₀ + φ₁·x. Параметров два: φ₁ задаёт наклон, а φ₀ — высоту, на которой прямая пересекает вертикальную ось. Это и есть наш сдвиг b, только под другой буквой."]]},
+    {t:"Смысл сдвига: каким будет ответ, если <b style=\"color:var(--sx)\">x</b> = 0. Вы только сели в машину, а счётчик уже показывает 100 ₽ — это <b style=\"color:var(--sb)\">b</b>. В кафе так же: даже в 0° кто-то купит мороженое, базовые продажи b = 20 порций. Поэтому при 25° прогноз 10·25 + 20 = 270, а при 0° — ровно 20.",
+     go:[{b:100, w:30}, "start"],
+     ex:[["Гудфеллоу и соавторы, гл. 5","Авторы объясняют английское название сдвига — bias, «смещение»: когда входа нет, ответ модели как бы смещён к числу b. И предупреждают, что это не та «смещённость», о которой говорят в статистике, хотя слово одно и то же."]]},
+    {t:"На графике <b style=\"color:var(--sb)\">b</b> поднимает или опускает всю линию, а наклон не меняется. Ночью посадка 200 ₽ — и любая поездка дороже ровно на 100 ₽: хоть 1 км, хоть 8. Без платы за посадку линия опускается на те же 100.",
+     go:[{b:100, w:30, km:5}, "pause", 200, "pause", 0, "pause", 100]},
+    {t:"Без сдвига линия обязана проходить через ноль: 0 км — 0 ₽. Пунктир — такая линия, у неё есть только наклон <b style=\"color:var(--sw)\">w</b>. В жизни так бывает редко: и такси берёт за посадку, и кафе что-то продаёт в мороз. Сдвиг снимает этот запрет: линия может пересечь ось на любой высоте.",
+     go:[{b:100, w:30, km:5}, "pause", 0, "pause", 100], ghost:true,
+     ex:[["Гудфеллоу и соавторы, гл. 5","Без b прямая y = w·x всегда проходит через начало координат. Со сдвигом модель по-прежнему рисует прямую, но уже на любой высоте. Строго говоря, такая функция уже не линейная, а аффинная, хотя модель всё равно называют линейной регрессией."]]},
+    {t:"<b style=\"color:var(--sw)\">w</b> и <b style=\"color:var(--sb)\">b</b> вместе называют параметрами модели. Две ручки: <b style=\"color:var(--sw)\">w</b> поворачивает линию вокруг точки на оси, <b style=\"color:var(--sb)\">b</b> двигает её вверх-вниз. Вместе они дают линии любой наклон и любую высоту — под любой тариф.",
+     go:[{b:100, w:30, km:5}, {w:50}, "pause", {w:10}, "pause", {w:30}, 180, "pause", 100],
+     ex:[["Гудфеллоу и соавторы, гл. 5","Параметрами авторы называют числа, которые управляют поведением модели. Формула ŷ = w·x + b при обучении не меняется — меняются только параметры: их подбирают по примерам."]]},
+    {look:true, t:"Перевод градусов: чтобы получить Фаренгейты, градусы Цельсия умножают на 1,8 и прибавляют 32. При 0 °C выходит не 0, а 32 °F — это сдвиг. А 1,8 — вес: каждый градус Цельсия добавляет 1,8 по Фаренгейту. Та же модель ŷ = w·x + b.",
+     go:[{b:100, w:30}, "start", {km:8}]},
+    {look:true, t:"Посмотрите на чек такси: «5 км × 30 ₽» и «посадка × 1 × 100 ₽». Посадка — такая же строка, только количество всегда 1. Поэтому сдвиг можно считать ещё одним весом — при входе, который всегда равен 1. Покрутите ползунки: <b style=\"color:var(--sb)\">b</b> двигает линию, <b style=\"color:var(--sw)\">w</b> поворачивает.",
+     go:[{b:100, w:30, km:5}],
+     ex:[["Гудфеллоу и соавторы, гл. 5","Авторы показывают приём: сдвиг можно не писать отдельно, а дописать ко входу ещё одно число, которое всегда равно 1. Вес при этой единице и работает как b — модель снова состоит из одних весов."]]}
+  ]},
   tasks:[
     {t:"fit", q:"Наклон уже верный (w = 10). Подвиньте сдвиг b, чтобы линия легла на точки.", data:"B", ctrl:["b"], init:{w:10,b:120}, goal:40, hint:"Линия должна опуститься. При 10° продали 108, а 10·10 = 100. Чего не хватает?", why:"b ≈ 10: при 10° прогноз 10·10 + 10 = 110 — почти 108.", steps:["Наклон верный (w = 10), его не трогаем.", "Смотрим на точку: при 10° продали 108. Без сдвига модель дала бы 10 · 10 = 100.", "Не хватает примерно 8–10 порций — это и есть сдвиг b.", "С b = 10 прогноз при 10° равен 110 — почти 108. Линия легла на точки."], idea:"Сдвиг двигает всю линию вверх-вниз, не трогая наклон. Две ручки, w и b, вместе дают линии любой наклон и любую высоту.", sol:"b = 10 (подходит и 5)"},
     {t:"num", q:"Такси: ŷ = 30·x + 100, где x — километры. Сколько стоит поездка на 0 км?", a:100, hint:"Подставьте x = 0.", why:"30·0 + 100 = 100. Это и есть сдвиг b.", steps:["Подставим x = 0: 30 · 0 = 0 ₽ за километры.", "Остаётся только сдвиг: 0 + 100 = 100.", "Эти 100 ₽ — плата за посадку. Её платят, даже если никуда не поехали."], idea:"Так и понимают сдвиг b: это ответ модели, когда вход равен нулю."},
@@ -800,6 +824,29 @@ const LESSONS = [
     ["Цель: L → 0","Чем ближе L к нулю, тем точнее модель."]]},
   analog:"Дартс: каждый бросок мимо центра даёт штраф, и дальние промахи наказываются особенно сильно. Счёт игрока — средний штраф. Хороший игрок тот, у кого он меньше.",
   src:"Траск, гл. 4 (шаг «сравнить»: средняя квадратичная ошибка). Принс, гл. 2 и 5 (функция потерь, метод наименьших квадратов).",
+  stand:{scene:"darts", steps:[
+    {t:"Чтобы улучшить модель, сначала надо измерить, насколько она плоха. Для этого считают ошибку — функцию потерь (loss), её пишут <b style=\"color:var(--cool)\">L</b>. Сыграем в дартс: модель ŷ = 10·x + 20 бросает дротик-прогноз <b style=\"color:var(--syh)\">ŷ</b>, а центр мишени — правда <b style=\"color:var(--sy)\">y</b>. Мишеней две, по одной на день.",
+     go:["clear", {w:10, b:20}, "throw"],
+     ex:[["Траск, гл. 4","Обучение у автора — круг из трёх шагов: предсказать, сравнить, научиться. Ошибка — это шаг «сравнить»: одно число, которое говорит, насколько прогноз промахнулся. Без него не понять, стала модель лучше или хуже."]]},
+    {t:"Шаг 1 — промах: <b style=\"color:var(--cool)\">ŷ − y</b>. В первый день прогноз 270, а пришло 265: дротик выше центра, промах +5. Во второй — 200 против 203: дротик ниже, промах −3. Знак говорит, в какую сторону ошиблись, длина пунктира — насколько.",
+     go:["landed", {w:10, b:20}, "pause", "miss"]},
+    {t:"Шаг 2 — квадрат промаха. Штраф — это площадь квадрата, у которого сторона равна промаху: 5² = 25 и (−3)² = 9. Минус пропадает: площадь не бывает отрицательной.",
+     go:["miss", {w:10, b:20}, "sq"],
+     ex:[["Траск, гл. 4","Автор возводит промах в квадрат и объясняет зачем: ошибка всегда выходит положительной, и промахи разного знака при усреднении не гасят друг друга."]]},
+    {t:"Большие промахи штрафуются сильнее. Сдвинем <b style=\"color:var(--sb)\">b</b> до 25: промахи стали +10 и +2. Промах 2 даёт штраф 4, промах 10 — уже 100: от центра в 5 раз дальше, а штраф в 25 раз больше. Сравните квадраты.",
+     go:["sqi", {w:10, b:20}, "pause", 25, "pause"],
+     ex:[["Траск, гл. 4","Ещё одно свойство квадрата, о котором пишет автор: большие промахи он раздувает, а совсем маленькие, меньше единицы, наоборот ужимает. Поэтому модель в первую очередь тянется исправлять самые грубые ошибки."]]},
+    {t:"Шаг 3 — среднее по всем примерам: <b style=\"color:var(--cool)\">L</b> = (25 + 9) / 2 = 17. Это <b>MSE</b>, средняя квадратичная ошибка — счёт модели на табло. Дней может быть хоть тысяча, <b style=\"color:var(--cool)\">L</b> всё равно одно число. Ноль — идеально: все дротики в центре.",
+     go:["sqi", {w:10, b:20}, "pause", "L"],
+     ex:[["Принс, гл. 2","У автора ошибка прямой — сумма квадратов промахов по всем обучающим парам; такой способ называют методом наименьших квадратов. Среднее отличается от суммы только делением на число примеров, а лучшая прямая у них одна и та же."],
+         ["Принс, гл. 5","Почему именно квадраты, автор выводит отдельно: если считать, что настоящие ответы разбросаны вокруг прогноза «колоколом» — по нормальному распределению, — то самая правдоподобная модель та, у которой сумма квадратов промахов меньше всего."]]},
+    {t:"Цель обучения — сделать <b style=\"color:var(--cool)\">L</b> как можно меньше, подкручивая <b style=\"color:var(--sw)\">w</b> и <b style=\"color:var(--sb)\">b</b>. Смотрите: модель пробует чуть сдвинуть ручки и оставляет только то, что уменьшает счёт. За пять поправок L падает с 17 до 9.",
+     go:["L", {w:10, b:20}, "pause", "hot"]},
+    {look:true, t:"Почему бы просто не сложить промахи? Поставим <b style=\"color:var(--sb)\">b</b> = 19: промахи +4 и −4, в сумме 0 — будто модель не ошиблась. А квадраты 16 + 16 честно говорят: ошибка есть, L = 16.",
+     go:["L", {w:10, b:20}, "pause", 19]},
+    {look:true, t:"Пицца 30 см кажется вдвое больше пиццы 15 см, а теста в ней вчетверо больше: площадь растёт как квадрат. Так и штраф: один промах на 10 обходится модели дороже, чем два по 5, — 100 против 25 + 25. Покрутите ползунки и следите за квадратами.",
+     go:["L", {w:10, b:20}, "pause", 25, "pause", 20]}
+  ]},
   tasks:[
     {t:"num", q:"Прогноз ŷ = 12, правда y = 9. Чему равен промах ŷ − y?", a:3, hint:"Из прогноза вычтите правду.", why:"12 − 9 = 3: модель переоценила на 3.", steps:["Промах = прогноз − правда = ŷ − y.", "12 − 9 = 3.", "Плюс значит: модель сказала больше, чем было на самом деле (переоценила)."], idea:"Промах на одном примере — первый кирпичик ошибки. Дальше промахи возводят в квадрат и усредняют."},
     {t:"num", q:"Промах равен −4. Чему равен штраф (квадрат промаха)?", a:16, hint:"Минус на минус даёт плюс.", why:"(−4)² = 16.", steps:["Квадрат — число, умноженное само на себя: (−4) · (−4).", "Минус на минус даёт плюс: 4 · 4 = 16.", "Штраф всегда положительный, даже если промах был «в минус»."], idea:"Ошибиться в меньшую сторону так же плохо, как в большую. Квадрат делает штраф одинаковым для +4 и −4."},
@@ -2066,7 +2113,7 @@ SCENES.cafe = {
       sa("xml", {x: xmx.toFixed(1), y: xup ? 55 : 102}); tx("xml", "x = " + fmt(x, 1) + "°");
       [10, 20, 30].forEach(t => { q("t" + t).style.opacity = !xup && Math.abs(CX(t) - xmx) < 36 ? 0 : 1; });
       // подпись w·x — с той стороны от точки, где нет линии
-      const right = px < 270, up = Math.abs(w) < 0.3 ? true : (w > 0) !== right;
+      const right = px < 270, up = Math.abs(w) < 0.3 ? !xup : (w > 0) !== right;   // почти ровная линия: подпись по другую сторону от метки x
       sa("Pl", {x: (px + (right ? 9 : -9)).toFixed(1), y: cl(py + (up ? -8 : 15), 24, 100).toFixed(1), "text-anchor": right ? "start" : "end"});
       tx("Pl", "w·x = " + n1(v));
       const ply = cl(py + (up ? -8 : 15), 24, 100), plw = q("Pl").textContent.length * 6.9, pl0 = right ? px + 9 : px - 9 - plw;
@@ -2153,6 +2200,412 @@ SCENES.cafe = {
         else if (a === "day") run(st.t >= 1 || !st.fc ? ["morning", "fc", "day"] : ["day"], id);
         else { let x; do { x = NEXT[nk++ % NEXT.length]; } while (x === Math.round(st.x)); run(["morning", x, "fc", "day"], id); }
       }
+    };
+  }
+};
+
+/* ---------- Сцена «Такси»: урок b ----------
+   Над дорогой табло-график цены ŷ = w·x + b: x — километры (0…8), b — посадка, w — рубли за километр.
+   Машина едет ровно под своей точкой графика; на крыше — счётчик ŷ. Столбик в точке = b (розовый) + w·x (фиолетовый).
+   Пунктир «без b» — та же линия без сдвига, через ноль. Стойка «Такси» слева — тариф: посадка b и цена километра w. */
+SCENES.taxi = {
+  vb: [0, 0, 360, 262], camMin: 250,
+  vals: [["b","посадка","--sb"],["w","₽ за 1 км","--sw"],["x","проехали","--sx"],["ŷ","к оплате","--syh"]],
+  ctrl: [{k:"b", min:0, max:200, step:10, col:"--sb"}, {k:"w", min:0, max:50, step:5, col:"--sw"}],
+  acts: [["go","▶ Поехали"],["seat","Другая посадка"]],
+  svg: `<svg viewBox="0 0 360 262" role="img" aria-label="Такси под табло с тарифом. Цена поездки ŷ = w·x + b: x — километры, w — рубли за километр, b — плата за посадку.">
+<defs><clipPath id="t-clip"><rect x="158" y="9" width="190" height="103.5"/></clipPath>
+<marker id="t-ah" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0L10 5L0 10Z" style="fill:var(--axis)"/></marker></defs>
+<path id="t-city" style="fill:var(--mount)"/>
+<path id="t-win" style="fill:var(--card)" opacity=".7"/>
+<rect x="160" y="128" width="6" height="30" style="fill:var(--reg)"/><rect x="302" y="128" width="6" height="30" style="fill:var(--reg)"/>
+<rect x="100" y="4" width="254" height="130" rx="4" style="fill:var(--reg)"/>
+<rect x="104" y="8" width="246" height="122" rx="2" style="fill:var(--board)"/>
+<path d="M158 112H344M158 112V12" fill="none" stroke-width="1" marker-end="url(#t-ah)" style="stroke:var(--axis)"/>
+<g id="t-tk" style="fill:var(--muted);font-size:9.5px" text-anchor="middle"></g>
+<text id="t-kml" x="347" y="126.5" text-anchor="end" style="fill:var(--muted);font-size:9.5px">км</text>
+<text x="164" y="19" style="fill:var(--muted);font-size:9.5px">₽</text>
+<g clip-path="url(#t-clip)">
+  <line id="t-gh" stroke-width="1.5" stroke-dasharray="4 3" style="stroke:var(--muted)"/>
+  <line id="t-ln" stroke-width="2.5" stroke-linecap="round" style="stroke:var(--syh)"/>
+  <rect id="t-bb" width="5" style="fill:var(--sb)"/>
+  <rect id="t-bw" width="5" style="fill:var(--sw)"/>
+</g>
+<line id="t-ax" x1="158" x2="158" y1="112" stroke-width="4" stroke-linecap="round" style="stroke:var(--sb)"/>
+<circle id="t-b0" cx="158" r="3.6" style="fill:var(--sb)"/>
+<circle id="t-P" r="4.2" style="fill:var(--syh)"/>
+<text id="t-ghl" class="lbb" style="fill:var(--muted);font-size:10px">без b</text>
+<text id="t-bl" text-anchor="end" class="lbb" style="fill:var(--sb);font-size:10.5px;font-weight:600"></text>
+<text id="t-wl" class="lbb" style="fill:var(--sw);font-size:10.5px;font-weight:600"></text>
+<text id="t-yl" class="lbb" style="fill:var(--syh);font-size:11.5px;font-weight:600"></text>
+<path id="t-xm" style="fill:var(--sx)"/>
+<text id="t-xl" y="127" text-anchor="middle" class="lbb" style="fill:var(--sx);font-size:10px;font-weight:600"></text>
+<line id="t-xc" y1="131" y2="151" stroke-width="1.3" stroke-dasharray="1.5 3" stroke-linecap="round" style="stroke:var(--sx)"/>
+<rect x="44" y="96" width="4" height="62" style="fill:var(--reg)"/>
+<rect x="4" y="34" width="90" height="66" rx="4" stroke-width="1" style="fill:var(--board);stroke:var(--line)"/>
+<path d="M4 50V38a4 4 0 0 1 4-4h82a4 4 0 0 1 4 4v12Z" style="fill:var(--car)"/>
+<text x="49" y="46" text-anchor="middle" class="deco" style="fill:#131B26;font-size:10px;font-weight:700;letter-spacing:.12em">ТАКСИ</text>
+<text x="10" y="68" style="fill:var(--muted);font-size:9.5px">посадка</text>
+<text x="10" y="89" style="fill:var(--muted);font-size:9.5px">за 1 км</text>
+<text id="t-sb" x="89" y="68" text-anchor="end" style="fill:var(--sb);font-size:11px;font-weight:600"></text>
+<text id="t-sw" x="89" y="89" text-anchor="end" style="fill:var(--sw);font-size:11px;font-weight:600"></text>
+<rect x="-400" y="156" width="1160" height="10" style="fill:var(--floor)"/>
+<rect x="-400" y="166" width="1160" height="60" style="fill:var(--road)"/>
+<path d="M-400 187H760" stroke-width="2" stroke-dasharray="14 12" style="stroke:var(--lane)"/>
+<rect x="-400" y="226" width="1160" height="436" style="fill:var(--floor)"/>
+<path d="M-400 226.5H760" stroke-width="1" style="stroke:var(--line)"/>
+<g id="t-km" style="fill:var(--muted)"></g>
+<ellipse id="t-sh" cy="219" rx="33" ry="2.6" style="fill:var(--ink)" opacity=".13"/>
+<g id="t-car" stroke-linejoin="round">
+  <path id="t-body" style="fill:var(--car)"/>
+  <path id="t-cab" style="fill:var(--car)"/>
+  <path id="t-wn" style="fill:var(--carw)"/>
+  <circle id="t-drv" r="3.4" style="fill:var(--skin)"/>
+  <path id="t-chk" style="fill:var(--tyre)" opacity=".75"/>
+  <path id="t-lt" style="fill:var(--sun)"/>
+  <circle id="t-w1" r="7.5" style="fill:var(--tyre)"/><circle id="t-w2" r="7.5" style="fill:var(--tyre)"/>
+  <circle id="t-h1" r="3.2" style="fill:var(--reg)"/><circle id="t-h2" r="3.2" style="fill:var(--reg)"/>
+  <path id="t-sp" fill="none" stroke-width="1.3" style="stroke:var(--tyre)"/>
+</g>
+<g id="t-mtr">
+  <rect id="t-mst" width="4" height="5" style="fill:var(--reg)"/>
+  <rect id="t-mb" width="62" height="15" rx="3" style="fill:var(--reg)"/>
+  <rect id="t-mi" width="58" height="11" rx="2" style="fill:var(--lcd)"/>
+  <text id="t-mt" text-anchor="middle" style="fill:var(--syh);font-size:9.5px;font-weight:600"></text>
+</g>
+</svg>`,
+  init(E){
+    const q = id => E.svg.querySelector("#t-" + id);
+    const sa = (id, o) => { const e = q(id); for (const k in o) e.setAttribute(k, o[k]); };
+    const tx = (id, t) => { const e = q(id); if (e.textContent !== t) e.textContent = t; };
+    const P = (x, y) => x.toFixed(1) + " " + y.toFixed(1);
+    const cl = (v, a, b) => Math.min(b, Math.max(a, v));
+    const X = k => 158 + k * 21.5, Y = v => 112 - v * 0.1633;          // табло: 0…8 км, 0…600 ₽
+    const RX = k => X(k);                                                 // дорога под табло: тот же масштаб
+    // город за табло: дома разной высоты (неизменный рисунок)
+    { const r = rng(11); let d = "", wn = "", x = -400;
+      while (x < 760){ const w = 34 + r() * 40, top = Math.round(x > 90 && x < 360 ? 20 + r() * 60 : -60 + r() * 120);
+        d += `M${x.toFixed(0)} 158V${top}h${w.toFixed(0)}V158Z`;
+        for (let y = top + 9; y < 148; y += 13) for (let k = x + 7; k < x + w - 9; k += 11) wn += `M${k.toFixed(0)} ${y}h5v6h-5Z`;
+        x += w + 6 + r() * 10; }
+      sa("city", {d}); sa("win", {d: wn}); }
+    q("tk").innerHTML = [0, 2, 4, 6, 8].map(k => `<text id="t-tk${k}" x="${X(k)}" y="126.5">${k}</text>`).join("");
+    q("km").innerHTML = [0,1,2,3,4,5,6,7,8].map(k => `<rect x="${RX(k) - 1.5}" y="227" width="3" height="${k % 2 ? 5 : 9}" rx="1"/>`).join("");
+    const st = {b:100, w:30, km:0, ghost:false, ph:0};
+
+    function draw(fromSlider){
+      const {b, w, km} = st, yh = w * km + b, px = X(km), py = Y(yh), cx = RX(km);
+      const [v0, v1] = E.view(cx);
+      // линия прогноза и линия «без b»
+      const xe = 8.6;
+      sa("ln", {x1: X(0), y1: Y(b).toFixed(1), x2: X(xe).toFixed(1), y2: Y(w * xe + b).toFixed(1)});
+      sa("gh", {x1: X(0), y1: Y(0), x2: X(xe).toFixed(1), y2: Y(w * xe).toFixed(1), opacity: st.ghost ? 0.9 : 0});
+      // b — на оси: розовый отрезок от 0 до b и точка, где линия пересекает ось
+      sa("ax", {y2: Y(b).toFixed(1), opacity: b > 0.5 ? 1 : 0}); sa("b0", {cy: Y(b).toFixed(1)});
+      // столбик в точке: снизу b, сверху w·x
+      sa("bb", {x: (px - 2.5).toFixed(1), y: Y(b).toFixed(1), height: (Y(0) - Y(b)).toFixed(1), opacity: km > 0.05 ? 0.55 : 0});
+      sa("bw", {x: (px - 2.5).toFixed(1), y: py.toFixed(1), height: Math.max(0, Y(b) - py).toFixed(1), opacity: km > 0.05 ? 0.85 : 0});
+      sa("P", {cx: px.toFixed(1), cy: py.toFixed(1)});
+      // подписи: каждая пробует несколько мест и берёт первое, где не задевает уже поставленные
+      const occ = [], hb = Y(b) - py;
+      const box = (x, y, w, an) => an === "end" ? [x - w, y - 9, x, y + 2] : [x, y - 9, x + w, y + 2];
+      const ok = r => r[0] >= 104 && r[2] <= 348 && r[1] >= 9 && r[3] <= 113.5 && occ.every(o => r[0] > o[2] + 1 || r[2] < o[0] - 1 || r[1] > o[3] + 1 || r[3] < o[1] - 1);
+      function place(id, text, fs, cands){
+        tx(id, text); const w = text.length * fs * 0.6;
+        for (const [x, y, an] of cands){ const r = box(x, y, w, an); if (ok(r)){ occ.push(r); sa(id, {x: x.toFixed(1), y: y.toFixed(1), "text-anchor": an}); q(id).style.opacity = 1; return; } }
+        q(id).style.opacity = 0;
+      }
+      const bly = cl((Y(0) + Y(b)) / 2 + 4, 24, 116), btx = "b = " + fmt(b, 0);
+      sa("bl", {x: 152, y: bly.toFixed(1)}); tx("bl", btx); occ.push([152 - btx.length * 6.3, bly - 9, 152, bly + 2]);
+      occ.push([px - 4, py - 4, px + 4, Y(0)], [155, 9, 161, 113]);   // точка со столбиком и ось ₽
+      place("yl", "ŷ = " + fmt(Math.round(yh), 0), 11.5, [[px - 7, py - 7, "end"], [px + 7, py + 15, "start"], [px - 7, py + 15, "end"], [px + 7, py - 7, "start"]]);
+      const wm = (Y(b) + py) / 2 + 4;
+      if (hb > 9 && km > 0.4) place("wl", "w·x = " + fmt(Math.round(w * km), 0), 10.5, [[px + 7, wm, "start"], [px - 7, wm, "end"], [px + 7, wm + 12, "start"], [px - 7, wm + 12, "end"]]);
+      else q("wl").style.opacity = 0;
+      // «без b»: между линиями у оси (если полоса между ними достаточно широкая) или под пунктиром
+      const gap = b * 0.1633, slope = w * 0.1633 / 21.5;
+      if (st.ghost && b > 15) place("ghl", "без b", 10, [
+        ...(gap >= 12 + slope * 30 ? [[X(1.2) - 15, Y(w * 1.2 + b / 2) + 3.5, "start"]] : []),
+        ...[2.6, 3.4, 1.8, 4.8, 6].map(k => [X(k), Y(w * k) + 11, "start"])]);
+      else q("ghl").style.opacity = 0;
+      // x: метка на оси табло, пунктир вниз к машине
+      sa("xm", {d: "M" + P(px, 113) + "l-3.5 4.5h7Z"});
+      const xtx = "x = " + fmt(km, 1) + " км", xhw = xtx.length * 3 + 6, xlx = cl(px, 182, 318);
+      sa("xl", {x: xlx.toFixed(1)}); tx("xl", xtx);
+      [0, 2, 4, 6, 8].forEach(k => { q("tk" + k).style.opacity = Math.abs(X(k) - xlx) < xhw + 4 ? 0 : 1; });
+      q("kml").style.opacity = xlx + xhw > 334 ? 0 : 1;
+      sa("xc", {x1: px.toFixed(1), x2: px.toFixed(1)});
+      // машина: кузов, кабина, окна, водитель, шашечки, колёса со спицами
+      const c = cx;
+      sa("body", {d: `M${P(c - 34, 210)}V194Q${P(c - 34, 187)} ${P(c - 27, 186.5)}L${P(c + 24, 186)}Q${P(c + 34, 187)} ${P(c + 34, 195)}V210Z`});
+      sa("cab", {d: `M${P(c - 23, 187)}L${P(c - 14, 172)}Q${P(c - 12, 170.5)} ${P(c - 9, 170.5)}H${(c + 7).toFixed(1)}Q${P(c + 10, 170.5)} ${P(c + 12, 173)}L${P(c + 20, 187)}Z`});
+      sa("wn", {d: `M${P(c - 18.5, 185)}L${P(c - 11.5, 173.5)}H${(c - 4).toFixed(1)}V185ZM${P(c - 1.5, 185)}V173.5H${(c + 6).toFixed(1)}Q${P(c + 8.5, 173.5)} ${P(c + 9.5, 175)}L${P(c + 15.5, 185)}Z`});
+      sa("drv", {cx: (c + 4).toFixed(1), cy: 180});
+      let ch = ""; for (let i = 0; i < 12; i++) ch += `M${P(c - 27 + i * 4.5, i % 2 ? 193 : 196.5)}h4.5v3.5h-4.5Z`;
+      sa("chk", {d: ch});
+      sa("lt", {d: `M${P(c + 31, 190.5)}h3.2v4h-3.2Z`});
+      const w1 = c - 20, w2 = c + 20, ang = -st.km * 21.5 / 7.5;
+      sa("w1", {cx: w1.toFixed(1), cy: 210}); sa("w2", {cx: w2.toFixed(1), cy: 210});
+      sa("h1", {cx: w1.toFixed(1), cy: 210}); sa("h2", {cx: w2.toFixed(1), cy: 210});
+      let sp = ""; [w1, w2].forEach(wx => { for (let i = 0; i < 2; i++){ const a = ang + i * Math.PI / 2, dx = Math.cos(a) * 3.2, dy = Math.sin(a) * 3.2; sp += `M${P(wx - dx, 210 - dy)}L${P(wx + dx, 210 + dy)}`; } });
+      sa("sp", {d: sp});
+      sa("sh", {cx: c.toFixed(1)});
+      // счётчик на крыше: ŷ
+      sa("mst", {x: (c - 4).toFixed(1), y: 166}); sa("mb", {x: (c - 33).toFixed(1), y: 152}); sa("mi", {x: (c - 31).toFixed(1), y: 154});
+      sa("mt", {x: (c - 2).toFixed(1), y: 163}); tx("mt", "ŷ = " + fmt(Math.round(yh), 0) + " ₽");
+      // стойка тарифа и плашки
+      tx("sb", fmt(b, 0) + " ₽"); tx("sw", fmt(w, 0) + " ₽");
+      E.val(0, fmt(b, 0) + " ₽"); E.val(1, fmt(w, 0) + " ₽"); E.val(2, fmt(km, 1) + " км"); E.val(3, fmt(Math.round(yh), 0) + " ₽");
+      if (!fromSlider){ E.setCtrl("b", Math.round(b)); E.setCtrl("w", Math.round(w)); }
+    }
+
+    function anim(ms, id, fn){
+      return new Promise(res => {
+        if (!E.live(id)) return res();
+        const t0 = performance.now();
+        const fr = now => {
+          if (!E.live(id)) return res();
+          const p = Math.min((now - t0) / ms, 1);
+          fn(p < .5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2); draw();
+          if (p < 1) requestAnimationFrame(fr); else res();
+        };
+        requestAnimationFrame(fr);
+      });
+    }
+    function tween(o, id){
+      const a = {}; let ms = 450;
+      for (const k in o){ a[k] = st[k]; ms = Math.max(ms, Math.abs(o[k] - st[k]) * {b: 6, w: 22, km: 480}[k]); }
+      if (Object.keys(o).every(k => Math.abs(o[k] - a[k]) < 0.01)) return Promise.resolve();
+      return anim(Math.min(ms, 4200), id, e => { for (const k in o) st[k] = a[k] + (o[k] - a[k]) * e; });
+    }
+    const KM = [5, 8, 3, 6], SEAT = {100: 200, 200: 0, 0: 100};
+    let nk = 0;
+    async function run(plan, id){
+      for (const p of plan){
+        if (!E.live(id)) return;
+        if (p === "pause") await E.wait(1300);
+        else if (p === "start"){ st.km = 0; draw(); await E.wait(350); }
+        else if (typeof p === "number") await tween({b: p}, id);
+        else if (typeof p === "object") await tween(p, id);
+      }
+    }
+    return {
+      draw,
+      step(s, id){ st.ghost = !!s.ghost; draw(); return run([].concat(s.go == null ? [] : s.go), id); },
+      slide(v, k){ st[k] = v; if (k === "b") st.ghost = true; draw(true); },
+      action(a, id){
+        if (a === "go") run(["start", {km: KM[nk++ % KM.length]}], id);
+        else { st.ghost = true; const b = Math.round(st.b); run([SEAT[b] != null ? SEAT[b] : 100], id); }
+      }
+    };
+  }
+};
+
+/* ---------- Сцена «Дартс»: урок L ----------
+   Каждый день — своя мишень. Центр мишени — правда y, дротик модели втыкается на высоте прогноза ŷ = w·x + b
+   (масштаб: 1 порция = 3 единицы картинки). Пунктир от центра до дротика — промах ŷ − y; штраф — настоящий квадрат
+   со стороной промаха. Табло сверху: промахи, штрафы и L = средний штраф. Числа — из разбора урока: дни 25° и 18°. */
+SCENES.darts = {
+  vb: [0, 0, 360, 262], camMin: 340,
+  vals: [["w","вес","--sw"],["b","сдвиг","--sb"],["(ŷ − y)²","штрафы","--cool"],["L","средний штраф","--cool"]],
+  ctrl: [{k:"w", min:9.7, max:10.3, step:0.1, col:"--sw"}, {k:"b", min:15, max:25, step:1, col:"--sb"}],
+  acts: [["throw","▶ Бросок"],["hot","Уменьшить L"]],
+  svg: `<svg viewBox="0 0 360 262" role="img" aria-label="Дартс: на каждый день своя мишень. Центр — правда y, дротик — прогноз ŷ. Пунктир — промах ŷ − y, квадрат со стороной промаха — штраф. На табло — средний штраф L.">
+<rect x="-400" y="-400" width="1160" height="636" style="fill:var(--wall)"/>
+<path d="M152 -400V-34M302 -400V-34" stroke-width="1.2" style="stroke:var(--muted)"/>
+<path d="M139 -22a13 12 0 0 1 26 0ZM289 -22a13 12 0 0 1 26 0Z" style="fill:var(--woodtop)"/>
+<circle cx="152" cy="-20" r="4" style="fill:var(--sun)"/><circle cx="302" cy="-20" r="4" style="fill:var(--sun)"/>
+<rect x="-400" y="188" width="1160" height="5" style="fill:var(--woodtop)"/>
+<rect x="-400" y="193" width="1160" height="43" style="fill:var(--wood)"/>
+<rect x="-400" y="236" width="1160" height="426" style="fill:var(--floor)"/>
+<rect x="8" y="4" width="344" height="52" rx="4" style="fill:var(--woodtop)"/>
+<rect x="12" y="8" width="336" height="44" rx="2" style="fill:var(--board)"/>
+<text id="d-r1" x="180" y="25" text-anchor="middle" style="font-size:10.5px"></text>
+<text id="d-r2" x="180" y="45" text-anchor="middle" style="font-size:12.5px;font-weight:600"></text>
+<g id="d-bd"></g>
+<g fill="none" stroke-width="5" style="stroke:var(--card)" opacity=".9"><rect id="d-qh0"/><rect id="d-qh1"/><line id="d-mh0"/><line id="d-mh1"/></g>
+<g id="d-sq" style="fill:var(--cool);stroke:var(--cool)"><rect id="d-q0" fill-opacity=".22" stroke-width="2"/><rect id="d-q1" fill-opacity=".22" stroke-width="2"/></g>
+<g stroke-width="2.4" stroke-dasharray="3.5 2.5" style="stroke:var(--cool)"><line id="d-m0"/><line id="d-m1"/></g>
+<g id="d-dt0"></g><g id="d-dt1"></g>
+<text id="d-yh0" text-anchor="end" class="lb" style="fill:var(--syh);font-size:10.5px;font-weight:600"></text>
+<text id="d-yh1" text-anchor="end" class="lb" style="fill:var(--syh);font-size:10.5px;font-weight:600"></text>
+<text id="d-y0" text-anchor="end" class="lb" style="fill:var(--sy);font-size:10.5px;font-weight:600"></text>
+<text id="d-y1" text-anchor="end" class="lb" style="fill:var(--sy);font-size:10.5px;font-weight:600"></text>
+<text id="d-a0" class="lb" style="fill:var(--cool);font-size:10.5px;font-weight:600"></text>
+<text id="d-a1" class="lb" style="fill:var(--cool);font-size:10.5px;font-weight:600"></text>
+<rect x="114" y="202" width="76" height="18" rx="3" style="fill:var(--board)"/><rect x="264" y="202" width="76" height="18" rx="3" style="fill:var(--board)"/>
+<text x="152" y="214.5" text-anchor="middle" style="fill:var(--muted);font-size:10px">день 1 · 25°</text>
+<text x="302" y="214.5" text-anchor="middle" style="fill:var(--muted);font-size:10px">день 2 · 18°</text>
+<rect x="58" y="236" width="3" height="7" style="fill:var(--muted)"/>
+<g id="d-man" stroke-linecap="round" stroke-linejoin="round" fill="none">
+  <path id="d-legs" stroke-width="5.5" style="stroke:var(--pants)"/>
+  <path id="d-arm2" stroke-width="4.5" style="stroke:var(--pc2)"/>
+  <path id="d-tor" stroke-width="12" style="stroke:var(--pc2)"/>
+  <circle id="d-head" r="7.5" stroke="none" style="fill:var(--skin)"/>
+  <path id="d-hair" stroke="none" style="fill:var(--pants)"/>
+  <circle id="d-eye" r="1.1" stroke="none" style="fill:var(--ink)"/>
+  <path id="d-arm" stroke-width="4.5" style="stroke:var(--pc2)"/>
+  <circle id="d-hand" r="2.6" stroke="none" style="fill:var(--skin)"/>
+</g>
+<g id="d-fly"></g>
+</svg>`,
+  init(E){
+    const q = id => E.svg.querySelector("#d-" + id);
+    const sa = (id, o) => { const e = q(id); for (const k in o) e.setAttribute(k, o[k]); };
+    const tx = (id, t) => { const e = q(id); if (e.textContent !== t) e.textContent = t; };
+    const P = (x, y) => x.toFixed(1) + " " + y.toFixed(1);
+    const r1 = v => Math.round(v * 10) / 10;
+    const n1 = v => (v < -0.04 ? "−" : "") + fmt(Math.abs(r1(v)), 1);
+    const sg = v => (v > 0.04 ? "+" : v < -0.04 ? "−" : "") + fmt(Math.abs(r1(v)), 1);
+    // дни из разбора: при w = 10, b = 20 прогнозы 270 и 200, правда 265 и 203
+    const D = [{x:25, y:265}, {x:18, y:203}], CX = [152, 302], CY = 122, K = 3, LX = 33;
+    const miss = (i, w = st.w, b = st.b) => w * D[i].x + b - D[i].y;
+    const Lf = (w, b) => (miss(0, w, b) ** 2 + miss(1, w, b) ** 2) / 2;
+    // мишени: тёмные и светлые секторы, кольца удвоения и утроения, «яблочко»
+    { let s = "";
+      CX.forEach(cx => {
+        s += `<circle cx="${cx}" cy="${CY}" r="28" style="fill:var(--dbk)"/><circle cx="${cx}" cy="${CY}" r="23.5" style="fill:var(--dbc)"/>`;
+        for (let k = 0; k < 20; k += 2){ const a0 = (k * 18 - 9) * Math.PI / 180, a1 = a0 + Math.PI / 10;
+          s += `<path d="M${cx} ${CY}L${P(cx + 23.5 * Math.cos(a0), CY + 23.5 * Math.sin(a0))}A23.5 23.5 0 0 1 ${P(cx + 23.5 * Math.cos(a1), CY + 23.5 * Math.sin(a1))}Z" style="fill:var(--dbk)" opacity=".42"/>`; }
+        [[22.3, 1.6], [13.8, 1.4]].forEach(([r, sw]) => { const d = (2 * Math.PI * r / 20).toFixed(2);
+          s += `<circle cx="${cx}" cy="${CY}" r="${r}" fill="none" stroke-width="${sw}" style="stroke:var(--dbg)"/><circle cx="${cx}" cy="${CY}" r="${r}" fill="none" stroke-width="${sw}" stroke-dasharray="${d} ${d}" stroke-dashoffset="${(d / 2).toFixed(2)}" style="stroke:var(--dbr)"/>`; });
+        s += `<circle cx="${cx}" cy="${CY}" r="3.6" style="fill:var(--dbg)"/><circle cx="${cx}" cy="${CY}" r="1.8" style="fill:var(--dbr)"/>`;
+      });
+      q("bd").innerHTML = s; }
+    // дротик: остриё в (0, 0), смотрит вправо; оперение — цвет прогноза ŷ
+    const DART = `<path d="M0 0L-5 -1.2V1.2Z" style="fill:var(--stick)"/><rect x="-13" y="-1.7" width="8.5" height="3.4" rx="1.2" style="fill:var(--tyre)"/><path d="M-13 0H-19" stroke-width="1.3" style="stroke:var(--stick)"/><path d="M-16.5 0L-23 -4.8L-21 0L-23 4.8Z" style="fill:var(--syh)"/>`;
+    q("dt0").innerHTML = q("dt1").innerHTML = q("fly").innerHTML = DART;
+    // ph: 0 — дротики в руке, 1 — первый в мишени, 2 — оба в мишенях, 3 — промахи, 4 — квадраты-штрафы, 5 — L на табло
+    const st = {w:10, b:20, ph:0, g:0, arm:0, fly:null};
+    let rk = "";
+
+    function man(){
+      const a = st.arm;   // −1 — замах, 0 — прицел, 1 — бросок
+      sa("legs", {d: "M34 198L28 236M34 198L43 222L46 236"});
+      sa("tor", {d: "M34 198L35 167"}); sa("arm2", {d: "M35 171L29 184L31 196"});
+      sa("head", {cx: 37, cy: 156}); sa("eye", {cx: 41, cy: 155});
+      sa("hair", {d: "M29.4 155.5a7.6 7.6 0 0 1 15.2 -1c-4-3-10-3-13 1Z"});
+      const hx = 54 + a * 9, hy = 153 + (a < 0 ? a * 4 : a * 9), ex = 44 + (a < 0 ? a * 4 : a * 3), ey = 170 + (a < 0 ? a * 2 : a);
+      sa("arm", {d: "M36 170L" + P(ex, ey) + "L" + P(hx, hy)}); sa("hand", {cx: hx.toFixed(1), cy: hy.toFixed(1)});
+      return [hx, hy];
+    }
+
+    function draw(fromSlider){
+      const [hx, hy] = man();
+      E.view(185);
+      const ph = st.ph, m = [miss(0), miss(1)];
+      // дротик в полёте: дуга от руки до мишени
+      if (st.fly){
+        const i = st.fly.i, u = st.fly.u, tx0 = CX[i], ty0 = CY - m[i] * K, cxp = (hx + tx0) / 2, cyp = Math.min(hy, ty0) - 46;
+        const x = (1 - u) ** 2 * hx + 2 * (1 - u) * u * cxp + u * u * tx0, y = (1 - u) ** 2 * hy + 2 * (1 - u) * u * cyp + u * u * ty0;
+        const dx = 2 * (1 - u) * (cxp - hx) + 2 * u * (tx0 - cxp), dy = 2 * (1 - u) * (cyp - hy) + 2 * u * (ty0 - cyp);
+        sa("fly", {transform: `translate(${P(x, y)}) rotate(${(Math.atan2(dy, dx) * 180 / Math.PI).toFixed(1)})`, opacity: 1});
+      } else if (ph < 2) sa("fly", {transform: `translate(${P(hx + 7, hy - 1)}) rotate(-8)`, opacity: 1});
+      else sa("fly", {opacity: 0});
+      for (let i = 0; i < 2; i++){
+        const cx = CX[i], ty = CY - m[i] * K, on = ph > i, s = Math.abs(m[i]) * K, hit = Math.abs(m[i]) < 0.05;
+        sa("dt" + i, {transform: `translate(${P(cx, ty)}) rotate(12)`, opacity: on ? 1 : 0});
+        const mo = ph >= 3 && !hit ? 1 : 0;
+        sa("m" + i, {x1: cx, y1: CY, x2: cx, y2: ty.toFixed(1), opacity: mo}); sa("mh" + i, {x1: cx, y1: CY, x2: cx, y2: ty.toFixed(1), opacity: mo});
+        const g = ph >= 4 ? st.g : 0;
+        const qa = {x: cx, y: Math.min(CY, ty).toFixed(1), width: (s * g).toFixed(1), height: s.toFixed(1), opacity: g > 0.01 && !hit ? 1 : 0};
+        sa("q" + i, qa); sa("qh" + i, qa);
+        // слева: ŷ — на высоте дротика, y — у центра; если близко, раздвигаем
+        let yhY = ty + 4, yY = CY + 4;
+        if (Math.abs(ty - CY) < 12){ const mid = (ty + CY) / 2, up = ty <= CY; yhY = mid + (up ? -6 : 6) + 4; yY = mid + (up ? 6 : -6) + 4; }
+        sa("yh" + i, {x: cx - LX, y: yhY.toFixed(1)}); tx("yh" + i, "ŷ = " + n1(st.w * D[i].x + st.b)); q("yh" + i).style.opacity = on ? 1 : 0;
+        sa("y" + i, {x: cx - LX, y: yY.toFixed(1)}); tx("y" + i, "y = " + D[i].y);
+        // справа: промах у пунктира, потом площадь квадрата — внутри, если помещается
+        let at = "", ax = cx + 5, ay = (CY + ty) / 2 + 3.5, an = "start";
+        if (ph === 3) at = sg(m[i]);
+        else if (ph >= 4 && g > 0.98) at = n1(m[i] ** 2);
+        if (hit && ph >= 3) { at = "в центр!"; ay = CY - 33; }
+        // площадь: внутри квадрата, если помещается; иначе справа; если справа тесно (соседняя мишень или край) — над или под квадратом
+        if (ph >= 4 && at && !hit){ const tw = at.length * 6.3, lim = i ? 356 : CX[1] - LX - 66;
+          if (s >= 22 && tw <= s - 4){ ax = cx + s / 2; an = "middle"; }
+          else if (cx + s + 3 + tw <= lim) ax = cx + s + 3;
+          else { ax = cx + s / 2 + 4; an = "middle"; ay = m[i] > 0 ? ty - 5 : ty + 13; } }
+        sa("a" + i, {x: ax.toFixed(1), y: ay.toFixed(1), "text-anchor": an}); tx("a" + i, at); q("a" + i).style.opacity = at ? 1 : 0;
+      }
+      // табло
+      // на табло считаем с теми же округлёнными числами, что видны: (6,3 + 11,6) / 2 = 9
+      const rr = v => Math.round(v * 10 + 1e-9) / 10, sq = m.map(v => rr(r1(v) ** 2)), Ld = rr((sq[0] + sq[1]) / 2);
+      const C = t => `<tspan style="fill:var(--cool);font-weight:600">${t}</tspan>`, M = t => `<tspan style="fill:var(--muted)">${t}</tspan>`;
+      const r1h = ph < 3 ? M("промахи ŷ − y: ?") : ph === 3 ? M("промахи ŷ − y: ") + C(sg(m[0])) + M(" и ") + C(sg(m[1]))
+        : M("штрафы: ") + C(`(${sg(m[0])})² + (${sg(m[1])})²`) + M(" = ") + C(n1(sq[0]) + " + " + n1(sq[1]));
+      const r2h = ph < 5 ? M("L = ?") : C(`L = (${n1(sq[0])} + ${n1(sq[1])}) / 2 = ${n1(Ld)}`);
+      if (r1h + r2h !== rk){ rk = r1h + r2h; q("r1").innerHTML = r1h; q("r2").innerHTML = r2h; }
+      E.val(0, fmt(r1(st.w), 1)); E.val(1, fmt(Math.round(st.b), 0));
+      E.val(2, ph >= 4 ? n1(sq[0]) + " и " + n1(sq[1]) : "?"); E.val(3, ph >= 5 ? n1(Ld) : "?");
+      if (!fromSlider){ E.setCtrl("w", r1(st.w)); E.setCtrl("b", Math.round(st.b)); }
+    }
+
+    function anim(ms, id, fn, lin){
+      return new Promise(res => {
+        if (!E.live(id)) return res();
+        const t0 = performance.now();
+        const fr = now => {
+          if (!E.live(id)) return res();
+          const p = Math.min((now - t0) / ms, 1);
+          fn(lin ? p : p < .5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2, p); draw();
+          if (p < 1) requestAnimationFrame(fr); else res();
+        };
+        requestAnimationFrame(fr);
+      });
+    }
+    function tween(o, id, ms){
+      const a = {}; let t = 0;
+      for (const k in o){ a[k] = st[k]; t = Math.max(t, Math.abs(o[k] - st[k]) * (k === "w" ? 1500 : 90)); }
+      if (t < 1) return Promise.resolve();
+      return anim(ms || Math.min(Math.max(t, 450), 1600), id, e => { for (const k in o) st[k] = a[k] + (o[k] - a[k]) * e; })
+        .then(() => { if (E.live(id)){ for (const k in o) st[k] = o[k]; draw(); } });
+    }
+    async function throwAll(id){
+      st.ph = 0; st.g = 0; st.fly = null; draw(); await E.wait(250);
+      for (const i of [0, 1]){
+        await anim(240, id, e => { st.arm = -e; });
+        if (!E.live(id)) return;
+        st.fly = {i, u: 0};
+        await anim(520, id, (e, p) => { st.fly.u = p; st.arm = Math.min(1, -1 + p * 6); }, true);
+        if (!E.live(id)){ st.fly = null; return; }
+        st.fly = null; st.ph = i + 1;
+        await anim(260, id, e => { st.arm = 1 - e; });
+      }
+    }
+    async function hot(id){
+      if (st.ph < 5){ st.ph = 5; st.g = 1; }
+      for (let n = 0; n < 20 && E.live(id); n++){
+        const L0 = Lf(st.w, st.b); let best = null;
+        for (const [dw, db] of [[0, 1], [0, -1], [0.1, 0], [-0.1, 0], [0.1, 1], [0.1, -1], [-0.1, 1], [-0.1, -1]]){   // пробуем чуть сдвинуть ручки, в том числе обе сразу
+          const w = r1(st.w + dw), b = Math.round(st.b + db);
+          if (w < 9.7 - 1e-9 || w > 10.3 + 1e-9 || b < 15 || b > 25) continue;
+          const L = Lf(w, b); if (L < L0 - 1e-9 && (!best || L < best[2])) best = [w, b, L];
+        }
+        if (!best) break;
+        await tween({w: best[0], b: best[1]}, id, 420); await E.wait(140);
+      }
+    }
+    async function run(plan, id){
+      for (const p of plan){
+        if (!E.live(id)) return;
+        if (p === "pause") await E.wait(1300);
+        else if (typeof p === "number") await tween({b: p}, id);
+        else if (typeof p === "object") await tween(p, id);
+        else if (p === "clear"){ st.ph = 0; st.g = 0; draw(); }
+        else if (p === "throw") await throwAll(id);
+        else if (p === "landed"){ st.ph = 2; st.g = 0; draw(); }
+        else if (p === "miss"){ st.ph = 3; st.g = 0; draw(); }
+        else if (p === "sq"){ st.ph = 4; st.g = 0; draw(); await E.wait(300); await anim(900, id, e => { st.g = e; }); }
+        else if (p === "sqi"){ st.ph = 4; st.g = 1; draw(); }
+        else if (p === "L"){ st.ph = 5; st.g = 1; draw(); }
+        else if (p === "hot") await hot(id);
+      }
+    }
+    return {
+      draw,
+      step(s, id){ st.fly = null; st.arm = 0; draw(); return run([].concat(s.go == null ? [] : s.go), id); },
+      slide(v, k){ st[k] = v; st.fly = null; st.arm = 0; st.ph = 5; st.g = 1; draw(true); },
+      action(a, id){ if (a === "throw") run(["throw", "pause", "miss", "sq", "L"], id); else run(["hot"], id); }
     };
   }
 };
