@@ -22,6 +22,9 @@
   /* стенды: цвета букв и сцен */
   --sw:#5B4FD6; --terr:rgba(29,158,117,.15); --surf:#1D9E75; --strata:rgba(29,158,117,.28); --mount:rgba(19,27,38,.07); --tree:rgba(29,158,117,.55);
   --pants:#46597A; --skin:#F2A27E; --pack:#C98A1E; --stick:#8A8F98; --axis:rgba(19,27,38,.25);
+  --sx:#47708F; --sb:#C2398A; --syh:#06767F; --sy:#687180;
+  --wall:#EFE7DB; --floor:#DCCFBD; --wood:#B5865B; --woodtop:#946641; --frame:#FBFCFD; --sky:#BFE2F5; --dusk:#2F3A66; --sun:#F5B83D; --cloud:#FFFFFF;
+  --board:#FFFFFF; --glass:rgba(150,200,228,.26); --reg:#CBD3DD; --lcd:#E4F4EF; --apron:#4E6E60; --shirt:#FFFFFF; --pc1:#C67C5E; --pc2:#7E9A57; --pc3:#C9A23F; --scoop:#F2A7BA; --scoop2:#F1D9A0; --cup:#FFFFFF; --tea:#B7652E;
   --f-display:'Unbounded','Golos Text',system-ui,sans-serif;
   --f-body:'Golos Text',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --f-mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
@@ -34,6 +37,9 @@
     --grid:rgba(90,168,234,.07); --band:rgba(90,168,234,.05);
     --sw:#9B93FF; --terr:rgba(43,179,134,.13); --surf:#2BB386; --strata:rgba(43,179,134,.25); --mount:rgba(255,255,255,.05); --tree:rgba(43,179,134,.5);
     --pants:#8696B4; --skin:#F2A27E; --pack:#D59A34; --stick:#7C8594; --axis:rgba(255,255,255,.22);
+    --sx:#8DB3D6; --sb:#F07BC0; --syh:#3CC7D2; --sy:#A6AFBB;
+    --wall:#212935; --floor:#181E27; --wood:#5E4530; --woodtop:#755639; --frame:#3A4656; --sky:#3B6E92; --dusk:#121830; --sun:#F2B544; --cloud:rgba(228,236,244,.85);
+    --board:#121923; --glass:rgba(120,170,210,.15); --reg:#3A4656; --lcd:#0E1A1B; --apron:#7FA393; --shirt:#C9D3DD; --pc1:#D99376; --pc2:#93B06B; --pc3:#D8B456; --scoop:#E79AAE; --scoop2:#E6CF97; --cup:#D5DDE6; --tea:#E08A4F;
     color-scheme:dark;
   }
 }
@@ -43,6 +49,9 @@
   --grid:rgba(90,168,234,.07); --band:rgba(90,168,234,.05);
   --sw:#9B93FF; --terr:rgba(43,179,134,.13); --surf:#2BB386; --strata:rgba(43,179,134,.25); --mount:rgba(255,255,255,.05); --tree:rgba(43,179,134,.5);
   --pants:#8696B4; --skin:#F2A27E; --pack:#D59A34; --stick:#7C8594; --axis:rgba(255,255,255,.22);
+  --sx:#8DB3D6; --sb:#F07BC0; --syh:#3CC7D2; --sy:#A6AFBB;
+  --wall:#212935; --floor:#181E27; --wood:#5E4530; --woodtop:#755639; --frame:#3A4656; --sky:#3B6E92; --dusk:#121830; --sun:#F2B544; --cloud:rgba(228,236,244,.85);
+  --board:#121923; --glass:rgba(120,170,210,.15); --reg:#3A4656; --lcd:#0E1A1B; --apron:#7FA393; --shirt:#C9D3DD; --pc1:#D99376; --pc2:#93B06B; --pc3:#D8B456; --scoop:#E79AAE; --scoop2:#E6CF97; --cup:#D5DDE6; --tea:#E08A4F;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -154,6 +163,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible,
 .lhead h1{font-size:clamp(21px,5.6vw,28px)}
 .seg2{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:12px}
 .seg2 button{border:0;background:none;border-radius:9px;padding:10px;font-weight:600;font-size:15px}
+.seg2 button[disabled]{opacity:.45;cursor:default}
 .seg2 button.on{background:var(--ink);color:var(--paper)}
 .intro p{margin:0 0 10px;max-width:65ch}
 .blk{font-size:15px;margin:20px 0 8px}
@@ -199,6 +209,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible,
 .st-scene svg{display:block;width:100%;height:auto}
 .st-scene text{font-family:var(--f-mono)}
 .st-scene .lb{paint-order:stroke;stroke:var(--card);stroke-width:3.5px;stroke-linejoin:round}
+.st-scene .lbb{paint-order:stroke;stroke:var(--board);stroke-width:3.5px;stroke-linejoin:round}
 .st-fade{transition:opacity .5s}
 .st-fs{position:absolute;right:7px;bottom:7px;width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);display:grid;place-items:center;padding:0;opacity:.92}
 .st-vals{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -209,8 +220,11 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible,
 .st-v .v{font-family:var(--f-mono);font-weight:600;font-size:20px;line-height:1.3;color:var(--c);font-variant-numeric:tabular-nums}
 .st-v .v.tx{font-family:var(--f-body);font-size:15px;padding-top:3px}
 .st-ctrl{display:grid;gap:8px}
-.st-sl{display:flex;align-items:center;gap:10px;font-family:var(--f-mono);font-weight:600;color:var(--sw)}
-.st-sl input{flex:1;accent-color:var(--sw);height:30px;font-size:16px;margin:0}
+.st-sl{display:flex;align-items:center;gap:10px;font-family:var(--f-mono);font-weight:600;color:var(--c,var(--sw));min-width:0}
+.st-sl input{flex:1;min-width:0;accent-color:var(--c,var(--sw));height:30px;font-size:16px;margin:0}
+.st-sw{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px}
+.st-sw button{flex:1;min-width:0;border:0;background:none;border-radius:9px;padding:7px 6px;min-height:40px;font-size:14px;font-weight:600;color:var(--muted);-webkit-tap-highlight-color:transparent}
+.st-sw button.on{background:var(--c,var(--sw));color:var(--card)}
 .st-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .stand.fs{position:fixed;inset:0;z-index:60;margin:0;background:var(--paper);overflow:hidden;padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
 .stand.fs .st-scene{flex:1;min-height:0}
@@ -666,6 +680,26 @@ const LESSONS = [
     ["y = 265","Вечером считаем, сколько продали на самом деле. Разница ŷ и y покажет, хороша ли модель."]]},
   analog:"x — как вопрос, который вы задаёте знакомому таксисту: «сколько будет стоить поездка на 10 км?». 10 км — это x, его ответ — ŷ, а цена в приложении — y.",
   src:"Принс, гл. 2 (обучение с учителем: вход, выход, модель). Траск, гл. 3 (прогноз: вход → вес → прогноз).",
+  stand:{scene:"cafe", mode:"x", steps:[
+    {t:"Любая модель начинается с входа — того, что она знает в момент прогноза. Утром в кафе известно одно: термометр за окном показывает 25°. Это вход, его обозначают буквой <b style=\"color:var(--sx)\">x</b>.",
+     go:["morning", 25],
+     ex:[["Траск, гл. 3","Первая сеть автора угадывает, выиграет ли бейсбольная команда. На вход идёт только то, что известно до игры: среднее число пальцев на ногах у игроков, доля прошлых побед, число болельщиков. Что случится в самой игре, сеть не знает — она знает лишь вход."]]},
+    {t:"<b style=\"color:var(--sx)\">x</b> — всегда число или набор чисел: температура, площадь квартиры, яркость пикселя, номер слова. Всё, что можно измерить или пронумеровать. Погода сменилась — x стал другим числом, а модель по-прежнему видит только его.",
+     go:["morning", 8, "pause", 31, "pause", 25],
+     ex:[["Принс, гл. 2","Пример автора: на вход модели подают возраст и пробег подержанной машины, а на выходе ждут её примерную цену. Вход — набор из двух чисел, и порядок у них всегда один: первое — возраст, второе — пробег. Для модели это просто два числа на своих местах."]]},
+    {t:"Модель — это правило, которое превращает <b style=\"color:var(--sx)\">x</b> в ответ. Касса берёт 25° и печатает число порций. Ответ-догадку пишут <b style=\"color:var(--syh)\">ŷ</b> («игрек с крышечкой»): крышечка значит «это прогноз». Какое правило спрятано в кассе — в следующих уроках.",
+     go:["morning", 25, "fc"],
+     ex:[["Принс, гл. 2","Модель автор называет просто формулой: подставили в неё вход — получили выход, такой прогон называют выводом (inference). Формулу выбирают из целого семейства похожих, а какую именно взять, решают её параметры — их и подбирают при обучении."]]},
+    {t:"Утром кафе готовит <b style=\"color:var(--syh)\">ŷ</b> = 270 порций. А правильный ответ из жизни — <b style=\"color:var(--sy)\">y</b>, без крышечки. Его узнают только вечером: на доске набралось 265 покупателей, по порции каждому.",
+     go:[25, "ready", "day"],
+     ex:[["Принс, гл. 2","Модель учат на парах «вход — правильный ответ»: возраст и пробег машины — и цена, за которую её на самом деле продали. Правильные ответы будто подсказывает учитель, поэтому такой подход и называют обучением с учителем."]]},
+    {t:"Хорошая модель — та, у которой <b style=\"color:var(--syh)\">ŷ</b> близко к <b style=\"color:var(--sy)\">y</b>. Сегодня разрыв <b style=\"color:var(--cool)\">ŷ − y</b> = 270 − 265 = 5: пять порций остались в витрине. Ошибись модель в другую сторону — кому-то не хватило бы мороженого, как в жаркий день при 30°.",
+     go:["eve", 25, "pause", 30, "pause", 25]},
+    {look:true, t:"Навигатор в телефоне. Вход <b style=\"color:var(--sx)\">x</b> — откуда вы едете и какие сейчас пробки. Прогноз <b style=\"color:var(--syh)\">ŷ</b> — «приедете в 9:40». Правильный ответ <b style=\"color:var(--sy)\">y</b> — когда вы на самом деле приехали. Навигатор хороший, если ŷ и y почти совпадают, а узнать y, как и в кафе, можно только потом.",
+     go:["morning", 18, "fc", "day"]},
+    {look:true, t:"Почему разрыв не исчезает совсем? Модель видит только <b style=\"color:var(--sx)\">x</b>, а на продажи влияет и то, чего во входе нет: выходной, праздник, дождь к вечеру. Поэтому y скачет вокруг прогноза то вверх, то вниз. Чем больше полезного во входе, тем точнее прогноз. Покрутите ползунок x: разрыв бывает и плюсом, и минусом.",
+     go:["eve", 12, "pause", 7, "pause", 25]}
+  ]},
   tasks:[
     {t:"mc", q:"Модель предсказывает цену квартиры по её площади. Что здесь x?", o:["Площадь квартиры","Цена квартиры","Сама модель","Количество квартир"], a:0, hint:"x — то, что известно до прогноза.", why:"Площадь известна заранее, а цену модель угадывает. Цена — это ŷ (прогноз) или y (настоящая цена).", steps:["Что мы знаем ещё до прогноза? Площадь — её можно измерить рулеткой.", "Что хотим узнать? Цену — её модель и угадывает.", "Значит, площадь — вход x, догадка о цене — ŷ, настоящая цена продажи — y."], idea:"Простое правило: x — то, что даём модели; ŷ — что она отвечает; y — правда, с которой ответ сравнивают."},
     {t:"match", q:"Соедините обозначение и его смысл", pairs:[["x","вход: что известно"],["ŷ","прогноз модели"],["y","правильный ответ"]], why:"x — на входе, ŷ — догадка на выходе, y — то, с чем догадку сравнивают.", steps:["x стоит на входе: это данные, которые мы даём модели.", "ŷ («игрек с крышечкой») выходит из модели. Крышечка означает «это догадка».", "y без крышечки — правильный ответ из жизни. С ним сравнивают догадку."], idea:"Вся работа ИИ — добиться, чтобы ŷ почти совпадал с y."},
@@ -692,6 +726,28 @@ const LESSONS = [
     ["w = −4","Для горячего чая вес отрицательный: каждый градус жары убирает 4 чашки."]]},
   analog:"Вес — как ручка громкости у входа на микшерном пульте. Выше — вход звучит в ответе громче. На нуле — его не слышно. Ниже нуля — он работает в обратную сторону и уменьшает ответ.",
   src:"Траск, гл. 3 (вес как чувствительность прогноза к входу). Принс, гл. 2 (наклон линии — параметр φ₁).",
+  stand:{scene:"cafe", mode:"w", steps:[
+    {t:"Вес <b style=\"color:var(--sw)\">w</b> говорит, насколько сильно вход <b style=\"color:var(--sx)\">x</b> влияет на прогноз. Модель умножает вход на вес: <b style=\"color:var(--syh)\">w · x</b>. В кафе w = 10, за окном 25°: касса считает 10 · 25 = 250 порций — это точка на графике.",
+     go:[{x:25}, 10],
+     ex:[["Траск, гл. 3","Первая сеть автора — одно умножение: вход умножают на вес и получают прогноз. Автор предлагает смотреть так: вход — это информация, вес — знание сети, а прогноз — то, что вышло, когда знание применили к информации."]]},
+    {t:"Смысл веса: на сколько изменится прогноз, если <b style=\"color:var(--sx)\">x</b> вырастет на 1. Стало 26° — касса показывает 260, прибавка ровно w = 10. Под лупой — одна такая ступенька: шаг на 1° вправо, подъём на w порций.",
+     go:[10, {x:25}, "pause", "plus", "pause"], lens:true,
+     ex:[["Траск, гл. 3","В примере автора вход — среднее число пальцев на ногах у игроков, 8,5, а вес — 0,1. Прогноз: 8,5 · 0,1 = 0,85. Будь вход на единицу больше, 9,5, прогноз стал бы 0,95 — больше ровно на вес."]]},
+    {t:"Вес бывает любым. Большой — вход очень важен: при w = 14 каждый градус добавляет 14 порций, и линия на графике идёт круче.",
+     go:[{x:25}, 14], lens:true,
+     ex:[["Траск, гл. 3","Вес можно понимать как чувствительность прогноза к входу. Если вес большой, даже небольшой вход даёт большой прогноз. Если маленький — даже большой вход почти ничего не меняет."]]},
+    {t:"Около нуля — вход почти не влияет. Кофе пьют в любую погоду: при w = 0,5 линия почти лежит, лишний градус почти ничего не добавляет.",
+     go:[{x:25}, 0.5], lens:true},
+    {t:"Отрицательный — чем больше <b style=\"color:var(--sx)\">x</b>, тем меньше ответ: горячий чай в жару продаётся хуже. При w = −4 каждый градус жары убирает 4 чашки, и линия идёт вниз.",
+     go:[{x:25}, -4], lens:true},
+    {t:"На графике <b style=\"color:var(--sw)\">w</b> — это наклон линии прогноза. Серые точки — продажи мороженого в прошлые дни. Обучение модели — это во многом поиск правильных весов: такого наклона, при котором линия ляжет на точки.",
+     go:[{x:25}, 4, 14, "pause", 10], pts:true,
+     ex:[["Принс, гл. 2","Простейшая модель у автора — прямая с двумя параметрами: φ₁ задаёт её наклон, φ₀ — высоту (о нём следующий урок). Каждый выбор параметров даёт свою прямую. Обучение — поиск тех значений, при которых прямая лучше всего проходит через примеры."]]},
+    {look:true, t:"На рынке яблоки стоят 150 ₽ за килограмм. Весы показывают вход — сколько килограммов, ценник — это вес, к оплате — их произведение. Положили ещё килограмм — сумма выросла ровно на 150 ₽, сколько бы яблок ни лежало до этого.",
+     go:[10, {x:25}, "plus", "pause", "plus"], lens:true},
+    {look:true, t:"Прибавка от лишнего градуса везде одна и та же: от 10° к 11° и от 28° к 29° — всё те же w порций. Поэтому график — прямая: её наклон нигде не меняется. Следите за лупой, пока точка едет по линии, и покрутите ползунок w.",
+     go:[10, {x:8}, "pause", {x:28}, "pause", {x:25}], lens:true}
+  ]},
   tasks:[
     {t:"fit", q:"Точки — реальные продажи. Сдвиг уже выставлен (b = 0). Подберите вес w, чтобы линия прошла через точки.", data:"W", ctrl:["w"], init:{w:4,b:0}, goal:120, hint:"При 10° продали около 120 порций. Сколько порций на один градус?", why:"w ≈ 12: каждый градус добавляет около 12 порций.", steps:["Сдвиг b = 0, значит прогноз — просто w · x.", "Смотрим на точку: при 10° продали около 120 порций.", "Делим: 120 / 10 = 12 порций на каждый градус. Это и есть вес.", "Проверяем на другой точке: 12 · 20 = 240, и при 20° продали как раз 240."], idea:"Вы сделали руками то, что модель делает при обучении: подобрали вес по примерам. Скоро она научится делать это сама.", sol:"w = 12"},
     {t:"num", q:"Модель ŷ = 3·x: вес w = 3, сдвига нет. Вход x вырос с 4 до 5. На сколько вырос прогноз ŷ?", a:3, hint:"Посчитайте прогноз при x = 4 и при x = 5, потом из большего вычтите меньшее.", why:"На 3 — ровно на величину веса w.", steps:["Прогноз при x = 4: 3 · 4 = 12.", "Прогноз при x = 5: 3 · 5 = 15.", "Разница: 15 − 12 = 3. Прогноз вырос на 3.", "Заметьте: 3 — это и есть вес w. Вход вырос на единицу, и прогноз вырос ровно на w. Будь в формуле сдвиг b, он есть в обоих прогнозах и при вычитании пропадает."], idea:"Вес отвечает на вопрос: на сколько изменится ответ, если вход вырастет на 1. Как в кафе: w = 3 порции на градус — потеплело на 1°, продадим на 3 порции больше. Было тепло 4° или 40° — неважно, каждый следующий градус добавляет те же 3."},
@@ -1342,8 +1398,9 @@ const glyphCls = g => g.length > 2 ? " g3" : g.length > 1 ? " g2" : "";
 /* ================= Маршруты ================= */
 function route(){
   stopAll(); exitFS();
-  const m = location.hash.match(/^#lesson-(\d+)$/);
-  if (m && LESSONS[+m[1]-1]) renderLesson(+m[1]);
+  // #theory-N — скрытая ссылка «только теория»: теория и стенд любого урока, даже закрытого (задачи остаются закрытыми)
+  const m = location.hash.match(/^#(lesson|theory)-(\d+)$/);
+  if (m && LESSONS[+m[2]-1]) renderLesson(+m[2], m[1] === "theory");
   else if (location.hash === "#review") renderReview();
   else if (location.hash === "#big") renderBig();
   else renderHome();
@@ -1469,8 +1526,16 @@ let standCur = null;
 window.addEventListener("resize", () => { if (standCur && document.body.contains(standCur.root)) requestAnimationFrame(() => standCur.relayout()); });
 
 function renderStand(L, host){
-  const cfg = L.stand, sc = SCENES[cfg.scene], steps = cfg.steps, life = alive;
-  const c = sc.ctrl;
+  // сцена может служить нескольким урокам: режим (mode) задаёт свои плашки, ползунки и кнопки;
+  // урок может переопределить их и сам (поля vals, ctrl, acts в stand)
+  const cfg = L.stand, base = SCENES[cfg.scene], steps = cfg.steps, life = alive;
+  const sc = Object.assign({}, base, base.modes && base.modes[cfg.mode] || {});
+  ["vals","ctrl","acts"].forEach(k => { if (cfg[k]) sc[k] = cfg[k]; });
+  // ctrl — один элемент или список: ползунок {k, min, max, step?, col?} или переключатель {k, opts:[[значение, подпись], …], col?}
+  const ctrls = [].concat(sc.ctrl || []);
+  const ctrlHTML = ctrls.map((c, i) => c.opts
+    ? `<div class="st-sw" role="group" aria-label="${esc(c.label || c.k)}" style="--c:var(${c.col || "--sw"})">${c.opts.map(([v, t]) => `<button data-sw="${i}" data-v="${esc(v)}">${esc(t)}</button>`).join("")}</div>`
+    : `<label class="st-sl" style="--c:var(${c.col || "--sw"})">${esc(c.k)}<input type="range" data-sl="${i}" min="${c.min}" max="${c.max}" step="${c.step || 0.01}" aria-label="Ручка ${esc(c.k)}"></label>`).join("");
   host.innerHTML = `<div class="stand" id="stand">
     <div class="st-cap" id="stCap">
       <div class="st-top"><span class="st-n" id="stN"></span>
@@ -1484,18 +1549,21 @@ function renderStand(L, host){
       <div class="st-ex" id="stEx" hidden></div>
     </div>
     <div class="st-scene" id="stScene">${sc.svg}<button class="st-fs" id="stFs" aria-label="На весь экран">${ST_ICO.open}</button></div>
-    <div class="st-vals">${sc.vals.map(([k,l,col],i) => `<div class="st-v" style="--c:var(${col})"><div class="l"><b>${esc(k)}</b> ${esc(l)}</div><div class="v${i===sc.vals.length-1?" tx":""}" id="stV${i}"></div></div>`).join("")}</div>
-    <div class="st-ctrl">
-      <label class="st-sl">${esc(c.k)}<input type="range" id="stSl" min="${c.min}" max="${c.max}" step="0.01" aria-label="Ручка ${esc(c.k)}"></label>
+    <div class="st-vals">${sc.vals.map(([k,l,col,tx],i) => `<div class="st-v" style="--c:var(${col})"><div class="l"><b>${esc(k)}</b> ${esc(l)}</div><div class="v${tx?" tx":""}" id="stV${i}"></div></div>`).join("")}</div>
+    <div class="st-ctrl">${ctrlHTML}
       <div class="st-acts">${sc.acts.map(([id,t]) => `<button class="btn ghost" data-act="${id}">${esc(t)}</button>`).join("")}</div>
     </div></div>`;
   const root = $("#stand", host);
-  const E = {root, svg: $("svg", $("#stScene", root)), act: 0, cur: 0, cam: null, vb: [0,-18,360,262]};
+  const E = {root, svg: $("svg", $("#stScene", root)), act: 0, cur: 0, cam: null, vb: sc.vb || [0,-18,360,262], mode: cfg.mode};
   standCur = E;
   E.live = id => id === E.act && life === alive && document.body.contains(root);
   E.wait = ms => new Promise(r => setTimeout(r, ms));
   E.val = (i, t) => { $("#stV"+i, root).textContent = t; };
-  E.sl = $("#stSl", root);
+  // ручки: E.setCtrl(буква, значение) двигает ползунок или переключатель под то, что сейчас на сцене
+  const ctl = {};
+  ctrls.forEach((c, i) => { ctl[c.k] = c.opts ? {btns: $$(`[data-sw="${i}"]`, root)} : {sl: $(`[data-sl="${i}"]`, root)}; });
+  E.setCtrl = (k, v) => { const c = ctl[k]; if (!c) return; if (c.sl) c.sl.value = v; else c.btns.forEach(b => { const on = b.dataset.v === String(v); b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on)); }); };
+  E.sl = $("[data-sl]", root);
   // «камера»: в полном экране кадр подстраивается под форму экрана и едет за героем
   E.relayout = () => {
     E.cam = null;
@@ -1503,8 +1571,8 @@ function renderStand(L, host){
       const r = $("#stScene", root).getBoundingClientRect(), [, , W, H] = E.vb;
       if (r.width && r.height){
         const a = r.width / r.height;
-        if (a >= W/H) E.cam = {vw: H*a, vh: H, fx: (W - H*a)/2};
-        else { const vw = Math.max(190, H*a); E.cam = {vw, vh: vw/a}; }
+        if (a >= W/H) E.cam = {vw: H*a, vh: H, fx: E.vb[0] + (W - H*a)/2};
+        else { const vw = Math.min(W, Math.max(sc.camMin || 190, H*a)); E.cam = {vw, vh: vw/a}; }
       }
     }
     if (!E.cam) E.svg.setAttribute("viewBox", E.vb.join(" "));
@@ -1553,11 +1621,14 @@ function renderStand(L, host){
     if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3) show(E.cur + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
   }, {passive:true});
 
-  // ползунок: перерисовка не чаще раза за кадр, бегущая анимация прерывается
-  let raf = 0, target = 0;
-  E.sl.addEventListener("input", () => {
-    E.act++; target = +E.sl.value;
-    if (!raf) raf = requestAnimationFrame(() => { raf = 0; S_.slide(target); });
+  // ползунки: перерисовка не чаще раза за кадр, бегущая анимация прерывается; переключатель — сразу
+  let raf = 0; const pend = {};
+  $$("[data-sl]", root).forEach(el => el.addEventListener("input", () => {
+    E.act++; pend[ctrls[+el.dataset.sl].k] = +el.value;
+    if (!raf) raf = requestAnimationFrame(() => { raf = 0; for (const k in pend){ const v = pend[k]; delete pend[k]; S_.slide(v, k); } });
+  }));
+  $$("[data-sw]", root).forEach(b => b.onclick = () => {
+    E.act++; const k = ctrls[+b.dataset.sw].k; E.setCtrl(k, b.dataset.v); S_.slide(b.dataset.v, k);
   });
   $$("[data-act]", root).forEach(b => b.onclick = () => S_.action(b.dataset.act, ++E.act));
 
@@ -1576,7 +1647,7 @@ function renderStand(L, host){
 
 /* ---------- Сцена «Долина в тумане»: ошибка L(w) = (w − 3)², путник = ручка w ---------- */
 SCENES.valley = {
-  vals: [["w","где стоим","--sw"],["L","высота = ошибка","--cool"],["dL/dw","наклон","--accent"],["→","куда шагать","--good"]],
+  vals: [["w","где стоим","--sw"],["L","высота = ошибка","--cool"],["dL/dw","наклон","--accent"],["→","куда шагать","--good",1]],
   ctrl: {k:"w", min:-1.5, max:7.5},
   acts: [["step","Один шаг"],["run","▶ Спуститься"]],
   svg: `<svg viewBox="0 -18 360 262" role="img" aria-label="Путник на склоне долины в тумане. Высота — ошибка L, положение — ручка w, наклон — градиент dL/dw.">
@@ -1672,7 +1743,7 @@ SCENES.valley = {
       let lx, ly = mid, anc;
       if (L < 9){ lx = x - 31; ly = 211; anc = "end"; }
       else if (g > 0.05){ lx = x + 7; anc = "start"; }
-      else if (x - 7 - lw > x0 + 2){ lx = x - 7; anc = "end"; }
+      else if (x - 7 - lw > x0 + 22){ lx = x - 7; anc = "end"; }   // левее — подпись оси «высота L»
       else { lx = x + 7; anc = "start"; ly = Math.max(mid, y + 27 * Math.abs(g * KX) + 16); }
       sa("Ll", {x: lx.toFixed(1), y: (L >= 9 ? Math.min(ly, 197) : ly).toFixed(1), "text-anchor": anc});
       q("Ll").textContent = L < 0.05 ? "L ≈ 0" : lt;
@@ -1709,7 +1780,7 @@ SCENES.valley = {
       // плашки
       E.val(0, n1(w)); E.val(1, n1(L)); E.val(2, st.tan ? sg1(g) : "?");
       E.val(3, st.tan ? (Math.abs(g) < 0.15 ? "мы на дне" : g > 0 ? "← уменьшать w" : "увеличивать w →") : "—");
-      if (!fromSlider) E.sl.value = w.toFixed(2);
+      if (!fromSlider) E.setCtrl("w", w.toFixed(2));
     }
     function go(to, ms, id){
       const a = st.w; ms = ms || Math.max(500, Math.abs(to - a) * 480);
@@ -1748,21 +1819,361 @@ SCENES.valley = {
   }
 };
 
+/* ---------- Сцена «Кафе»: уроки x и w ----------
+   Режим x: термометр за окном (x) → касса-модель печатает прогноз (ŷ) → на доске за день набираются покупатели (y);
+            вечером в витрине виден разрыв ŷ − y: лишние порции или очередь тех, кому не хватило.
+   Режим w: то же кафе днём, на доске график вклада w·x, под лупой — ступенька «+1° → +w»; от знака веса зависит товар. */
+SCENES.cafe = {
+  vb: [0, 0, 360, 262], camMin: 250,
+  modes: {
+    x: {vals: [["x","за окном","--sx"],["ŷ","прогноз утром","--syh"],["y","на самом деле","--sy"],["ŷ − y","разрыв","--cool"]],
+        ctrl: {k:"x", min:0, max:35, step:1, col:"--sx"},
+        acts: [["day","▶ Прожить день"],["new","Другая погода"]]},
+    w: {vals: [["w","порций на 1°","--sw"],["x","за окном","--sx"],["w · x","вклад входа","--syh"],["+1°","даёт прибавку","--sw",1]],
+        ctrl: {k:"w", min:-6, max:14, step:0.5, col:"--sw"},
+        acts: [["plus","+1°"],["prod","Другой товар"]]}
+  },
+  svg: `<svg viewBox="0 0 360 262" role="img" aria-label="Кафе. Термометр за окном — вход x. Касса-модель печатает прогноз ŷ. Доска на стене: сколько покупателей пришло на самом деле (y) или график вклада w·x.">
+<defs><clipPath id="c-win"><rect x="17" y="17" width="86" height="82"/></clipPath><clipPath id="c-lc"><circle cx="161" cy="50" r="28.5"/></clipPath></defs>
+<rect x="-400" y="-400" width="1160" height="566" style="fill:var(--wall)"/>
+<path d="M70 -400V-33M250 -400V-33" stroke-width="1.2" style="stroke:var(--muted)"/>
+<path d="M57 -21a13 12 0 0 1 26 0ZM237 -21a13 12 0 0 1 26 0Z" style="fill:var(--woodtop)"/>
+<circle cx="70" cy="-19" r="4" style="fill:var(--sun)"/><circle cx="250" cy="-19" r="4" style="fill:var(--sun)"/>
+<text x="180" y="-52" text-anchor="middle" class="deco" style="fill:var(--woodtop);font-family:var(--f-display);font-size:15px;font-weight:700;letter-spacing:.04em">«ПЛОМБИР»</text>
+<rect x="12" y="12" width="96" height="92" rx="3" style="fill:var(--frame)"/>
+<g clip-path="url(#c-win)">
+  <rect x="17" y="17" width="86" height="82" style="fill:var(--sky)"/>
+  <circle id="c-sun" r="8" style="fill:var(--sun)"/>
+  <g id="c-cl" style="fill:var(--cloud)"><path d="M22 46a6 6 0 0 1 8-6a8 8 0 0 1 15 1a5.5 5.5 0 0 1 1 11H25a5 5 0 0 1-3-6Z"/><path d="M57 33a5 5 0 0 1 7-5a7 7 0 0 1 12 1a4.5 4.5 0 0 1 0 9H60a4 4 0 0 1-3-5Z"/></g>
+  <path d="M17 99V83h11v-7h13v9h9V78h15v8h9V72h15v8h14v19Z" style="fill:var(--axis)"/>
+  <rect id="c-dusk" x="17" y="17" width="86" height="82" style="fill:var(--dusk)" opacity="0"/>
+</g>
+<path d="M60 17V99M17 57H103" fill="none" stroke-width="2.5" style="stroke:var(--frame)"/>
+<rect x="8" y="102" width="104" height="6" rx="2" style="fill:var(--frame)"/>
+<rect x="86.5" y="21" width="13" height="75" rx="6.5" stroke-width="1" style="fill:var(--card);stroke:var(--axis)"/>
+<rect x="91.6" y="26" width="2.8" height="62" rx="1.4" style="fill:var(--axis)"/>
+<rect id="c-col" x="91.6" width="2.8" style="fill:var(--sx)"/>
+<circle cx="93" cy="90" r="4.3" style="fill:var(--sx)"/>
+<path d="M96 84h2M96 70h2M96 56h2M96 42h2M96 28h2" stroke-width="1" style="stroke:var(--muted)"/>
+<path id="c-xp" d="M93 96C93 108 66 104 62 113" fill="none" stroke-width="1.5" stroke-dasharray="1.5 3" stroke-linecap="round" style="stroke:var(--sx)"/>
+<circle id="c-dot" r="3" style="fill:var(--sx)" opacity="0"/>
+<rect x="123" y="7" width="232" height="104" rx="4" style="fill:var(--woodtop)"/>
+<rect x="127" y="11" width="224" height="96" rx="2" style="fill:var(--board)"/>
+<g id="c-tal">
+  <text x="135" y="27" style="fill:var(--muted);font-size:10.5px">покупатели за день</text>
+  <g id="c-st" fill="none" stroke-width="2" stroke-linecap="round" style="stroke:var(--sy)"></g>
+  <text x="135" y="99" style="fill:var(--muted);font-size:9.5px">| — 10 покупателей</text>
+  <text id="c-yl" x="343" y="99" text-anchor="end" style="fill:var(--sy);font-size:15px;font-weight:600"></text>
+  <text id="c-wait" x="239" y="58" text-anchor="middle" style="fill:var(--muted);font-size:11px">заполнится за день</text>
+</g>
+<g id="c-ch">
+  <path d="M204 15V96M204 66H344M248.7 64v4M293.3 64v4M338 64v4" fill="none" stroke-width="1" style="stroke:var(--axis)"/>
+  <text x="200" y="69.5" text-anchor="end" style="fill:var(--muted);font-size:9.5px">0</text>
+  <g style="fill:var(--muted);font-size:9.5px" text-anchor="middle"><text id="c-t10" x="248.7" y="102">10°</text><text id="c-t20" x="293.3" y="102">20°</text><text id="c-t30" x="338" y="102">30°</text></g>
+
+  <g id="c-pts" style="fill:var(--sy)"></g>
+  <line id="c-ln" stroke-width="2.5" stroke-linecap="round" style="stroke:var(--syh)"/>
+  <line id="c-wd" stroke-width="1.5" stroke-dasharray="3 3" style="stroke:var(--syh)"/>
+  <path id="c-xm" style="fill:var(--sx)"/>
+  <text id="c-xml" y="102" text-anchor="middle" class="lbb" style="fill:var(--sx);font-size:10px;font-weight:600"></text>
+  <circle id="c-P" r="4" style="fill:var(--syh)"/>
+  <text id="c-Pl" class="lbb" style="fill:var(--syh);font-size:11.5px;font-weight:600"></text>
+  <g id="c-lens" class="st-fade">
+    <text x="161" y="100" text-anchor="middle" style="fill:var(--muted);font-size:9.5px">лупа: 1°</text>
+    <line id="c-ll" stroke-width="1" style="stroke:var(--muted)"/>
+    <circle id="c-lr" r="7" fill="none" stroke-width="1.2" style="stroke:var(--muted)"/>
+    <circle cx="161" cy="50" r="29" stroke-width="1.5" style="fill:var(--board);stroke:var(--muted)"/>
+    <g clip-path="url(#c-lc)">
+      <line id="c-lline" stroke-width="1.2" stroke-dasharray="2 2.5" style="stroke:var(--syh)"/>
+      <path id="c-stair" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="stroke:var(--syh)"/>
+    </g>
+    <text id="c-l1" text-anchor="middle" style="fill:var(--sx);font-size:10px;font-weight:600">+1°</text>
+    <text id="c-l2" class="lbb" style="fill:var(--sw);font-size:11px;font-weight:600"></text>
+  </g>
+</g>
+<g id="c-bar" stroke-linecap="round" stroke-linejoin="round" fill="none">
+  <path id="c-tor" stroke-width="12" style="stroke:var(--apron)"/>
+  <path id="c-arm" stroke-width="4" style="stroke:var(--shirt)"/>
+  <circle id="c-hand" r="2.6" stroke="none" style="fill:var(--skin)"/>
+  <circle id="c-head" r="7.5" stroke="none" style="fill:var(--skin)"/>
+  <path id="c-hat" stroke="none" style="fill:var(--shirt)"/>
+  <circle id="c-eye" r="1.1" stroke="none" style="fill:var(--ink)"/>
+</g>
+<rect x="-400" y="165" width="1160" height="7" style="fill:var(--woodtop)"/>
+<rect x="-400" y="172" width="1160" height="66" style="fill:var(--wood)"/>
+<path d="M-360 172V238M-240 172V238M-120 172V238M0 172V238M120 172V238M240 172V238M360 172V238M480 172V238M600 172V238" stroke-width="1" opacity=".2" style="stroke:var(--ink)"/>
+<rect x="-400" y="238" width="1160" height="400" style="fill:var(--floor)"/>
+<path d="M22 165L28 139H94L100 165Z" style="fill:var(--reg)"/>
+<path d="M36 146h50M36 152h50M36 158h50" stroke-width="3" stroke-dasharray="6 3" opacity=".3" style="stroke:var(--ink)"/>
+<rect x="55" y="132" width="12" height="8" style="fill:var(--reg)"/>
+<rect x="19" y="111" width="84" height="23" rx="4" style="fill:var(--reg)"/>
+<rect x="22" y="114" width="78" height="17" rx="2" style="fill:var(--lcd)"/>
+<text id="c-scr" x="61" y="126.5" text-anchor="middle" style="fill:var(--syh);font-size:11px;font-weight:600"></text>
+<rect x="35" y="177" width="52" height="15" rx="3" style="fill:var(--board)"/>
+<text x="61" y="188" text-anchor="middle" style="fill:var(--muted);font-size:9.5px">модель</text>
+<g id="c-show"></g>
+<g id="c-left"></g>
+<path d="M192 165L199 124H352V165Z" stroke-width="1" style="fill:var(--glass);stroke:var(--line)"/>
+<path d="M199 124H352" stroke-width="2.5" style="stroke:var(--frame)"/>
+<rect x="232" y="184" width="92" height="20" rx="4" style="fill:var(--board)"/>
+<text id="c-sign" x="278" y="198" text-anchor="middle" style="fill:var(--ink);font-size:10px;font-weight:600;letter-spacing:.06em"></text>
+<g id="c-ppl"></g>
+<rect id="c-xlb" width="54" height="17" rx="3" style="fill:var(--card)" opacity=".94"/>
+<text id="c-xl" text-anchor="middle" style="fill:var(--sx);font-size:12px;font-weight:600"></text>
+<text id="c-gap" x="276" y="120" text-anchor="middle" class="lb" style="font-size:10.5px"><tspan id="c-g1" style="fill:var(--cool);font-weight:600"></tspan><tspan id="c-g2" style="fill:var(--muted)"></tspan></text>
+</svg>`,
+  init(E){
+    const q = id => E.svg.querySelector("#c-" + id);
+    const sa = (id, o) => { const e = q(id); for (const k in o) e.setAttribute(k, o[k]); };
+    const tx = (id, t) => { const e = q(id); if (e.textContent !== t) e.textContent = t; };
+    const P = (x, y) => x.toFixed(1) + " " + y.toFixed(1);
+    const cl = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+    const n1 = v => (v < -0.05 ? "−" : "") + fmt(Math.abs(v), 1);
+    const sg = v => (v > 0.05 ? "+" : v < -0.05 ? "−" : "") + fmt(Math.abs(v), 1);
+    const W = E.mode === "w";
+    // модель кафе из урока: ŷ = 10·x + 20; «жизнь» — y = ŷ + небольшая случайность (при 25° продали 265)
+    const yh = x => 10 * x + 20, life = x => Math.round(7 * Math.sin(1.7 * x + 0.686)), yy = x => yh(x) + life(x);
+    const TY = x => 84 - x * 1.4;                                 // термометр: 0° внизу, 40° вверху
+    const CX = x => 204 + x * 4.467, CY = v => 66 - v * 0.12;     // график на доске: 0…30°, −180…420 порций
+    const PTS = [[6,58],[10,104],[14,136],[18,183],[22,216],[26,264],[29,287]];
+    // позы баристы за прилавком: где стоит, куда смотрит, куда тянется рука, за кем следит камера
+    const POSE = {win:{bx:124, f:-1, fx:80}, reg:{bx:116, f:-1, hand:[100,148], fx:80}, serve:{bx:180, f:1, hand:[200,150], fx:245},
+                  eve:{bx:172, f:1, fx:236}, idle:{bx:172, f:1, fx:236}};
+    const st = W ? {x:25, w:4, t:.45, fc:1, lvl:1, pose:"idle", bx:172, fx:236, lens:false, pts:false, dot:-1, pr:0}
+                 : {x:12, w:10, t:0, fc:0, lvl:0, pose:"win", bx:124, fx:80, dot:-1, pr:0};
+    q(W ? "tal" : "ch").style.display = "none";
+    if (W) q("scr").style.fontSize = "10px";
+    const prod = w => w >= 1.5 ? "ice" : w > -1.5 ? "cof" : "tea";
+    const SIGN = {ice:"МОРОЖЕНОЕ", cof:"КОФЕ", tea:"ГОРЯЧИЙ ЧАЙ"};
+    const PRESET = {ice:0.5, cof:-4, tea:10};                      // «Другой товар»: мороженое → кофе → чай → мороженое
+    const SC = ["--scoop","--scoop2","--tea","--scoop","--scoop2"];
+    let showKey = "", leftKey = "", stKey = "", ptsDone = false;
+
+    // витрина: ванночки с мороженым (уровень lvl), чашки кофе или чайник с чашками
+    function showcase(p, lvl){
+      const hh = lvl > 0.01 ? (2 + lvl * 11).toFixed(1) : "0", key = p + hh;
+      if (key === showKey) return; showKey = key;
+      let s = "";
+      if (p === "ice") for (let i = 0; i < 5; i++){
+        const x = 206 + i * 29, h = +hh, top = 163 - h;
+        s += `<rect x="${x}" y="151" width="23" height="13" rx="2" style="fill:var(--reg)"/>`;
+        if (h) s += `<path d="M${x+2} 163V${top.toFixed(1)}a3.5 3.5 0 0 1 6.3 -1a3.8 3.8 0 0 1 6.4 0a3.5 3.5 0 0 1 6.3 1V163Z" style="fill:var(${SC[i]})"/>`;
+      }
+      else if (p === "cof") for (let i = 0; i < 6; i++){
+        const x = 210 + i * 23;
+        s += `<path d="M${x+6} 152a3.5 3.5 0 0 1 0 7" fill="none" stroke-width="1.6" style="stroke:var(--line)"/><rect x="${x-6}" y="148" width="12" height="15" rx="2.5" stroke-width="1" style="fill:var(--cup);stroke:var(--line)"/><rect x="${x-4.5}" y="150" width="9" height="2.5" rx="1" style="fill:var(--tea)"/><path d="M${x-9} 164h18" stroke-width="1.6" style="stroke:var(--line)"/>`;
+      }
+      else {
+        s += `<path d="M213 150c-6-1-8-6-10-9" fill="none" stroke-width="3" stroke-linecap="round" style="stroke:var(--cup)"/><ellipse cx="226" cy="154" rx="14" ry="10" stroke-width="1" style="fill:var(--cup);stroke:var(--line)"/><path d="M219 144h14l-2-4h-10Z" style="fill:var(--tea)"/><path d="M240 150a5 5 0 0 1 0 9" fill="none" stroke-width="2.5" style="stroke:var(--cup)"/>`;
+        for (let i = 0; i < 4; i++){
+          const x = 262 + i * 22;
+          s += `<path d="M${x-6} 152h12l-2 11h-8Z" stroke-width="1" style="fill:var(--cup);stroke:var(--line)"/><path d="M${x-5} 154h10" stroke-width="2.5" style="stroke:var(--tea)"/><path d="M${x-2} 148c-2-3 2-5 0-8M${x+3} 148c-2-3 2-5 0-8" fill="none" stroke-width="1.2" stroke-linecap="round" opacity=".55" style="stroke:var(--muted)"/>`;
+        }
+      }
+      q("show").innerHTML = s;
+      tx("sign", SIGN[p]);
+    }
+    // покупатель на переднем плане (видно по пояс): идёт с покачиванием по фазе ph, f — куда смотрит, cone — несёт рожок
+    function person(x, k, ph, f, cone, sc){
+      const c = `var(--pc${k % 3 + 1})`, b = Math.abs(Math.sin(ph)) * 1.6, hx = x + f * 1.5, hy = 168 - b, hand = cone ? [x + f * 13, 196 - b] : [x + f * 8, 236];
+      return `<g stroke-linecap="round" fill="none"${sc ? ` transform="translate(${x.toFixed(1)} 262) scale(${sc}) translate(${(-x).toFixed(1)} -262)"` : ""}><path d="M${P(x, 194 - b)}V280" stroke-width="24" style="stroke:${c}"/>` +
+        `<circle cx="${hx.toFixed(1)}" cy="${hy.toFixed(1)}" r="9.5" stroke="none" style="fill:var(--skin)"/>` +
+        `<path d="M${P(hx - 9.8, hy - 1)}a9.8 9.8 0 0 1 19.6 0c-4-2-12-2-15 2Z" stroke="none" style="fill:var(--pants)"/>` +
+        `<path d="M${P(x + f * 5, 192 - b)}L${P(x + f * 13, 214 - b)}L${P(hand[0], hand[1])}" stroke-width="6" style="stroke:${c};filter:brightness(.9)"/>` +
+        (cone ? `<path d="M${P(hand[0] - 4, hand[1] - 4)}h8l-4 12Z" stroke="none" style="fill:var(--pack)"/><circle cx="${hand[0].toFixed(1)}" cy="${(hand[1] - 7).toFixed(1)}" r="4.6" stroke="none" style="fill:var(--scoop)"/>` : "") + `</g>`;
+    }
+    // бариста: туловище за прилавком, рука тянется к цели позы
+    function barista(){
+      const p = POSE[st.pose], f = p.f, bx = st.bx, hx = bx + f * 1.3, sx = bx + f * 1.5, sy = 137;
+      sa("tor", {d: "M" + P(bx, 170) + "L" + P(bx, 136)});
+      sa("head", {cx: hx.toFixed(1), cy: 122}); sa("eye", {cx: (hx + f * 3.6).toFixed(1), cy: 121.5});
+      sa("hat", {d: "M" + P(hx - 7.6, 119) + "L" + P(hx - 6, 111) + "H" + (hx + 6).toFixed(1) + "L" + P(hx + 7.6, 119) + "Z"});
+      let [hx2, hy2] = p.hand || [bx + f * 8, 165], dx = hx2 - sx, dy = hy2 - sy, d = Math.hypot(dx, dy);
+      if (d > 29){ hx2 = sx + dx * 29 / d; hy2 = sy + dy * 29 / d; dx = hx2 - sx; dy = hy2 - sy; d = 29; }
+      const h = Math.sqrt(Math.max(0, 225 - d * d / 4)); let nx = -dy / d, ny = dx / d;
+      if (nx * f > 0){ nx = -nx; ny = -ny; }                       // локоть отходит назад
+      sa("arm", {d: "M" + P(sx, sy) + "L" + P(sx + dx / 2 + nx * h, sy + dy / 2 + ny * h) + "L" + P(hx2, hy2)});
+      sa("hand", {cx: hx2.toFixed(1), cy: hy2.toFixed(1)});
+    }
+
+    function draw(fromSlider){
+      const xi = Math.round(st.x), t = st.t;
+      // окно: солнце идёт по небу, в холод — облака, вечером темнеет
+      const cold = cl((19 - st.x) / 11);
+      sa("sun", {cx: (27 + 56 * t).toFixed(1), cy: (77 - 47 * Math.sin(Math.PI * t) + 6 * t).toFixed(1), opacity: (1 - 0.65 * cold).toFixed(2)});
+      q("cl").style.opacity = (0.15 + 0.85 * cold).toFixed(2);
+      q("dusk").setAttribute("opacity", (cl((t - 0.62) / 0.38) * 0.78).toFixed(2));
+      // термометр и подпись x
+      const ty = TY(st.x);
+      sa("col", {y: ty.toFixed(1), height: (90 - ty).toFixed(1)});
+      sa("xlb", {x: 29, y: (ty - 8.5).toFixed(1)}); sa("xl", {x: 56, y: (ty + 4).toFixed(1)}); tx("xl", "x = " + xi + "°");
+      // точка «x идёт в модель»
+      if (st.dot >= 0){
+        const u = st.dot, v = 1 - u, bx = v*v*v*93 + 3*v*v*u*93 + 3*v*u*u*66 + u*u*u*62, by = v*v*v*96 + 3*v*v*u*108 + 3*v*u*u*104 + u*u*u*113;
+        sa("dot", {cx: bx.toFixed(1), cy: by.toFixed(1), opacity: 1});
+      } else q("dot").setAttribute("opacity", 0);
+      q("xp").style.opacity = W ? 0.35 : 0.8;
+      barista();
+      E.view(st.fx);
+      if (W) drawW(xi); else drawX(xi, t);
+      if (!fromSlider) E.setCtrl(W ? "w" : "x", W ? st.w : xi);
+    }
+
+    function drawX(xi, t){
+      const f = yh(xi), y = yy(xi), gap = f - y, eve = t >= 1;
+      tx("scr", st.pr ? "печатает…" : st.fc ? "ŷ = " + f : "ŷ = ?");
+      // за день набираются покупатели; витрина пустеет; кончилось мороженое — рожков больше нет
+      const seen = t <= 0 ? 0 : Math.round(y * cl((t - 0.04) / 0.94));
+      const lvl = t <= 0 ? st.lvl : 1 - Math.min(seen, f) / f;
+      showcase("ice", eve ? 0 : lvl);
+      const sticks = Math.floor(seen / 10), sk = sticks + "";
+      if (sk !== stKey){ stKey = sk; let s = "";
+        for (let i = 0; i < sticks; i++){ const g = Math.floor(i / 5), j = i % 5, gx = 137 + g * 24;
+          s += j < 4 ? `<path d="M${gx + j * 4.5} 42V64"/>` : `<path d="M${gx - 2} 60L${gx + 15.5} 46"/>`; }
+        q("st").innerHTML = s; }
+      tx("yl", t <= 0 ? "y = ?" : eve ? "y = " + y : String(seen));
+      q("wait").style.opacity = t <= 0 ? 1 : 0;
+      // покупатели днём: идут справа налево, у витрины берут рожок
+      let pp = "";
+      if (t > 0 && !eve) for (let k = 0; k < 8; k++){
+        const u = (t - 0.04 - k * 0.1) / 0.24;
+        if (u > 0 && u < 1){ const x = 395 - u * 440; pp += person(x, k, u * 26, -1, x < 232 && seen <= f + 4); }
+      }
+      // вечером: разрыв ŷ − y — лишние порции в витрине или очередь тех, кому не хватило
+      const lk = eve ? String(gap) : "";
+      if (lk !== leftKey){ leftKey = lk; let s = "";
+        if (eve && gap > 0) for (let j = 0; j < gap; j++){ const x = 210 + j * 14;
+          s += `<path d="M${x - 4.5} 146h9l-1.5 11h-6Z" stroke-width="1" style="fill:var(--cup);stroke:var(--line)"/><circle cx="${x}" cy="144" r="4.2" style="fill:var(${SC[j % 3]})"/>`; }
+        q("left").innerHTML = s; }
+      if (eve && gap < 0) for (let j = -gap - 1; j >= 0; j--) pp += person(218 + j * 19, j + 1, j * 1.3, -1, false);
+      q("ppl").innerHTML = pp;
+      tx("g1", !eve ? "" : gap ? "ŷ − y = " + sg(gap) : "ŷ = y");
+      tx("g2", !eve ? "" : gap > 0 ? ": осталось " + gap : gap < 0 ? ": не хватило " + (-gap) : ": угадали точно");
+      E.val(0, xi + "°"); E.val(1, st.fc ? String(f) : "?"); E.val(2, eve ? String(y) : "?"); E.val(3, eve ? sg(gap) : "?");
+    }
+
+    function drawW(xi){
+      const w = st.w, x = st.x, v = w * x, px = CX(x), py = CY(v), p = prod(w);
+      showcase(p, 1);
+      tx("scr", "w·x = " + n1(v));
+      // линия прогноза ŷ = w·x: наклон — вес
+      sa("ln", {x1: CX(0), y1: CY(0), x2: CX(30), y2: CY(30 * w).toFixed(1)});
+      sa("wd", {x1: px.toFixed(1), y1: 66, x2: px.toFixed(1), y2: py.toFixed(1), opacity: Math.abs(v) > 4 ? 1 : 0});
+      sa("P", {cx: px.toFixed(1), cy: py.toFixed(1)});
+      // метка x — по другую сторону нулевой линии от точки, чтобы не спорить с подписью w·x
+      const xup = v < -4;
+      sa("xm", {d: xup ? "M" + P(px, 65) + "l-4 -6h8Z" : "M" + P(px, 67) + "l-4 6h8Z"});
+      const xmx = cl(px, 226, 326);
+      sa("xml", {x: xmx.toFixed(1), y: xup ? 55 : 102}); tx("xml", "x = " + fmt(x, 1) + "°");
+      [10, 20, 30].forEach(t => { q("t" + t).style.opacity = !xup && Math.abs(CX(t) - xmx) < 36 ? 0 : 1; });
+      // подпись w·x — с той стороны от точки, где нет линии
+      const right = px < 270, up = Math.abs(w) < 0.3 ? true : (w > 0) !== right;
+      sa("Pl", {x: (px + (right ? 9 : -9)).toFixed(1), y: cl(py + (up ? -8 : 15), 24, 100).toFixed(1), "text-anchor": right ? "start" : "end"});
+      tx("Pl", "w·x = " + n1(v));
+      const ply = cl(py + (up ? -8 : 15), 24, 100), plw = q("Pl").textContent.length * 6.9, pl0 = right ? px + 9 : px - 9 - plw;
+      if (ply > 84) [10, 20, 30].forEach(t => { if (CX(t) > pl0 - 12 && CX(t) < pl0 + plw + 12) q("t" + t).style.opacity = 0; });
+      // точки прошлых дней
+      if (st.pts !== ptsDone){ ptsDone = st.pts; q("pts").innerHTML = st.pts ? PTS.map(([a, b]) => `<circle cx="${CX(a)}" cy="${CY(b).toFixed(1)}" r="3"/>`).join("") : ""; }
+      // лупа: одна ступенька под увеличением — шаг на 1° вправо, подъём на w порций
+      const C = [161, 50], dx = px - C[0], dy = py - C[1], d = Math.hypot(dx, dy) || 1;
+      sa("ll", {x1: (C[0] + dx / d * 29).toFixed(1), y1: (C[1] + dy / d * 29).toFixed(1), x2: (px - dx / d * 7).toFixed(1), y2: (py - dy / d * 7).toFixed(1)});
+      sa("lr", {cx: px.toFixed(1), cy: py.toFixed(1)});
+      const a = 22, r = w * 1.5, sx = C[0] - 18, sy = C[1] + r / 2 + 2;
+      sa("stair", {d: "M" + P(sx - 12, sy) + "H" + (sx + a) + "V" + (sy - r).toFixed(1) + "H" + (sx + a + 14)});
+      sa("lline", {x1: sx - 14, y1: (sy + r * 14 / a).toFixed(1), x2: sx + a + 14, y2: (sy - r - r * 14 / a).toFixed(1)});
+      sa("l1", {x: (sx + a / 2).toFixed(1), y: (sy + (r > -4 ? 12 : -5)).toFixed(1)});
+      sa("l2", {x: (sx + a + 4).toFixed(1), y: (Math.abs(r) < 9 ? sy - r - 5 : sy - r / 2 + 4).toFixed(1)});
+      tx("l2", sg(w));
+      q("lens").style.opacity = st.lens ? 1 : 0;
+      const f3 = p === "ice" ? ["порция","порции","порций"] : ["чашка","чашки","чашек"], aw = Math.abs(w);
+      E.val(0, n1(w)); E.val(1, fmt(x, 1) + "°"); E.val(2, n1(v)); E.val(3, sg(w) + " " + (Number.isInteger(aw) ? plural(aw, ...f3) : f3[1]));
+    }
+
+    // анимации: любая прерывается ползунком или новым шагом (E.live)
+    function anim(ms, id, fn, lin){
+      return new Promise(res => {
+        if (!E.live(id)) return res();
+        const t0 = performance.now();
+        const fr = now => {
+          if (!E.live(id)) return res();
+          const p = Math.min((now - t0) / ms, 1);
+          fn(lin ? p : p < .5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2, p); draw();
+          if (p < 1) requestAnimationFrame(fr); else res();
+        };
+        requestAnimationFrame(fr);
+      });
+    }
+    function tween(o, ms, id, lin){ const a = {}; for (const k in o) a[k] = st[k]; return anim(ms, id, e => { for (const k in o) st[k] = a[k] + (o[k] - a[k]) * e; }, lin); }
+    function pose(name, id, ms){ st.pose = name; const p = POSE[name]; return ms ? tween({bx: p.bx, fx: p.fx}, ms, id) : (st.bx = p.bx, st.fx = p.fx, draw()); }
+    const morning = () => { st.t = 0; st.fc = 0; st.lvl = 0; st.pr = 0; st.dot = -1; pose("win"); };
+    async function forecast(id){
+      if (st.t > 0 || st.fc) morning();
+      await pose("reg", id, 500);
+      await anim(650, id, (e, p) => { st.dot = p; }, true); st.dot = -1;
+      if (!E.live(id)) return;
+      st.pr = 1; draw(); await E.wait(500); if (!E.live(id)) return;
+      st.pr = 0; st.fc = 1; draw();
+      await anim(700, id, e => { st.lvl = e; });
+    }
+    const ready = () => { morning(); st.fc = 1; st.lvl = 1; pose("reg"); };
+    async function day(id){
+      if (!st.fc || st.t >= 1) ready();
+      await pose("serve", id, 500);
+      await anim(6500, id, (e, p) => { st.t = p; }, true);
+      if (E.live(id)) await pose("eve", id, 500);
+    }
+    const evening = () => { st.fc = 1; st.lvl = 1; st.t = 1; st.dot = -1; st.pr = 0; pose("eve"); };
+    const NEXT = [12, 31, 18, 7, 28, 22, 34, 15, 3];
+    let nk = 0;
+
+    async function run(plan, id){
+      for (const p of plan){
+        if (!E.live(id)) return;
+        if (p === "pause") await E.wait(1300);
+        else if (typeof p === "number"){ const k = W ? "w" : "x", d = Math.abs(p - st[k]); if (d > 0.01) await tween({[k]: p}, Math.max(500, d * (W ? 90 : 45)), id); }
+        else if (typeof p === "object"){ const d = Math.abs(p.x - st.x); if (d > 0.01) await tween({x: p.x}, Math.max(400, d * 60), id); }
+        else if (p === "morning") morning();
+        else if (p === "fc") await forecast(id);
+        else if (p === "ready") ready();
+        else if (p === "day") await day(id);
+        else if (p === "eve") evening();
+        else if (p === "plus") await tween({x: st.x >= 30 ? 20 : Math.round(st.x) + 1}, 500, id);
+      }
+    }
+    return {
+      draw,
+      step(s, id){ if (W){ st.lens = !!s.lens; st.pts = !!s.pts; } draw(); return run([].concat(s.go == null ? [] : s.go), id); },
+      slide(v){
+        if (W){ st.w = v; st.lens = true; }
+        else { st.x = v; evening(); }
+        draw(true);
+      },
+      action(a, id){
+        if (a === "plus"){ st.lens = true; run(["plus"], id); }
+        else if (a === "prod") run([PRESET[prod(st.w)]], id);
+        else if (a === "day") run(st.t >= 1 || !st.fc ? ["morning", "fc", "day"] : ["day"], id);
+        else { let x; do { x = NEXT[nk++ % NEXT.length]; } while (x === Math.round(st.x)); run(["morning", x, "fc", "day"], id); }
+      }
+    };
+  }
+};
+
 /* ================= Урок ================= */
-function renderLesson(id){
-  const L = LESSONS[id-1];
-  if (!lessonUnlocked(L)) { go("#home"); return; }
+function renderLesson(id, peek){
+  const L = LESSONS[id-1], open = lessonUnlocked(L);
+  if (!open && !peek) { go("#home"); return; }
   if (LV.id !== id) LV = {id, view:null, ti:null};
   if (!LV.view) LV.view = solvedCount(L) ? "tasks" : "theory";
+  if (peek && (!open || LV.view !== "tasks")) LV.view = "theory";
   if (LV.ti == null){ const k = L.tasks.findIndex(t => !S.solved[t.id]); LV.ti = k < 0 ? L.tasks.length : k; }
   const st = STAGES[L.stage-1];
   app.innerHTML = `
   <div class="topbar"><button class="back" id="bk">← Карта</button>${xpBar()}</div>
   <div class="lhead"><span class="glyph big${glyphCls(L.g)}">${esc(L.g)}</span><div><small>Этап ${st.n} · ${esc(st.name)} · урок ${id} из 24</small><h1>${esc(L.title)}</h1></div></div>
-  <nav class="seg2" role="tablist"><button data-v="theory" role="tab">Теория</button><button data-v="tasks" role="tab">Задачи <span class="mono" id="tc">${solvedCount(L)}/${L.tasks.length}</span></button></nav>
+  <nav class="seg2" role="tablist"><button data-v="theory" role="tab">Теория</button><button data-v="tasks" role="tab"${open ? "" : " disabled"}>Задачи <span class="mono" id="tc">${open ? solvedCount(L) + "/" + L.tasks.length : "🔒"}</span></button></nav>
   <section id="pane"></section>`;
   $("#bk").onclick = () => go("#home");
-  $$(".seg2 button").forEach(b => b.onclick = () => { LV.view = b.dataset.v; showView(L); });
+  $$(".seg2 button").forEach(b => b.onclick = () => { if (!b.disabled){ LV.view = b.dataset.v; showView(L); } });
   showView(L);
 }
 function showView(L){
@@ -1786,9 +2197,9 @@ function renderTheory(L, pane){
     <div class="real"><b>В настоящем ИИ</b>${esc(L.real)}</div>
     <p class="src"><b>Откуда:</b> ${esc(L.src)}</p>
     <button class="biglink" id="bl"><span><b>Общая картина</b><span>Как этот урок связан с остальными и с ChatGPT</span></span><i>→</i></button>
-    <div class="next"><button class="btn" id="tt">К задачам →</button></div>`;
+    <div class="next">${lessonUnlocked(L) ? `<button class="btn" id="tt">К задачам →</button>` : `<span class="muted">Задачи откроются, когда будут решены прошлые уроки</span>`}</div>`;
   if (L.stand) renderStand(L, $("#standHost"));
-  $("#tt").onclick = () => { LV.view = "tasks"; showView(L); window.scrollTo(0,0); };
+  if ($("#tt")) $("#tt").onclick = () => { LV.view = "tasks"; showView(L); window.scrollTo(0,0); };
   $("#bl").onclick = () => go("#big");
 }
 function renderTasks(L, pane){
