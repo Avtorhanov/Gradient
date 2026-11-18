@@ -19,6 +19,9 @@
   --paper:#E6EBF0; --card:#F8FAFC; --ink:#131B26; --muted:#586474; --line:#C6CFD9;
   --accent:#D4470C; --cool:#1F6CB0; --good:#2B8A3E; --bad:#C0392B; --codebg:#EEF2F6;
   --grid:rgba(31,108,176,.08); --band:rgba(31,108,176,.045);
+  /* стенды: цвета букв и сцен */
+  --sw:#5B4FD6; --terr:rgba(29,158,117,.15); --surf:#1D9E75; --strata:rgba(29,158,117,.28); --mount:rgba(19,27,38,.07); --tree:rgba(29,158,117,.55);
+  --pants:#46597A; --skin:#F2A27E; --pack:#C98A1E; --stick:#8A8F98; --axis:rgba(19,27,38,.25);
   --f-display:'Unbounded','Golos Text',system-ui,sans-serif;
   --f-body:'Golos Text',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --f-mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
@@ -28,13 +31,19 @@
   :root:not([data-theme="light"]){
     --paper:#0D131B; --card:#151E2A; --ink:#E4EAF1; --muted:#8B98A8; --line:#283547;
     --accent:#FF7A3D; --cool:#5AA8EA; --good:#55C26B; --bad:#FF6B5E; --codebg:#101823;
-    --grid:rgba(90,168,234,.07); --band:rgba(90,168,234,.05); color-scheme:dark;
+    --grid:rgba(90,168,234,.07); --band:rgba(90,168,234,.05);
+    --sw:#9B93FF; --terr:rgba(43,179,134,.13); --surf:#2BB386; --strata:rgba(43,179,134,.25); --mount:rgba(255,255,255,.05); --tree:rgba(43,179,134,.5);
+    --pants:#8696B4; --skin:#F2A27E; --pack:#D59A34; --stick:#7C8594; --axis:rgba(255,255,255,.22);
+    color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --paper:#0D131B; --card:#151E2A; --ink:#E4EAF1; --muted:#8B98A8; --line:#283547;
   --accent:#FF7A3D; --cool:#5AA8EA; --good:#55C26B; --bad:#FF6B5E; --codebg:#101823;
-  --grid:rgba(90,168,234,.07); --band:rgba(90,168,234,.05); color-scheme:dark;
+  --grid:rgba(90,168,234,.07); --band:rgba(90,168,234,.05);
+  --sw:#9B93FF; --terr:rgba(43,179,134,.13); --surf:#2BB386; --strata:rgba(43,179,134,.25); --mount:rgba(255,255,255,.05); --tree:rgba(43,179,134,.5);
+  --pants:#8696B4; --skin:#F2A27E; --pack:#D59A34; --stick:#7C8594; --axis:rgba(255,255,255,.22);
+  color-scheme:dark;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
@@ -161,6 +170,61 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible,
 .analog{border-left:4px solid var(--cool);background:var(--card);padding:12px 14px;border-radius:0 12px 12px 0;margin-top:16px}
 .analog b{display:block;font-size:13px;color:var(--cool);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
 .src{font-size:13.5px;color:var(--muted);margin-top:12px}
+/* стенд — анимированное объяснение в теории */
+.stand{display:flex;flex-direction:column;gap:10px;margin:0 0 4px}
+.st-cap{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 10px 12px 14px;min-height:150px;touch-action:pan-y;overflow:hidden}
+.st-top{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:4px}
+.st-n{font-family:var(--f-mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.st-pg{display:flex;align-items:center;gap:2px}
+.st-ar,.st-bk{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--ink);display:grid;place-items:center;padding:0;-webkit-tap-highlight-color:transparent}
+.st-ar.nx{background:var(--accent);border-color:var(--accent);color:#fff}
+.st-bk{border-color:transparent;color:var(--muted);margin-right:2px}
+.st-bk.on{color:var(--accent);background:var(--paper)}
+.st-dots{display:flex;align-items:center;margin:0 3px}
+.st-dots i{width:5px;height:5px;border-radius:3px;margin:0 2px;background:var(--line);transition:width .25s}
+.st-dots i.on{width:14px;background:var(--accent)}
+.st-tag{display:block;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--cool);font-weight:600;margin-bottom:2px}
+.st-tag:empty{display:none}
+#stTxt{margin:0;font-size:16px;line-height:1.5}
+#stTxt b{font-family:var(--f-mono);font-weight:600}
+.st-ex[hidden]{display:none}
+.st-ex{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px;display:grid;gap:8px}
+.st-ex .eh{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.st-ex b{display:block;font-size:12.5px;color:var(--muted);font-weight:600}
+.st-ex p{margin:2px 0 0;font-size:14.5px;line-height:1.45}
+@keyframes stInR{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:none}}
+@keyframes stInL{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:none}}
+.st-inR{animation:stInR .28s ease-out}.st-inL{animation:stInL .28s ease-out}
+.st-scene{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.st-scene svg{display:block;width:100%;height:auto}
+.st-scene text{font-family:var(--f-mono)}
+.st-scene .lb{paint-order:stroke;stroke:var(--card);stroke-width:3.5px;stroke-linejoin:round}
+.st-fade{transition:opacity .5s}
+.st-fs{position:absolute;right:7px;bottom:7px;width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);display:grid;place-items:center;padding:0;opacity:.92}
+.st-vals{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.st-v{position:relative;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:7px 10px 8px 13px;overflow:hidden;min-width:0}
+.st-v::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:var(--c)}
+.st-v .l{font-size:12px;color:var(--muted);line-height:1.3}
+.st-v .l b{font-family:var(--f-mono);color:var(--c)}
+.st-v .v{font-family:var(--f-mono);font-weight:600;font-size:20px;line-height:1.3;color:var(--c);font-variant-numeric:tabular-nums}
+.st-v .v.tx{font-family:var(--f-body);font-size:15px;padding-top:3px}
+.st-ctrl{display:grid;gap:8px}
+.st-sl{display:flex;align-items:center;gap:10px;font-family:var(--f-mono);font-weight:600;color:var(--sw)}
+.st-sl input{flex:1;accent-color:var(--sw);height:30px;font-size:16px;margin:0}
+.st-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stand.fs{position:fixed;inset:0;z-index:60;margin:0;background:var(--paper);overflow:hidden;padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+.stand.fs .st-scene{flex:1;min-height:0}
+.stand.fs .st-scene svg{height:100%}
+.stand.fs .st-vals{display:none}
+.stand.fs .st-cap{min-height:0;max-height:42vh;overflow:auto}
+@media (orientation:landscape){
+  .stand.fs{display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,34%);grid-template-rows:auto 1fr;grid-template-areas:"sc cap" "sc ctl"}
+  .stand.fs .st-scene{grid-area:sc}
+  .stand.fs .st-cap{grid-area:cap;max-height:none}
+  .stand.fs .st-n{display:none}
+  .stand.fs .st-top{justify-content:flex-end}
+  .stand.fs .st-ctrl{grid-area:ctl;align-self:end}
+}
 .need{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:16px}
 .need .nl,.bigsec .nl{display:block;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:4px;font-weight:600}
 .need p{margin:0}
@@ -709,6 +773,31 @@ const LESSONS = [
     ["w = 3 → dL/dw = 0","На дне склон ровный, двигаться некуда."]]},
   analog:"Вы стоите на склоне в густом тумане и не видите долину. Но ногами чувствуете, куда земля уходит вниз. Градиент — это наклон под ногами: он не показывает всю карту, но говорит, куда шагнуть прямо сейчас.",
   src:"Траск, гл. 4 (градиентный спуск, «горячо-холодно»). Принс, гл. 6 (подбор параметров). 3Blue1Brown, видео про градиентный спуск.",
+  stand:{scene:"valley", steps:[
+    {t:"Ошибка зависит от ручек. Если нарисовать, как L меняется при разных w, получится долина: где-то на дне ошибка минимальна. Представьте, что вы стоите на её склоне в тумане. Место на склоне — ручка <b style=\"color:var(--sw)\">w</b> (метка внизу), высота — ошибка <b style=\"color:var(--cool)\">L</b> (синяя линия до дна).",
+     go:6.2,
+     ex:[["Принс, гл. 6","Когда у модели две ручки, как у линии w·x + b, ошибку рисуют уже не кривой, а рельефом — картой местности с горизонталями, где по одной оси w, по другой b. Обучение — это поиск самой низкой точки на такой карте."]]},
+    {t:"Дна не видно, но под ногами чувствуется наклон. Это и есть <b style=\"color:var(--accent)\">градиент</b>: его пишут ∇ («набла») или dL/dw — «как изменится L, если чуть сдвинуть w». Оранжевый треугольник: шагнули на 1 вправо (w +1) — высота изменилась примерно на dL/dw. Как в разборе примера: при w = 5 наклон равен 4.",
+     go:5, tan:true,
+     ex:[["Траск, гл. 4","Сначала автор учит вес способом «горячо-холодно»: чуть сдвигает вес вверх, потом вниз, делает прогноз в обоих случаях и оставляет тот, где ошибка меньше. Это работает, но медленно и грубо — на каждый шаг уходят лишние прогнозы. Наклон даёт то же направление сразу, одним расчётом."]]},
+    {t:"Знак — это направление. Здесь <b style=\"color:var(--accent)\">dL/dw</b> с плюсом: шаг вправо ведёт вверх, ошибка вырастет. Значит, шагаем влево — уменьшаем w.",
+     go:6, tan:true, arr:true,
+     ex:[["Траск, гл. 4","У автора поправка веса — это промах, умноженный на вход. Модель завысила прогноз — поправка выходит с плюсом, и вес уменьшают. Занизила — с минусом, и вес увеличивают. Знак получается сам, угадывать направление не нужно."]]},
+    {t:"А здесь <b style=\"color:var(--accent)\">dL/dw</b> с минусом: шаг вправо ведёт вниз. Шагаем вправо — увеличиваем w. Правило одно на все случаи: идём против знака градиента.",
+     go:0, tan:true, arr:true,
+     ex:[["3Blue1Brown, видео о градиентном спуске","Правило для одной ручки показано на шарике: смотрим на наклон в точке, где он лежит. Склон уходит вниз влево — шаг влево, вниз вправо — шаг вправо. Повторяем, пока шарик не окажется в ямке."]]},
+    {t:"Величина — это крутизна. Далеко от дна склон крутой: треугольник высокий, dL/dw почти 9 по модулю. Ближе ко дну почти ровно — около 1. Чем дальше от дна, тем больше градиент.",
+     go:[-1.4,"pause",2.4], tan:true, arr:true,
+     ex:[["3Blue1Brown, видео о градиентном спуске","Если делать шаг пропорционально наклону, у дна, где склон пологий, шаги сами становятся мельче, и шарик не проскакивает ямку. А когда ручек тысячи, величина градиента по каждой подсказывает, какую ручку подвинуть важнее всего."]]},
+    {t:"Шагаем против наклона, пока он не исчезнет. Шаги сами становятся короче. На дне <b style=\"color:var(--accent)\">dL/dw</b> = 0: ни подъёма, ни спуска — ошибка <b style=\"color:var(--cool)\">L</b> минимальна.",
+     go:"descend", tan:true, arr:true, fog:false,
+     ex:[["Принс, гл. 6","У простой линии из прошлых уроков долина одна и дно одно. У сложных моделей рельеф бугристый: бывают ямки, которые не самые глубокие, и «сёдла» — места, где наклон тоже нулевой, хотя до настоящего дна ещё далеко. Поэтому нулевой градиент значит «здесь ровно», но не всегда «лучше не бывает»."]]},
+    {look:true, t:"Утром вы настраиваете душ. Повернули кран чуть вправо — вода стала горячее, чем нужно: значит, крутить надо влево. Если от маленького поворота температура сильно скачет — до нужной ещё далеко, если почти не меняется — вы почти у цели. Знак и величина отклика — это и есть градиент.",
+     go:[6.6,"pause",3.6], tan:true, arr:true},
+    {look:true, t:"Почему бы не нарисовать всю долину и не найти дно глазами? Для одной ручки это, скажем, 100 замеров ошибки, для двух — 10 000, а ручек у настоящих сетей миллионы: столько замеров не сделать никогда. Градиент — один расчёт в той точке, где вы стоите. Поэтому и туман: модель всегда видит только склон под ногами. Покрутите ползунок w и проверьте сами.",
+     go:7.2, tan:true, arr:true,
+     ex:[["3Blue1Brown, видео о градиентном спуске","В сети, которая узнаёт рукописные цифры, около 13 тысяч ручек — значит, её «долина» в 13 тысячах измерений. Нарисовать такую нельзя, но градиент — это просто список из 13 тысяч чисел: для каждой ручки — в какую сторону и насколько её подвинуть."]]}
+  ]},
   tasks:[
     {t:"slope", q:"Кривая — ошибка при разных w. Смотрите на знак градиента и спуститесь на дно (зелёная зона). Два раунда, в каждом не больше 12 шагов.", hint:"Градиент «+» — жмите «уменьшить w». Градиент «−» — «увеличить w».", why:"Вы шли против знака градиента и каждый раз приходили на дно.", steps:["Градиент «+» значит: если увеличить w, ошибка вырастет. Поэтому w уменьшаем.", "Градиент «−» значит: если увеличить w, ошибка упадёт. Поэтому w увеличиваем.", "Чем ближе ко дну, тем меньше градиент: склон становится пологим."], idea:"Вы шли вслепую, глядя только на наклон под ногами, — и всё равно нашли дно. Так и учится нейросеть: всей долины она не видит.", sol:"В первом раунде 9 раз «уменьшить w», во втором 7 раз «увеличить w»."},
     {t:"mc", q:"Градиент равен +6. Что делать с w?", o:["Уменьшить w","Увеличить w","Ничего, мы на дне","Сделать w = 6"], a:0, hint:"Плюс значит: вправо ошибка растёт.", why:"Идём против градиента: он положительный, значит w уменьшаем.", steps:["+6 значит: если увеличить w (шагнуть вправо), ошибка вырастет, и довольно быстро.", "Нам нужно, чтобы ошибка падала, — значит, идём в обратную сторону.", "w уменьшаем."], idea:"Правило одно на все случаи: шагать против знака градиента. Поэтому способ и называют градиентным спуском."},
@@ -1365,6 +1454,300 @@ function bindMap(){
 function bindNI(){ const b = $("#ni [data-open]"); if (b) b.onclick = () => openLesson(+b.dataset.open); }
 function openLesson(id, view, ti){ LV = {id, view: view || null, ti: ti ?? null}; go("#lesson-"+id); }
 
+/* ================= Стенды: анимированные объяснения в теории ================= */
+/* Движок общий для всех уроков: шаги со свайпом, примеры из книг, плашки значений,
+   ползунок, кнопки, полный экран с «камерой». Картинку рисует сцена из SCENES. */
+const SCENES = {};
+const svgI = (d, s=16, w=2.5) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ST_ICO = {
+  book: svgI('<path d="M3 5.5c3-1.3 6-1.3 9 .7 3-2 6-2 9-.7v13c-3-1.3-6-1.3-9 .7-3-2-6-2-9-.7z"/><path d="M12 6.2v13.2"/>', 17, 2),
+  l: svgI('<path d="M15 5l-7 7 7 7"/>'), r: svgI('<path d="M9 5l7 7-7 7"/>'),
+  open: svgI('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>', 20, 2),
+  close: svgI('<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>', 20, 2)
+};
+let standCur = null;
+window.addEventListener("resize", () => { if (standCur && document.body.contains(standCur.root)) requestAnimationFrame(() => standCur.relayout()); });
+
+function renderStand(L, host){
+  const cfg = L.stand, sc = SCENES[cfg.scene], steps = cfg.steps, life = alive;
+  const c = sc.ctrl;
+  host.innerHTML = `<div class="stand" id="stand">
+    <div class="st-cap" id="stCap">
+      <div class="st-top"><span class="st-n" id="stN"></span>
+        <span class="st-pg">
+          <button class="st-bk" id="stBk" aria-label="Примеры из книг" aria-expanded="false">${ST_ICO.book}</button>
+          <button class="st-ar" id="stPrev" aria-label="Назад">${ST_ICO.l}</button>
+          <span class="st-dots" id="stDots"></span>
+          <button class="st-ar nx" id="stNext" aria-label="Дальше">${ST_ICO.r}</button>
+        </span></div>
+      <div id="stBody"><span class="st-tag" id="stTag"></span><p id="stTxt"></p></div>
+      <div class="st-ex" id="stEx" hidden></div>
+    </div>
+    <div class="st-scene" id="stScene">${sc.svg}<button class="st-fs" id="stFs" aria-label="На весь экран">${ST_ICO.open}</button></div>
+    <div class="st-vals">${sc.vals.map(([k,l,col],i) => `<div class="st-v" style="--c:var(${col})"><div class="l"><b>${esc(k)}</b> ${esc(l)}</div><div class="v${i===sc.vals.length-1?" tx":""}" id="stV${i}"></div></div>`).join("")}</div>
+    <div class="st-ctrl">
+      <label class="st-sl">${esc(c.k)}<input type="range" id="stSl" min="${c.min}" max="${c.max}" step="0.01" aria-label="Ручка ${esc(c.k)}"></label>
+      <div class="st-acts">${sc.acts.map(([id,t]) => `<button class="btn ghost" data-act="${id}">${esc(t)}</button>`).join("")}</div>
+    </div></div>`;
+  const root = $("#stand", host);
+  const E = {root, svg: $("svg", $("#stScene", root)), act: 0, cur: 0, cam: null, vb: [0,-18,360,262]};
+  standCur = E;
+  E.live = id => id === E.act && life === alive && document.body.contains(root);
+  E.wait = ms => new Promise(r => setTimeout(r, ms));
+  E.val = (i, t) => { $("#stV"+i, root).textContent = t; };
+  E.sl = $("#stSl", root);
+  // «камера»: в полном экране кадр подстраивается под форму экрана и едет за героем
+  E.relayout = () => {
+    E.cam = null;
+    if (root.classList.contains("fs")){
+      const r = $("#stScene", root).getBoundingClientRect(), [, , W, H] = E.vb;
+      if (r.width && r.height){
+        const a = r.width / r.height;
+        if (a >= W/H) E.cam = {vw: H*a, vh: H, fx: (W - H*a)/2};
+        else { const vw = Math.max(190, H*a); E.cam = {vw, vh: vw/a}; }
+      }
+    }
+    if (!E.cam) E.svg.setAttribute("viewBox", E.vb.join(" "));
+    S_.draw();
+  };
+  E.view = fx => {   // возвращает видимую часть сцены: [левый край, правый край]
+    const [x0b, , W] = E.vb;
+    if (!E.cam) return [x0b, x0b + W];
+    const {vw, vh} = E.cam, x0 = E.cam.fx != null ? E.cam.fx : Math.min(x0b + W - vw, Math.max(x0b, fx - vw/2));
+    E.svg.setAttribute("viewBox", `${x0.toFixed(1)} ${(E.vb[1] + E.vb[3] - vh).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`);
+    return [x0, x0 + vw];
+  };
+  const S_ = sc.init(E);
+
+  // шаги
+  const txt = $("#stTxt", root), ex = $("#stEx", root), bk = $("#stBk", root);
+  let exOpen = false;
+  function fillEx(){
+    const list = steps[E.cur].ex || [];
+    bk.style.visibility = list.length ? "visible" : "hidden";
+    if (!list.length){ ex.hidden = true; bk.classList.remove("on"); bk.setAttribute("aria-expanded","false"); return; }
+    ex.hidden = !exOpen; bk.classList.toggle("on", exOpen); bk.setAttribute("aria-expanded", String(exOpen));
+    ex.innerHTML = `<span class="eh">Примеры из книг</span>` + list.map(([b,t]) => `<div><b>${esc(b)}</b><p>${esc(t)}</p></div>`).join("");
+  }
+  function show(i, dir){
+    const id = ++E.act;
+    E.cur = (i + steps.length) % steps.length;
+    const s = steps[E.cur];
+    $("#stN", root).textContent = `Шаг ${E.cur+1} из ${steps.length}`;
+    $("#stDots", root).innerHTML = steps.map((_,k) => `<i class="${k===E.cur?"on":""}"></i>`).join("");
+    $("#stTag", root).textContent = s.look ? "Другой взгляд" : "";
+    txt.innerHTML = s.t;
+    if (dir){ const b = $("#stBody", root); b.classList.remove("st-inR","st-inL"); void b.offsetWidth; b.classList.add(dir > 0 ? "st-inR" : "st-inL"); }
+    fillEx();
+    S_.step(s, id);
+  }
+  $("#stNext", root).onclick = () => show(E.cur + 1, 1);
+  $("#stPrev", root).onclick = () => show(E.cur - 1, -1);
+  bk.onclick = () => { exOpen = !exOpen; fillEx(); };
+  let tx = null, ty = 0;
+  const cap = $("#stCap", root);
+  cap.addEventListener("touchstart", e => { const t = e.touches[0]; tx = t.clientX; ty = t.clientY; }, {passive:true});
+  cap.addEventListener("touchend", e => {
+    if (tx == null) return;
+    const t = e.changedTouches[0], dx = t.clientX - tx, dy = t.clientY - ty; tx = null;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3) show(E.cur + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+  }, {passive:true});
+
+  // ползунок: перерисовка не чаще раза за кадр, бегущая анимация прерывается
+  let raf = 0, target = 0;
+  E.sl.addEventListener("input", () => {
+    E.act++; target = +E.sl.value;
+    if (!raf) raf = requestAnimationFrame(() => { raf = 0; S_.slide(target); });
+  });
+  $$("[data-act]", root).forEach(b => b.onclick = () => S_.action(b.dataset.act, ++E.act));
+
+  // полный экран (как у задач: блок растягивается на весь экран, работает и на iPhone)
+  const fsb = $("#stFs", root);
+  fsb.onclick = () => {
+    const on = !root.classList.contains("fs");
+    exitFS();
+    if (on){ root.classList.add("fs"); fsCard = root; document.documentElement.classList.add("noscroll"); }
+    fsb.innerHTML = on ? ST_ICO.close : ST_ICO.open; fsb.setAttribute("aria-label", on ? "Свернуть" : "На весь экран");
+    requestAnimationFrame(E.relayout);
+  };
+
+  show(0);
+}
+
+/* ---------- Сцена «Долина в тумане»: ошибка L(w) = (w − 3)², путник = ручка w ---------- */
+SCENES.valley = {
+  vals: [["w","где стоим","--sw"],["L","высота = ошибка","--cool"],["dL/dw","наклон","--accent"],["→","куда шагать","--good"]],
+  ctrl: {k:"w", min:-1.5, max:7.5},
+  acts: [["step","Один шаг"],["run","▶ Спуститься"]],
+  svg: `<svg viewBox="0 -18 360 262" role="img" aria-label="Путник на склоне долины в тумане. Высота — ошибка L, положение — ручка w, наклон — градиент dL/dw.">
+<defs><marker id="v-ah" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="3.2" markerHeight="3.2" orient="auto"><path d="M0 0L10 5L0 10Z" style="fill:var(--good)"/></marker></defs>
+<path d="M-300 214L-300 110L-200 70L-120 108L-60 80L-5 118L38 86L70 112L118 64L160 104L200 76L246 112L292 60L330 96L365 80L420 108L480 70L560 104L660 84L660 214Z" style="fill:var(--mount)"/>
+<path id="v-terr" style="fill:var(--terr)"/>
+<path id="v-st1" fill="none" stroke-width="1" style="stroke:var(--strata)"/>
+<path id="v-st2" fill="none" stroke-width="1" style="stroke:var(--strata)" opacity=".7"/>
+<path id="v-surf" fill="none" stroke-width="3" stroke-linejoin="round" style="stroke:var(--surf)"/>
+<g id="v-trees"></g>
+<line x1="169" y1="200" x2="169" y2="172" stroke-width="1.5" style="stroke:var(--stick)"/>
+<path d="M169 172L184 177L169 182Z" style="fill:var(--good)"/>
+<text id="v-dno" x="187" y="186" class="lb" style="fill:var(--good);font-size:11px">дно</text>
+<g id="v-fog" class="st-fade" style="transition-duration:1.1s">
+  <path id="v-fg1" fill-rule="evenodd" style="fill:var(--card)" opacity=".34"/>
+  <path id="v-fg2" fill-rule="evenodd" style="fill:var(--card)" opacity=".34"/>
+  <path id="v-fg3" fill-rule="evenodd" style="fill:var(--card)" opacity=".34"/>
+</g>
+<line x1="-400" y1="200" x2="760" y2="200" stroke-width="1" stroke-dasharray="2 4" style="stroke:var(--cool)" opacity=".55"/>
+<text id="v-lz" x="354" y="195" text-anchor="end" class="lb" style="fill:var(--cool);font-size:11px">L = 0</text>
+<line x1="-400" y1="214" x2="760" y2="214" stroke-width="1" style="stroke:var(--axis)"/>
+<g id="v-ticks" style="fill:var(--muted);font-size:11px" text-anchor="middle"></g>
+<text id="v-lax" x="11" y="112" transform="rotate(-90 11 112)" text-anchor="middle" class="lb" style="fill:var(--cool);font-size:11px">высота L = ошибка</text>
+<line id="v-Lm" stroke-width="2.5" stroke-linecap="round" style="stroke:var(--cool)"/>
+<line id="v-Lt" stroke-width="2" style="stroke:var(--cool)"/>
+<text id="v-Ll" class="lb" style="fill:var(--cool);font-size:12px;font-weight:600"></text>
+<line id="v-wd" stroke-width="1.5" stroke-dasharray="2 3" style="stroke:var(--sw)"/>
+<path id="v-ptr" style="fill:var(--sw)"/>
+<text id="v-wl" text-anchor="middle" style="fill:var(--sw);font-size:12px;font-weight:600"></text>
+<g id="v-tri" class="st-fade" opacity="0">
+  <path id="v-triP" style="fill:var(--accent)" opacity=".16"/>
+  <line id="v-hleg" stroke-width="1.5" stroke-dasharray="3 3" style="stroke:var(--accent)"/>
+  <line id="v-vleg" stroke-width="2" style="stroke:var(--accent)"/>
+  <line id="v-tang" stroke-width="3" stroke-linecap="round" style="stroke:var(--accent)"/>
+  <text id="v-lab1" text-anchor="middle" class="lb" style="fill:var(--accent);font-size:10.5px">w +1</text>
+  <text id="v-lab2a" class="lb" style="fill:var(--accent);font-size:11px">dL/dw</text>
+  <text id="v-lab2b" class="lb" style="fill:var(--accent);font-size:13px;font-weight:600"></text>
+</g>
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect id="v-pack" width="6.5" height="11" rx="2" stroke="none" style="fill:var(--pack)"/>
+  <path id="v-legB" stroke-width="4" style="stroke:var(--pants)"/>
+  <path id="v-legA" stroke-width="4" style="stroke:var(--pants)"/>
+  <line id="v-stick" stroke-width="2" style="stroke:var(--stick)"/>
+  <path id="v-torso" stroke-width="7.5" style="stroke:var(--sw)"/>
+  <path id="v-arm" stroke-width="3.5" style="stroke:var(--sw)"/>
+  <circle id="v-head" r="4.8" stroke="none" style="fill:var(--skin)"/>
+  <path id="v-hat" stroke="none" style="fill:var(--sw)"/>
+</g>
+<g id="v-arrG" class="st-fade" opacity="0">
+  <line id="v-arr" stroke-width="3.5" stroke-linecap="round" marker-end="url(#v-ah)" style="stroke:var(--good)"/>
+  <text id="v-arrL" text-anchor="middle" class="lb" style="fill:var(--good);font-size:12px;font-weight:600;font-family:var(--f-body)"></text>
+</g>
+</svg>`,
+  init(E){
+    const q = id => E.svg.getElementById ? E.svg.getElementById("v-"+id) : E.svg.querySelector("#v-"+id);
+    const sa = (id, o) => { const e = q(id); for (const k in o) e.setAttribute(k, o[k]); };
+    const X = w => 34 + (w + 2) * 27, Y = L => 200 - L * 6.4, Lf = w => (w - 3) ** 2, G = w => 2 * (w - 3);
+    const gy = w => Y(Lf(w)), cw = w => Math.min(8, Math.max(-2, w)), KX = 6.4 / 27, BOT = X(3);
+    const P = (x, y) => x.toFixed(1) + " " + y.toFixed(1);
+    const sg1 = v => (v > 0.05 ? "+" : v < -0.05 ? "−" : "") + fmt(Math.abs(v), 1).replace(/^(\d+)$/, "$1,0");
+    const n1 = v => (v < -0.05 ? "−" : "") + fmt(Math.abs(v), 1).replace(/^(\d+)$/, "$1,0");
+    const curve = off => { let d = ""; for (let i = 0; i <= 600; i++){ const w = -14 + i * 0.05, y = Math.min(Math.max(gy(w), 22) + off, 214); d += (i ? "L" : "M") + P(X(w), y); } return d; };
+    sa("terr", {d: curve(0) + "L700 214L-400 214Z"}); sa("surf", {d: curve(0)}); sa("st1", {d: curve(16)}); sa("st2", {d: curve(34)});
+    q("trees").innerHTML = [[-1.45,1],[-.75,.8],[1.3,.72],[4.9,.78],[6.85,1],[7.6,.85]].map(([tw, s]) => { const x = X(tw), y = gy(tw) + 1;
+      return `<line x1="${x}" y1="${y}" x2="${x}" y2="${y-6*s}" stroke-width="2" style="stroke:var(--stick)"/><path d="M${P(x-7*s,y-5*s)}L${P(x,y-21*s)}L${P(x+7*s,y-5*s)}ZM${P(x-5.5*s,y-12*s)}L${P(x,y-27*s)}L${P(x+5.5*s,y-12*s)}Z" style="fill:var(--tree)"/>`; }).join("");
+    const TK = [0, 3, 6];
+    q("ticks").innerHTML = TK.map(t => `<text id="v-tk${t}" x="${X(t)}" y="238">${t}</text>`).join("");
+    const st = {w: 7.4, f: -1, ph: 0, moving: 0, tan: false, arr: false, fog: true};
+
+    function draw(fromSlider){
+      const w = st.w, x = X(w), y = gy(w), g = G(w), L = Lf(w);
+      const [x0, vr] = E.view(x);
+      sa("lz", {x: (vr - 6).toFixed(1)}); sa("lax", {x: (x0 + 11).toFixed(1), transform: `rotate(-90 ${(x0 + 11).toFixed(1)} 112)`});
+      if (!st.moving && Math.abs(g) > 0.15) st.f = -Math.sign(g);
+      const f = st.f;
+      // путник: ноги на склоне, шаг по фазе ph
+      const s = 0.15 * Math.sin(st.ph), fa = cw(w + s*f), fb = cw(w - s*f), ax = X(fa), ay = gy(fa), bx = X(fb), by = gy(fb);
+      const hy = (ay + by) / 2 - 15 + Math.abs(Math.sin(st.ph)) * 1.2;
+      const leg = (fx, fy) => "M" + P(x, hy) + "L" + P((x + fx) / 2 + f * 2.5, (hy + fy) / 2) + "L" + P(fx, fy) + "l" + (f * 3.5).toFixed(1) + " 0";
+      sa("legA", {d: leg(ax, ay)}); sa("legB", {d: leg(bx, by)});
+      const sx = x + f * 1.5, sy = hy - 13;
+      sa("torso", {d: "M" + P(x, hy) + "L" + P(sx, sy)});
+      sa("pack", {x: (x - f * 5 - 3.25).toFixed(1), y: (hy - 14.5).toFixed(1)});
+      const hx = x + f * 2.2, hh = hy - 20.5; sa("head", {cx: hx.toFixed(1), cy: hh.toFixed(1)});
+      sa("hat", {d: "M" + P(hx - 5, hh - 0.8) + "A5 5 0 0 1 " + P(hx + 5, hh - 0.8) + "Z"});
+      const tw = cw(w + f * 0.6), tx = X(tw), ty = gy(tw), hx2 = x + f * 7.5, hy2 = hy - 6;
+      sa("stick", {x1: tx.toFixed(1), y1: ty.toFixed(1), x2: (hx2 + (hx2 - tx) * 0.3).toFixed(1), y2: (hy2 + (hy2 - ty) * 0.3).toFixed(1)});
+      sa("arm", {d: "M" + P(sx, sy + 1) + "L" + P(hx2, hy2)});
+      // L — высота над дном
+      const showL = L > 0.6, lt = "L = " + n1(L), lw = lt.length * 7.3, mid = (y + 200) / 2 + 4;
+      sa("Lm", {x1: x, y1: (y + 3).toFixed(1), x2: x, y2: 200, opacity: showL ? 1 : 0});
+      sa("Lt", {x1: x - 4, y1: 200, x2: x + 4, y2: 200, opacity: showL ? 1 : 0});
+      let lx, ly = mid, anc;
+      if (L < 9){ lx = x - 31; ly = 211; anc = "end"; }
+      else if (g > 0.05){ lx = x + 7; anc = "start"; }
+      else if (x - 7 - lw > x0 + 2){ lx = x - 7; anc = "end"; }
+      else { lx = x + 7; anc = "start"; ly = Math.max(mid, y + 27 * Math.abs(g * KX) + 16); }
+      sa("Ll", {x: lx.toFixed(1), y: (L >= 9 ? Math.min(ly, 197) : ly).toFixed(1), "text-anchor": anc});
+      q("Ll").textContent = L < 0.05 ? "L ≈ 0" : lt;
+      // w — метка на оси
+      sa("wd", {x1: x, y1: 200, x2: x, y2: 214});
+      sa("ptr", {d: "M" + P(x, 215) + "L" + P(x - 5, 223) + "L" + P(x + 5, 223) + "Z"});
+      const wx = Math.min(vr - 72, Math.max(x0 + 34, x));
+      sa("wl", {x: wx.toFixed(1), y: 238}); q("wl").textContent = "w = " + n1(w);
+      TK.forEach(t => { q("tk" + t).style.opacity = Math.abs(X(t) - wx) < 40 ? 0 : 1; });
+      // dL/dw — треугольник наклона: шаг на 1 вправо и на сколько изменилась высота
+      const k = g * KX, ty2 = y - 27 * k;
+      sa("triP", {d: "M" + P(x, y) + "L" + P(x + 27, y) + "L" + P(x + 27, ty2) + "Z"});
+      sa("hleg", {x1: x, y1: y, x2: x + 27, y2: y}); sa("vleg", {x1: x + 27, y1: y, x2: x + 27, y2: ty2});
+      sa("tang", {x1: (x - 28).toFixed(1), y1: (y + 28 * k).toFixed(1), x2: (x + 27).toFixed(1), y2: ty2.toFixed(1)});
+      sa("lab1", {x: (x + 13.5).toFixed(1), y: (y + 12).toFixed(1)});
+      const vm = y - 13.5 * k;
+      sa("lab2a", {x: (x + 31).toFixed(1), y: (vm - 2).toFixed(1)}); sa("lab2b", {x: (x + 31).toFixed(1), y: (vm + 12).toFixed(1)});
+      q("lab2b").textContent = sg1(g);
+      const big = Math.abs(g) >= 0.4;
+      q("lab2a").style.opacity = q("lab2b").style.opacity = big ? 1 : 0;
+      q("lab1").style.opacity = g >= 2.5 ? 1 : 0;
+      q("dno").style.opacity = Math.abs(x - BOT) < 70 ? 0 : 1;
+      sa("tri", {opacity: st.tan ? 1 : 0});
+      // стрелка «куда шагать»: против наклона, длина — по крутизне
+      const dir = Math.abs(g) < 0.15 ? 0 : -Math.sign(g), len = Math.min(16 + Math.abs(g) * 5, 62), ay3 = hy - 38;
+      sa("arr", {x1: x, y1: ay3, x2: x + dir * len, y2: ay3, opacity: dir ? 1 : 0});
+      sa("arrL", {x: Math.min(vr - 60, Math.max(x0 + 60, x + dir * len / 2)).toFixed(1), y: (ay3 - 9).toFixed(1)});
+      q("arrL").textContent = dir > 0 ? "увеличиваем w" : dir < 0 ? "уменьшаем w" : "мы на дне";
+      sa("arrG", {opacity: st.arr ? 1 : 0});
+      // туман: светлое «окно» вокруг путника
+      const fy = hy - 6;
+      [[1,48],[2,66],[3,88]].forEach(([n, r]) => sa("fg" + n, {d: `M-400 -300H760V214H-400ZM${(x - r).toFixed(1)} ${fy.toFixed(1)}a${r} ${r} 0 1 0 ${2*r} 0a${r} ${r} 0 1 0 ${-2*r} 0Z`}));
+      q("fog").style.opacity = st.fog ? 1 : 0;
+      // плашки
+      E.val(0, n1(w)); E.val(1, n1(L)); E.val(2, st.tan ? sg1(g) : "?");
+      E.val(3, st.tan ? (Math.abs(g) < 0.15 ? "мы на дне" : g > 0 ? "← уменьшать w" : "увеличивать w →") : "—");
+      if (!fromSlider) E.sl.value = w.toFixed(2);
+    }
+    function go(to, ms, id){
+      const a = st.w; ms = ms || Math.max(500, Math.abs(to - a) * 480);
+      return new Promise(res => {
+        if (!E.live(id)) return res();
+        const t0 = performance.now(); let pv = a; st.moving = Math.sign(to - a); if (st.moving) st.f = st.moving;
+        function fr(t){
+          if (!E.live(id)){ st.moving = 0; return res(); }
+          let p = Math.min((t - t0) / ms, 1); p = p < .5 ? 2*p*p : 1 - (-2*p + 2) ** 2 / 2;
+          st.w = a + (to - a) * p; st.ph += Math.abs(st.w - pv) * 7; pv = st.w; draw();
+          if (p < 1) requestAnimationFrame(fr); else { st.moving = 0; draw(); res(); }
+        }
+        requestAnimationFrame(fr);
+      });
+    }
+    const stepOnce = id => Math.abs(G(st.w)) > 0.1 ? go(st.w - 0.3 * G(st.w), 460, id) : Promise.resolve();
+    async function descend(id){
+      while (E.live(id) && Math.abs(G(st.w)) > 0.1){ await stepOnce(id); await E.wait(120); }
+      if (E.live(id)){ st.w = 3; draw(); }
+    }
+    return {
+      draw,
+      async step(s, id){
+        st.tan = !!s.tan; st.arr = !!s.arr; st.fog = s.fog !== false; draw();
+        const plan = s.go == null ? [] : [].concat(s.go);
+        for (const p of plan){
+          if (!E.live(id)) return;
+          if (p === "pause") await E.wait(1300);
+          else if (p === "descend"){ if (Math.abs(st.w - 3) < 1.5) await go(6.6, 0, id); await descend(id); }
+          else await go(p, 0, id);
+        }
+      },
+      slide(v){ st.ph += Math.abs(v - st.w) * 7; st.moving = 0; st.w = v; st.tan = st.arr = true; draw(true); },
+      action(a, id){ st.tan = st.arr = true; draw(); if (a === "step") stepOnce(id); else descend(id); }
+    };
+  }
+};
+
 /* ================= Урок ================= */
 function renderLesson(id){
   const L = LESSONS[id-1];
@@ -1395,7 +1778,7 @@ function renderTheory(L, pane){
   const prev = LESSONS[L.id-2], next = LESSONS[L.id];
   pane.innerHTML = `<div class="need"><span class="nl">Зачем этот урок</span><p>${esc(L.need)}</p>
       <div class="path" aria-label="Путь курса">${prev ? pathChip(prev) + "→" : ""}${pathChip(L, true)}${next ? "→" + pathChip(next) : ""}</div></div>
-    <div class="intro">${L.intro.map(p => `<p>${p}</p>`).join("")}</div>
+    ${L.stand ? `<div id="standHost"></div>` : `<div class="intro">${L.intro.map(p => `<p>${p}</p>`).join("")}</div>`}
     <h3 class="blk">Что значат буквы</h3>${symTable(L)}
     <h3 class="blk">Разбор примера: ${esc(L.ex.t)}</h3>
     <ol class="steps">${L.ex.s.map(([f,e]) => `<li><code>${esc(f)}</code><p>${esc(e)}</p></li>`).join("")}</ol>
@@ -1404,6 +1787,7 @@ function renderTheory(L, pane){
     <p class="src"><b>Откуда:</b> ${esc(L.src)}</p>
     <button class="biglink" id="bl"><span><b>Общая картина</b><span>Как этот урок связан с остальными и с ChatGPT</span></span><i>→</i></button>
     <div class="next"><button class="btn" id="tt">К задачам →</button></div>`;
+  if (L.stand) renderStand(L, $("#standHost"));
   $("#tt").onclick = () => { LV.view = "tasks"; showView(L); window.scrollTo(0,0); };
   $("#bl").onclick = () => go("#big");
 }
