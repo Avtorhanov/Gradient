@@ -26,6 +26,7 @@
   --wall:#EFE7DB; --floor:#DCCFBD; --wood:#B5865B; --woodtop:#946641; --frame:#FBFCFD; --sky:#BFE2F5; --dusk:#2F3A66; --sun:#F5B83D; --cloud:#FFFFFF;
   --board:#FFFFFF; --glass:rgba(150,200,228,.26); --reg:#CBD3DD; --lcd:#E4F4EF; --apron:#4E6E60; --shirt:#FFFFFF; --pc1:#C67C5E; --pc2:#7E9A57; --pc3:#C9A23F; --scoop:#F2A7BA; --scoop2:#F1D9A0; --cup:#FFFFFF; --tea:#B7652E;
   --car:#F2B630; --carw:#BFD9EA; --road:#B9C1CB; --lane:#F8FAFC; --tyre:#2B313A; --dbk:#2B313A; --dbc:#F1E3C2; --dbr:#D6453D; --dbg:#3E9A5B;
+  --sf:#9A5B00; --curt:#A8323E; --cloth:#33506E; --water:#4FA3D8;
   --f-display:'Unbounded','Golos Text',system-ui,sans-serif;
   --f-body:'Golos Text',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --f-mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
@@ -42,6 +43,7 @@
     --wall:#212935; --floor:#181E27; --wood:#5E4530; --woodtop:#755639; --frame:#3A4656; --sky:#3B6E92; --dusk:#121830; --sun:#F2B544; --cloud:rgba(228,236,244,.85);
     --board:#121923; --glass:rgba(120,170,210,.15); --reg:#3A4656; --lcd:#0E1A1B; --apron:#7FA393; --shirt:#C9D3DD; --pc1:#D99376; --pc2:#93B06B; --pc3:#D8B456; --scoop:#E79AAE; --scoop2:#E6CF97; --cup:#D5DDE6; --tea:#E08A4F;
     --car:#E0A92E; --carw:#4A6F8C; --road:#2A3340; --lane:#7C8594; --tyre:#0B0F14; --dbk:#0B0F14; --dbc:#D9CBA8; --dbr:#E0605A; --dbg:#55B072;
+  --sf:#F0A84A; --curt:#7A2B35; --cloth:#24394F; --water:#3E8FC6;
     color-scheme:dark;
   }
 }
@@ -55,6 +57,7 @@
   --wall:#212935; --floor:#181E27; --wood:#5E4530; --woodtop:#755639; --frame:#3A4656; --sky:#3B6E92; --dusk:#121830; --sun:#F2B544; --cloud:rgba(228,236,244,.85);
   --board:#121923; --glass:rgba(120,170,210,.15); --reg:#3A4656; --lcd:#0E1A1B; --apron:#7FA393; --shirt:#C9D3DD; --pc1:#D99376; --pc2:#93B06B; --pc3:#D8B456; --scoop:#E79AAE; --scoop2:#E6CF97; --cup:#D5DDE6; --tea:#E08A4F;
   --car:#E0A92E; --carw:#4A6F8C; --road:#2A3340; --lane:#7C8594; --tyre:#0B0F14; --dbk:#0B0F14; --dbc:#D9CBA8; --dbr:#E0605A; --dbg:#55B072;
+  --sf:#F0A84A; --curt:#7A2B35; --cloth:#24394F; --water:#3E8FC6;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -228,6 +231,9 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible,
 .st-sw button{flex:1;min-width:0;border:0;background:none;border-radius:9px;padding:7px 6px;min-height:40px;font-size:14px;font-weight:600;color:var(--muted);-webkit-tap-highlight-color:transparent}
 .st-sw button.on{background:var(--c,var(--sw));color:var(--card)}
 .st-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.st-ctrl.c2{grid-template-columns:1fr 1fr;column-gap:14px}.st-ctrl.c2 .st-acts{grid-column:1/-1}
+.k-flow{stroke-dasharray:3 7;animation:kflow .55s linear infinite}@keyframes kflow{to{stroke-dashoffset:-10}}
+@media (prefers-reduced-motion:reduce){.k-flow{animation:none}}
 .stand.fs{position:fixed;inset:0;z-index:60;margin:0;background:var(--paper);overflow:hidden;padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
 .stand.fs .st-scene{flex:1;min-height:0}
 .stand.fs .st-scene svg{height:100%}
@@ -1023,6 +1029,28 @@ const LESSONS = [
     ["ŷ = 81","Вес подготовки больше: для модели час учёбы важнее часа сна."]]},
   analog:"Жюри на конкурсе: голосуют все, но голос председателя весит больше. Итог — взвешенная сумма голосов.",
   src:"Траск, гл. 3 и 5 (несколько входов, взвешенная сумма, скалярное произведение). Принс, гл. 3.",
+  stand:{scene:"jury", steps:[
+    {t:"До сих пор у модели был один вход. Но в жизни ответ зависит от многих вещей сразу: оценка за экзамен — от часов подготовки, часов сна, посещаемости. Каждый такой вход нумеруют: <b style=\"color:var(--sx)\">x₁, x₂, x₃…</b> На конкурсе так же: итог зависит от всего жюри, и оценка каждого судьи — свой вход. Председатель поднял <b style=\"color:var(--sx)\">x₁</b> = 5, член жюри — <b style=\"color:var(--sx)\">x₂</b> = 7.",
+     go:["down", {x1:5, x2:7, w1:8, w2:3}, "up"]},
+    {t:"У каждого входа свой вес: <b style=\"color:var(--sw)\">w₁, w₂</b>. Голос председателя весит больше: <b style=\"color:var(--sw)\">w₁</b> = 8, у члена жюри <b style=\"color:var(--sw)\">w₂</b> = 3 — это таблички на столе. Каждый голос умножают на его вес: w₁·x₁ = 8·5 = 40, w₂·x₂ = 3·7 = 21. Каждое произведение летит на табло своей полоской.",
+     go:[{x1:5, x2:7, w1:8, w2:3}, "up1", "count"],
+     ex:[["Принс, гл. 3","Когда входов два, автор рисует сумму θ₀ + θ₁·x₁ + θ₂·x₂ уже не линией, а наклонной плоскостью над картой входов. У каждого входа свой наклон — свой вес: вдоль одного входа плоскость может подниматься круто, вдоль другого почти не меняться."]]},
+    {t:"Потом всё складывают и прибавляют сдвиг: <b style=\"color:var(--syh)\">ŷ</b> = w₁·x₁ + w₂·x₂ + <b style=\"color:var(--sb)\">b</b>. Стартовые 20 баллов есть у каждого участника ещё до голосования — это b. Полоски встают в ряд, и длина ряда — итог: 20 + 40 + 21 = 81.",
+     go:[{x1:5, x2:7, w1:8, w2:3}, "counted", "sum"]},
+    {t:"В разборе примера — то же жюри. «Председатель» — часы подготовки <b style=\"color:var(--sx)\">x₁</b> = 5 с весом 8, «член жюри» — часы сна <b style=\"color:var(--sx)\">x₂</b> = 7 с весом 3, базовый балл <b style=\"color:var(--sb)\">b</b> = 20. Прогноз: 8·5 + 3·7 + 20 = 81. Вес подготовки больше: для модели час учёбы важнее часа сна.",
+     go:[{x1:5, x2:7, w1:8, w2:3}, "full"]},
+    {t:"Это называют взвешенной суммой. Σ («сигма») — знак суммы: <b style=\"color:var(--sw)\">Σ wᵢ·xᵢ</b> значит «сложить все wᵢ·xᵢ». Вес показывает важность входа: чем больше он по модулю, тем сильнее вход влияет. Другой участник: 9 от председателя и 2 от члена жюри — 72 + 6 + 20 = 98. Наоборот, 2 и 9 — 16 + 27 + 20 = 63. Оценки те же, а итог решает председатель.",
+     go:[{x1:5, x2:7, w1:8, w2:3}, "full", "pause", {x1:9, x2:2}, "pause", {x1:2, x2:9}],
+     ex:[["Принс, гл. 3","В общем виде автор записывает нейрон так: сдвиг плюс сумма Σ по всем входам, где каждый вход умножен на свой параметр. Входов может быть два или тысяча — запись одна и та же: знак суммы избавляет от длинной строки «+ … + … + …»."]]},
+    {code:true, t:"В коде входы и веса хранят списками-векторами: <b style=\"color:var(--sx)\">x</b> = [5, 7], <b style=\"color:var(--sw)\">w</b> = [8, 3]. Взвешенную сумму считают одной командой <b>x @ w</b> — скалярное произведение: перемножить числа на одинаковых местах и сложить, 5·8 + 7·3 = 61. Хоть два входа, хоть тысяча — запись та же.",
+     go:[{x1:5, x2:7, w1:8, w2:3}, "full"],
+     ex:[["Траск, гл. 3","Сначала автор пишет взвешенную сумму сам, циклом: пройти по парам «вход и вес», перемножить, накопить. Потом показывает, что это и есть скалярное произведение векторов, которое библиотека numpy считает одной командой. И замечает: у двух наборов из нулей и единиц скалярное произведение большое, когда единицы стоят на одних местах, и нулевое, когда не совпадают нигде, — так что это ещё и мера похожести."]]},
+    {look:true, t:"Чек в магазине — та же взвешенная сумма. В каждой строке количество — вход, цена — вес: 2 кг яблок по 150 ₽ и 3 пакета молока по 90 ₽ — это 300 + 270 = 570 ₽. Доставка 100 ₽ — сдвиг: её платят при любой корзине. Итого 670 ₽. Строк в чеке может быть сколько угодно — Σ сложит все.",
+     go:["vote"]},
+    {look:true, t:"Вес 0 — голос не считается. Поставим члену жюри <b style=\"color:var(--sw)\">w₂</b> = 0: ставит он 1 или 10 — его полоски нет, итог не меняется. Так модель учится не замечать бесполезный вход. Покрутите ползунки: одна и та же оценка даёт длинную полоску при большом весе и короткую — при маленьком.",
+     go:[{x1:5, x2:7, w1:8, w2:3}, "full", "pause", {w2:0}, "pause", {x2:1}, "pause", {x2:10}],
+     ex:[["Траск, гл. 3","В примере автора у трёх входов веса 0,1, 0,2 и 0. Прогноз: 8,5·0,1 + 0,65·0,2 + 1,2·0 = 0,85 + 0,13 + 0 = 0,98. Число болельщиков в прогноз не попадает совсем: как бы оно ни менялось, умножение на ноль даёт ноль."]]}
+  ]},
   tasks:[
     {t:"num", q:"ŷ = 8·x₁ + 3·x₂ + 20. Посчитайте прогноз при x₁ = 2, x₂ = 8.", a:60, hint:"8·2 + 3·8 + 20.", why:"16 + 24 + 20 = 60.", steps:["Вклад подготовки: 8 · 2 = 16.", "Вклад сна: 3 · 8 = 24.", "Складываем всё со сдвигом: 16 + 24 + 20 = 60."], idea:"Каждый вход вносит свою долю, и доли складываются. Так модель учитывает сразу много вещей."},
     {t:"num", q:"Скалярное произведение: [1, 2] · [3, 4] = 1·3 + 2·4 = ?", a:11, hint:"Перемножьте попарно и сложите.", why:"3 + 8 = 11.", steps:["Перемножаем числа на одинаковых местах: 1 · 3 = 3 и 2 · 4 = 8.", "Складываем: 3 + 8 = 11."], idea:"Скалярное произведение — та же взвешенная сумма: входы × веса и всё сложить. Видеокарты считают его невероятно быстро."},
@@ -1049,6 +1077,29 @@ const LESSONS = [
     ["излом в x = 2","До x = 2 нейрон выключен, после — растёт прямой."]]},
   analog:"ReLU — как кран с порогом: пока давление ниже нуля, вода не течёт; выше — течёт пропорционально давлению. Много кранов с разными порогами вместе дают поток любой формы.",
   src:"Принс, гл. 3 (неглубокие сети: ReLU, изломы, кусочно-линейные функции). Траск, гл. 9 (функции активации).",
+  stand:{scene:"tap", steps:[
+    {plain:true, t:"Взвешенная сумма рисует только прямую. Пунктир на доске — сумма <b style=\"color:var(--syh)\">z</b> = <b style=\"color:var(--sw)\">w</b>·<b style=\"color:var(--sx)\">x</b> + <b style=\"color:var(--sb)\">b</b>: сколько ни крути w и b, меняются наклон и высота, а изгиба нет. Но мир не прямой: кошку от собаки одной прямой не отделишь.",
+     go:[{x:0, w:1, b:-2}, "pause", {w:-0.5, b:-1}, "pause", {w:1.5, b:-5}, "pause", {w:1, b:-2}],
+     ex:[["Принс, гл. 3","Автор начинает главу с того же: линейная регрессия из прошлой главы описывает связь входа и выхода только прямой. Неглубокие нейросети описывают ломаные — и этого уже хватает, чтобы как угодно точно приблизить очень сложную зависимость."]]},
+    {t:"Решение — пропустить сумму через функцию-изгиб <b style=\"color:var(--sf)\">f</b>, её называют функцией активации. Самая популярная — <b style=\"color:var(--sf)\">ReLU(z)</b> = max(0, z): всё отрицательное превращает в 0, положительное оставляет как есть. Как кран с пружиной: пока <b style=\"color:var(--syh)\">z</b> меньше нуля, пружина держит клапан и вода не течёт; выше нуля — течёт, и тем сильнее, чем больше z.",
+     go:["one", {w:1, b:-2}, "pump"],
+     ex:[["Траск, гл. 9","Автор перечисляет, какой должна быть хорошая функция активации: непрерывной — давать ответ на любой вход; монотонной — не менять направление; нелинейной — с изгибом; и быстро считаться вместе со своей производной. ReLU подходит под все четыре условия: это просто сравнение с нулём."]]},
+    {t:"Разбор примера: <b style=\"color:var(--sw)\">w</b> = 1, <b style=\"color:var(--sb)\">b</b> = −2. Стрелка манометра — давление насоса w·x, розовая метка — пружина: она держит 2. Нажим <b style=\"color:var(--sx)\">x</b> = 1: <b style=\"color:var(--syh)\">z</b> = 1·1 − 2 = −1, давление пружину не пересилило, ReLU(−1) = 0 — нейрон молчит, кран сухой. Нажим x = 5: z = 3, и ReLU(3) = 3 — проходит как есть.",
+     go:["one", {x:1, w:1, b:-2}, "pause", {x:5}]},
+    {kink:true, t:"Взвешенная сумма + активация = <b>нейрон</b>. Он рисует ломаную с одним изломом: до излома 0, после — прямая. Излом там, где w·x + b = 0, то есть при x = <b style=\"color:var(--sb)\">−b/w</b> = 2: здесь давление насоса ровно уравновешивает пружину.",
+     go:["one", {x:0, w:1, b:-2}, {x:2}, "pause", {x:4}],
+     ex:[["Принс, гл. 3","Нейрон у автора бывает активным — когда его сумма больше нуля — и неактивным, когда ReLU срезает её до нуля. Там, где нейрон переключается, у графика сети появляется излом. Сеть из трёх нейронов рисует ломаную из четырёх кусков, и какой кусок где, решает, какие нейроны сейчас активны."]]},
+    {t:"Где излом, решают <b style=\"color:var(--sw)\">w</b> и <b style=\"color:var(--sb)\">b</b>. Пружина туже, b = −4, — кран откроется только при x = 4. Насос вдвое сильнее, w = 2, — тот же порог берётся уже при x = 2. А при отрицательном w насос работает наоборот: чем сильнее нажим, тем ниже давление, и ломаная смотрит влево — вода течёт только при малых x.",
+     go:["one", {x:5, w:1, b:-2}, "pause", {b:-4}, "pause", {w:2}, "pause", {w:-1, b:2}, "pause", {x:1}],
+     ex:[["Принс, гл. 3","У автора параметры нейронов решают, где у ломаной изломы и какой наклон у каждого куска. Обучение подбирает эти параметры — а значит, и расставляет изломы."]]},
+    {t:"Если сложить несколько таких ломаных, можно согнуть любую форму, как из кусочков проволоки. Второй кран на той же трубе, но пружина у него туже: b₂ = −4. Первый открывается при x = 2, второй — при x = 4. Вместе поток сначала 0, потом растёт, потом растёт вдвое быстрее — линия гнётся.",
+     go:[{x:0, w:1, b:-2}, "two", "pump"],
+     ex:[["Принс, гл. 3","Автор приводит теорему об универсальной аппроксимации: если нейронов достаточно, неглубокая сеть может сколь угодно точно повторить любую непрерывную функцию. Чем больше нейронов, тем больше изломов и тем ближе ломаная к нужной кривой."]]},
+    {look:true, t:"Премия продавца: 10 % от продаж сверх плана в 100 тысяч. Продал на 80 тысяч — премия 0, а не минус: в долг за недобор не загоняют. Продал на 150 — премия 5 тысяч, и каждая следующая тысяча продаж добавляет 100 ₽. План — это излом, а премия — ReLU: ниже порога ноль, выше — прямая.",
+     go:["one", {w:1, b:-2}, "pump"]},
+    {look:true, t:"ReLU — как пол под наклонной доской: всё, что ниже нуля, ложится на пол, что выше — остаётся как было. Покрутите ползунки: <b style=\"color:var(--sb)\">b</b> двигает излом влево-вправо, <b style=\"color:var(--sw)\">w</b> меняет крутизну, а его знак решает, с какой стороны от излома течёт вода.",
+     go:["one", {x:5, w:1, b:-2}]}
+  ]},
   tasks:[
     {t:"num", q:"ReLU(−3) = ?", a:0, hint:"Отрицательное превращается в…", why:"max(0, −3) = 0.", steps:["ReLU(z) = max(0, z): выбираем большее из двух чисел — 0 или z.", "Из 0 и −3 больше 0.", "Значит, ReLU(−3) = 0: отрицательное превращается в ноль."], idea:"Нейрон с отрицательной суммой «молчит» — не передаёт сигнал дальше."},
     {t:"num", q:"ReLU(2,5) = ?", a:2.5, hint:"Положительное проходит без изменений.", why:"max(0; 2,5) = 2,5.", steps:["Из 0 и 2,5 больше 2,5.", "Положительное число проходит без изменений: ReLU(2,5) = 2,5."], idea:"ReLU очень проста: отрезает минус и пропускает плюс. Простота — одна из причин, почему её так любят."},
@@ -1643,7 +1694,7 @@ function renderStand(L, host){
     </div>
     <div class="st-scene" id="stScene">${sc.svg}<button class="st-fs" id="stFs" aria-label="На весь экран">${ST_ICO.open}</button></div>
     <div class="st-vals">${sc.vals.map(([k,l,col,tx],i) => `<div class="st-v" style="--c:var(${col})"><div class="l"><b>${esc(k)}</b> ${esc(l)}</div><div class="v${tx?" tx":""}" id="stV${i}"></div></div>`).join("")}</div>
-    <div class="st-ctrl">${ctrlHTML}
+    <div class="st-ctrl${sc.cols === 2 ? " c2" : ""}">${ctrlHTML}
       <div class="st-acts">${sc.acts.map(([id,t]) => `<button class="btn ghost" data-act="${id}">${esc(t)}</button>`).join("")}</div>
     </div></div>`;
   const root = $("#stand", host);
@@ -2200,7 +2251,6 @@ SCENES.cafe = {
   <circle id="c-hand" r="2.6" stroke="none" style="fill:var(--skin)"/>
   <circle id="c-head" r="7.5" stroke="none" style="fill:var(--skin)"/>
   <path id="c-hat" stroke="none" style="fill:var(--shirt)"/>
-  <circle id="c-eye" r="1.1" stroke="none" style="fill:var(--ink)"/>
 </g>
 <rect x="-400" y="165" width="1160" height="7" style="fill:var(--woodtop)"/>
 <rect x="-400" y="172" width="1160" height="66" style="fill:var(--wood)"/>
@@ -2289,7 +2339,7 @@ SCENES.cafe = {
     function barista(){
       const p = POSE[st.pose], f = p.f, bx = st.bx, hx = bx + f * 1.3, sx = bx + f * 1.5, sy = 137;
       sa("tor", {d: "M" + P(bx, 170) + "L" + P(bx, 136)});
-      sa("head", {cx: hx.toFixed(1), cy: 122}); sa("eye", {cx: (hx + f * 3.6).toFixed(1), cy: 121.5});
+      sa("head", {cx: hx.toFixed(1), cy: 122});
       sa("hat", {d: "M" + P(hx - 7.6, 119) + "L" + P(hx - 6, 111) + "H" + (hx + 6).toFixed(1) + "L" + P(hx + 7.6, 119) + "Z"});
       let [hx2, hy2] = p.hand || [bx + f * 8, 165], dx = hx2 - sx, dy = hy2 - sy, d = Math.hypot(dx, dy);
       if (d > 29){ hx2 = sx + dx * 29 / d; hy2 = sy + dy * 29 / d; dx = hx2 - sx; dy = hy2 - sy; d = 29; }
@@ -2700,7 +2750,6 @@ SCENES.darts = {
   <path id="d-tor" stroke-width="12" style="stroke:var(--pc2)"/>
   <circle id="d-head" r="7.5" stroke="none" style="fill:var(--skin)"/>
   <path id="d-hair" stroke="none" style="fill:var(--pants)"/>
-  <circle id="d-eye" r="1.1" stroke="none" style="fill:var(--ink)"/>
   <path id="d-arm" stroke-width="4.5" style="stroke:var(--pc2)"/>
   <circle id="d-hand" r="2.6" stroke="none" style="fill:var(--skin)"/>
 </g>
@@ -2740,7 +2789,7 @@ SCENES.darts = {
       const a = st.arm;   // −1 — замах, 0 — прицел, 1 — бросок
       sa("legs", {d: "M34 198L28 236M34 198L43 222L46 236"});
       sa("tor", {d: "M34 198L35 167"}); sa("arm2", {d: "M35 171L29 184L31 196"});
-      sa("head", {cx: 37, cy: 156}); sa("eye", {cx: 41, cy: 155});
+      sa("head", {cx: 37, cy: 156});
       sa("hair", {d: "M29.4 155.5a7.6 7.6 0 0 1 15.2 -1c-4-3-10-3-13 1Z"});
       const hx = 54 + a * 9, hy = 153 + (a < 0 ? a * 4 : a * 9), ex = 44 + (a < 0 ? a * 4 : a * 3), ey = 170 + (a < 0 ? a * 2 : a);
       sa("arm", {d: "M36 170L" + P(ex, ey) + "L" + P(hx, hy)}); sa("hand", {cx: hx.toFixed(1), cy: hy.toFixed(1)});
@@ -2928,7 +2977,6 @@ SCENES.range = {
   <circle cx="66" cy="141" r="8" stroke="none" style="fill:var(--skin)"/>
   <path d="M58.3 139.5a7.8 7.8 0 0 1 15.4 -1.8l5.2 .8l-.8 1.6Z" stroke="none" style="fill:var(--apron)"/>
   <rect x="59" y="138.5" width="6" height="8.5" rx="2.6" stroke="none" style="fill:var(--dbr)"/>
-  <circle cx="71.5" cy="141.5" r="1.1" stroke="none" style="fill:var(--ink)"/>
   <path id="s-arm" stroke-width="5" style="stroke:var(--pc1)"/>
   <circle id="s-hand" r="3" stroke="none" style="fill:var(--skin)"/>
 </g>
@@ -3175,6 +3223,497 @@ SCENES.range = {
       step(s, id){ st.fly = null; st.rc = 0; st.hand = 0; st.turn = null; draw(); return run([].concat(s.go == null ? [] : s.go), id); },
       slide(v){ st.eta = v; st.fly = null; st.rc = 0; st.hand = 0; st.turn = null; path(); draw(true); },
       action(a, id){ st.fly = null; st.rc = 0; st.hand = 0; if (st.turn){ st.turn = null; st.stage = 0; } if (a === "cycle") cycle(id); else train(id); }
+    };
+  }
+};
+
+/* ---------- Сцена «Жюри»: урок Σ ----------
+   Финал конкурса: председатель и член жюри поднимают таблички с оценками x₁ и x₂, вес голоса w₁, w₂ — на табличках на столе.
+   Голос × вес становится фиолетовой полоской и летит на табло; полоски встают в ряд за розовой полоской стартовых баллов b,
+   длина ряда — итог ŷ = w₁·x₁ + w₂·x₂ + b. Числа — из разбора урока: 8·5 + 3·7 + 20 = 81.
+   Шкала табло 0…220 баллов (1,2 единицы картинки на балл): столько даёт 10·10 + 10·10 + 20 — ползунки в крайних положениях. */
+SCENES.jury = {
+  vb: [0, 0, 360, 262], camMin: 360, cols: 2,
+  vals: [["w₁·x₁","председатель","--sw"],["w₂·x₂","член жюри","--sw"],["Σ","взвешенная сумма","--sw"],["ŷ","итог: Σ + b","--syh"]],
+  ctrl: [{k:"x₁", min:0, max:10, step:1, col:"--sx"}, {k:"w₁", min:0, max:10, step:1, col:"--sw"},
+         {k:"x₂", min:0, max:10, step:1, col:"--sx"}, {k:"w₂", min:0, max:10, step:1, col:"--sw"}],
+  acts: [["vote","▶ Голосуем"],["next","Следующий"]],
+  svg: `<svg viewBox="0 0 360 262" role="img" aria-label="Жюри конкурса. Судьи поднимают таблички с оценками x, на столе — вес голоса каждого судьи w. Голос, умноженный на вес, становится полоской на табло; полоски складываются со стартовыми баллами b в итог ŷ.">
+<rect x="-400" y="-400" width="1160" height="636" style="fill:var(--wall)"/>
+<rect x="-400" y="236" width="1160" height="426" style="fill:var(--floor)"/>
+<path d="M-400 236H760" stroke-width="2" style="stroke:var(--woodtop)"/>
+<path d="M70 -400V-34M290 -400V-34" stroke-width="1.2" style="stroke:var(--muted)"/>
+<path d="M60 -34h20l5 13h-30ZM280 -34h20l5 13h-30Z" style="fill:var(--tyre)"/>
+<path d="M58 -21l-20 40h64l-20-40ZM278 -21l-20 40h64l-20-40Z" style="fill:var(--sun)" opacity=".13"/>
+<text x="180" y="-52" text-anchor="middle" class="deco" style="fill:var(--curt);font-family:var(--f-display);font-size:15px;font-weight:700;letter-spacing:.04em">ФИНАЛ</text>
+<path d="M-400 -400H22C20 -200 14 60 15 140C16 190 22 216 28 236H-400Z" style="fill:var(--curt)"/>
+<path d="M760 -400H338C340 -200 346 60 345 140C344 190 338 216 332 236H760Z" style="fill:var(--curt)"/>
+<path d="M6 -400V236M-6 -400V236M354 -400V236M366 -400V236" stroke-width="2.5" style="stroke:var(--ink)" opacity=".13"/>
+<rect x="8" y="4" width="344" height="80" rx="4" style="fill:var(--tyre)"/>
+<rect x="12" y="8" width="336" height="72" rx="2" style="fill:var(--board)"/>
+<text id="j-r1" x="180" y="22" text-anchor="middle" style="font-size:10.5px"></text>
+<text id="j-r2" x="180" y="37" text-anchor="middle" style="font-size:11.5px;font-weight:600"></text>
+<rect x="24" y="44" width="264" height="14" rx="2" style="fill:var(--line)" opacity=".6"/>
+<path d="M84 44v14M144 44v14M204 44v14M264 44v14" stroke-width="1" style="stroke:var(--board)"/>
+<rect id="j-sb" y="44" height="14" style="fill:var(--sb)"/>
+<rect id="j-s0" y="44" height="14" style="fill:var(--sw)"/>
+<rect id="j-s1" y="44" height="14" style="fill:var(--sw)" fill-opacity=".62"/>
+<line id="j-sep" y1="44" y2="58" stroke-width="1.4" style="stroke:var(--board)"/>
+<g text-anchor="middle" style="fill:var(--card);font-size:9.5px;font-weight:700"><text id="j-nb" y="54.5"></text><text id="j-n0" y="54.5"></text><text id="j-n1" y="54.5"></text></g>
+<path id="j-br" fill="none" stroke-width="1.4" stroke-linejoin="round" style="stroke:var(--sw)"/>
+<text id="j-sl" y="75" text-anchor="middle" class="lbb" style="fill:var(--sw);font-size:10px;font-weight:700"></text>
+<line id="j-ye" y1="40" y2="62" stroke-width="2.4" style="stroke:var(--syh)"/>
+<text id="j-yl" y="55" class="lbb" style="fill:var(--syh);font-size:11px;font-weight:700"></text>
+<path d="M84 186V124q0-12 12-12h16q12 0 12 12V186Z" style="fill:var(--wood)"/>
+<path d="M104 120l2.4 5h5.4l-4.3 3.2 1.6 5.3-5.1-3.2-5.1 3.2 1.6-5.3-4.3-3.2h5.4Z" style="fill:var(--sun)"/>
+<path d="M239 186V138q0-10 10-10h14q10 0 10 10V186Z" style="fill:var(--wood)"/>
+<g id="j-man" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M89 186V169q0-10 10-10h10q10 0 10 10V186Z" style="fill:var(--pants)"/>
+  <path d="M99 159l5 13 5-13Z" style="fill:var(--shirt)"/>
+  <path d="M100 162l4 2.4 4-2.4v5l-4-2.4-4 2.4Z" style="fill:var(--dbr)"/>
+  <path d="M92 165L86 178L96 182" fill="none" stroke-width="5" style="stroke:var(--pants)"/>
+  <circle cx="97" cy="182" r="2.8" style="fill:var(--skin)"/>
+  <circle cx="104" cy="147" r="9.5" style="fill:var(--skin)"/>
+  <path d="M94.6 146a9.5 9.5 0 0 1 18.8 0c-2-4-5-5.5-9.4-5.5s-7.4 1.5-9.4 5.5Z" style="fill:var(--stick)"/>
+  <path d="M241 186V170q0-10 10-10h10q10 0 10 10V186Z" style="fill:var(--pc1)"/>
+  <path d="M251 160l5 9 5-9Z" style="fill:var(--shirt)"/>
+  <path d="M268 166L274 179L264 182" fill="none" stroke-width="5" style="stroke:var(--pc1)"/>
+  <circle cx="263" cy="182" r="2.8" style="fill:var(--skin)"/>
+  <path d="M245 150q-1-15 11-15t11 15v8h-22Z" style="fill:var(--pack)"/>
+  <circle cx="256" cy="148" r="9.2" style="fill:var(--skin)"/>
+  <path d="M246.8 147a9.2 9.2 0 0 1 18.4 0c-4-1-9-3.5-11-7.5-1.5 3.5-4 6-7.4 7.5Z" style="fill:var(--pack)"/>
+  <path id="j-a0" fill="none" stroke-width="5" style="stroke:var(--pants)"/><circle id="j-h0" r="2.8" style="fill:var(--skin)"/>
+  <path id="j-a1" fill="none" stroke-width="5" style="stroke:var(--pc1)"/><circle id="j-h1" r="2.8" style="fill:var(--skin)"/>
+</g>
+<rect x="28" y="180" width="304" height="6" rx="1.5" style="fill:var(--woodtop)"/>
+<path d="M32 186H328V236H32Z" style="fill:var(--cloth)"/>
+<path d="M32 229H328" stroke-width="2" stroke-dasharray="6 3" style="stroke:var(--sun)" opacity=".8"/>
+<rect x="66" y="191" width="76" height="41" rx="3" style="fill:var(--board)"/>
+<rect x="218" y="191" width="76" height="41" rx="3" style="fill:var(--board)"/>
+<rect x="158" y="194" width="44" height="32" rx="3" style="fill:var(--board)"/>
+<text x="104" y="200.5" text-anchor="middle" class="deco" style="fill:var(--muted);font-size:8px">председатель</text>
+<text x="256" y="200.5" text-anchor="middle" class="deco" style="fill:var(--muted);font-size:8px">член жюри</text>
+<text x="180" y="203.5" text-anchor="middle" class="deco" style="fill:var(--muted);font-size:8px">старт</text>
+<text id="j-w0" x="104" y="213.5" text-anchor="middle" style="fill:var(--sw);font-size:11px;font-weight:700"></text>
+<text id="j-w1" x="256" y="213.5" text-anchor="middle" style="fill:var(--sw);font-size:11px;font-weight:700"></text>
+<text x="180" y="218" text-anchor="middle" style="fill:var(--sb);font-size:11px;font-weight:700">b = 20</text>
+<text id="j-p0" x="104" y="226.5" text-anchor="middle" style="fill:var(--sw);font-size:10px;font-weight:600"></text>
+<text id="j-p1" x="256" y="226.5" text-anchor="middle" style="fill:var(--sw);font-size:10px;font-weight:600"></text>
+<g id="j-c0"><path d="M0 12V20" stroke-width="2.4" style="stroke:var(--woodtop)"/><rect x="-15" y="-12" width="30" height="24" rx="3" stroke-width="1.2" style="fill:var(--board);stroke:var(--line)"/><text id="j-t0" y="5.5" text-anchor="middle" style="fill:var(--sx);font-size:15px;font-weight:700"></text></g>
+<g id="j-c1"><path d="M0 12V20" stroke-width="2.4" style="stroke:var(--woodtop)"/><rect x="-15" y="-12" width="30" height="24" rx="3" stroke-width="1.2" style="fill:var(--board);stroke:var(--line)"/><text id="j-t1" y="5.5" text-anchor="middle" style="fill:var(--sx);font-size:15px;font-weight:700"></text></g>
+<text id="j-l0" text-anchor="end" class="lb" style="fill:var(--sx);font-size:11px;font-weight:700">x₁</text>
+<text id="j-l1" class="lb" style="fill:var(--sx);font-size:11px;font-weight:700">x₂</text>
+<rect id="j-chip" rx="2" style="fill:var(--sw)" opacity="0"/>
+</svg>`,
+  init(E){
+    const QC = {}, q = id => QC[id] || (QC[id] = E.svg.querySelector("#j-" + id));
+    const sa = (id, o) => { const e = q(id); for (const k in o) e.setAttribute(k, o[k]); };
+    const tx = (id, t) => { const e = q(id); if (e.textContent !== t) e.textContent = t; };
+    const P = (x, y) => x.toFixed(1) + " " + y.toFixed(1);
+    const X0 = 24, K = 1.2, BY = 44, BH = 14, B = 20, CX = [104, 256], SD = [1, -1], SUB = ["₁", "₂"];
+    const PAIRS = [[5, 7], [9, 2], [2, 9]];
+    const KEY = {"x₁": ["x", 0], "x₂": ["x", 1], "w₁": ["w", 0], "w₂": ["w", 1]};
+    // ph: 0 — таблички на столе, 1 — оценки подняты, 2 — голос председателя на табло, 3 — оба голоса (Σ), 4 — итог ŷ
+    const st = {x: [5, 7], w: [8, 3], ph: 4, r: [1, 1], chip: null, code: false, pi: 0};
+    let rk = "";
+    const C = (c, t) => `<tspan style="fill:var(${c})">${t}</tspan>`, M = t => `<tspan style="fill:var(--muted)">${t}</tspan>`;
+
+    function draw(fromSlider){
+      E.view(180);
+      const [x1, x2] = st.x, [w1, w2] = st.w, p = [w1 * x1, w2 * x2], S = p[0] + p[1], Y = S + B, ph = st.ph;
+      const shown = i => ph >= i + 2 || (st.chip && st.chip.i >= i);   // произведение уже посчитано
+      // руки и таблички с оценками: r = 0 — на столе, 1 — подняты
+      for (let i = 0; i < 2; i++){
+        const cx = CX[i], s = SD[i], e = st.r[i];
+        const ex = cx + s * (20 + 7 * e), ey = 177 - 27 * e, hx = cx + s * (14 + 18 * e), hy = 181 - 51 * e;
+        sa("a" + i, {d: `M${P(cx + s * 12, 163)}L${P(ex, ey)}L${P(hx, hy)}`}); sa("h" + i, {cx: hx.toFixed(1), cy: hy.toFixed(1)});
+        const op = Math.max(0, Math.min(1, (e - 0.25) / 0.4)).toFixed(2);
+        sa("c" + i, {transform: `translate(${P(hx, hy - 20)})`, opacity: op}); tx("t" + i, String(st.x[i]));
+        sa("l" + i, {x: (hx - s * 19).toFixed(1), y: (hy - 16).toFixed(1), opacity: e > 0.85 ? 1 : 0});
+        tx("w" + i, `w${SUB[i]} = ${st.w[i]}`);
+        tx("p" + i, shown(i) ? `w${SUB[i]}·x${SUB[i]} = ${p[i]}` : "");
+      }
+      // табло: розовая полоска b, за ней голоса; длина ряда — итог
+      const xa = X0 + K * B, seg = [[xa, K * p[0]], [xa + K * p[0], K * p[1]]];
+      sa("sb", {x: X0, width: K * B});
+      for (let i = 0; i < 2; i++){ const on = ph >= i + 2 && seg[i][1] > 0.5;
+        sa("s" + i, {x: seg[i][0].toFixed(1), width: seg[i][1].toFixed(1), opacity: on ? 1 : 0});
+        const t = String(p[i]), fit = on && seg[i][1] >= t.length * 5.8 + 4;
+        sa("n" + i, {x: (seg[i][0] + seg[i][1] / 2).toFixed(1)}); tx("n" + i, fit ? t : ""); }
+      sa("nb", {x: (X0 + K * B / 2).toFixed(1)}); tx("nb", "20");
+      sa("sep", {x1: seg[1][0].toFixed(1), x2: seg[1][0].toFixed(1), opacity: ph >= 3 && p[0] > 0 && p[1] > 0 ? 1 : 0});
+      // Σ — скобка под двумя голосами
+      const xb = xa + K * S;
+      if (ph >= 3){
+        sa("br", {d: xb - xa > 4 ? `M${P(xa + 0.5, 61)}V64.5H${(xb - 0.5).toFixed(1)}V61` : `M${P(xa, 61)}V64.5`, opacity: 1});
+        const t = "Σ = " + S, w = t.length * 6;
+        sa("sl", {x: Math.min(346 - w / 2, Math.max(X0 + w / 2, (xa + xb) / 2)).toFixed(1)}); tx("sl", t);
+      } else { sa("br", {opacity: 0}); tx("sl", ""); }
+      // ŷ — конец ряда
+      const xe = X0 + K * Y;
+      sa("ye", {x1: xe.toFixed(1), x2: xe.toFixed(1), opacity: ph >= 4 ? 1 : 0});
+      sa("yl", {x: (xe + 5).toFixed(1)}); tx("yl", ph >= 4 ? "ŷ = " + Y : "");
+      // голос в полёте: полоска с таблички на столе → на своё место на табло
+      if (st.chip){ const i = st.chip.i, u = st.chip.u, a = [CX[i] - 30, 219, 60, 9], b = [seg[i][0], BY, Math.max(seg[i][1], 0.5), BH];
+        const L = k => a[k] + (b[k] - a[k]) * u;
+        sa("chip", {x: L(0).toFixed(1), y: (L(1) - Math.sin(u * Math.PI) * 18).toFixed(1), width: L(2).toFixed(1), height: L(3).toFixed(1), opacity: 0.92}); }
+      else sa("chip", {opacity: 0});
+      // строки табло
+      const W = i => C("--sw", st.w[i]), X = i => C("--sx", st.x[i]);
+      let r1;
+      const head = st.code ? C("--sx", "x") + M(" @ ") + C("--sw", "w") + M(" = ") + M("[") + X(0) + M(", ") + X(1) + M("] @ [") + W(0) + M(", ") + W(1) + M("]")
+                           : C("--sw", "Σ wᵢ·xᵢ") + M(" = ") + W(0) + M("·") + X(0) + M(" + ") + W(1) + M("·") + X(1);
+      if (ph < 1) r1 = C("--sw", st.code ? "x @ w" : "Σ wᵢ·xᵢ") + M(" = ?");
+      else if (ph === 1) r1 = head + M(" = ?");
+      else if (ph === 2) r1 = head + M(" = ") + C("--sw", p[0]) + M(" + ?");
+      else r1 = head + M(" = ") + C("--sw", p[0]) + M(" + ") + C("--sw", p[1]) + M(" = ") + C("--sw", S);
+      const r2 = ph < 4 ? C("--syh", "ŷ") + M(" = Σ + b = ?")
+        : C("--syh", "ŷ") + M(" = ") + C("--sw", "Σ") + M(" + ") + C("--sb", "b") + M(" = ") + C("--sw", S) + M(" + ") + C("--sb", B) + M(" = ") + C("--syh", Y);
+      if (r1 + r2 !== rk){ rk = r1 + r2; q("r1").innerHTML = r1; q("r2").innerHTML = r2; }
+      // плашки
+      E.val(0, shown(0) ? `${w1}·${x1} = ${p[0]}` : "?"); E.val(1, shown(1) ? `${w2}·${x2} = ${p[1]}` : "?");
+      E.val(2, ph >= 3 ? String(S) : "?"); E.val(3, ph >= 4 ? String(Y) : "?");
+      if (!fromSlider){ E.setCtrl("x₁", x1); E.setCtrl("x₂", x2); E.setCtrl("w₁", w1); E.setCtrl("w₂", w2); }
+    }
+
+    function anim(ms, id, fn){
+      return new Promise(res => {
+        if (!E.live(id)) return res();
+        const t0 = performance.now();
+        const fr = now => {
+          if (!E.live(id)) return res();
+          const p = Math.min((now - t0) / ms, 1); fn(p < .5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2, p); draw();
+          if (p < 1) requestAnimationFrame(fr); else res();
+        };
+        requestAnimationFrame(fr);
+      });
+    }
+    // числа на табличках — целые: при плавной смене они просто пересчитываются, как счётчик
+    function tween(o, id){
+      const a = {}, keys = Object.keys(o); let t = 0;
+      for (const k of keys){ const [f, i] = [k[0], +k[1] - 1]; a[k] = st[f][i]; t = Math.max(t, Math.abs(o[k] - a[k]) * 110); }
+      if (t < 1) return Promise.resolve();
+      return anim(Math.min(Math.max(t, 420), 1300), id, e => { for (const k of keys) st[k[0]][+k[1] - 1] = Math.round(a[k] + (o[k] - a[k]) * e); })
+        .then(() => { if (E.live(id)){ for (const k of keys) st[k[0]][+k[1] - 1] = o[k]; draw(); } });
+    }
+    async function raise(id, to, ms){
+      const r0 = st.r.slice();
+      await anim(ms || (to ? 700 : 380), id, e => { st.r[0] = r0[0] + (to - r0[0]) * Math.min(1, e * 1.5); st.r[1] = r0[1] + (to - r0[1]) * Math.max(0, e * 1.5 - 0.5); });
+    }
+    async function count(id, fast){
+      for (const i of [0, 1]){
+        if (!E.live(id)) return;
+        if (st.ph >= i + 2) continue;
+        st.ph = Math.max(st.ph, i + 1); st.chip = {i, u: 0}; draw();
+        await E.wait(fast ? 150 : 450);
+        await anim(fast ? 480 : 800, id, e => { st.chip.u = e; });
+        st.chip = null; if (!E.live(id)) return;
+        st.ph = i + 2; draw(); await E.wait(fast ? 120 : 350);
+      }
+    }
+    async function vote(id, fast){
+      if (st.r[0] > 0 || st.r[1] > 0){ st.ph = Math.min(st.ph, 1); await raise(id, 0); }
+      if (!E.live(id)) return;
+      st.ph = 0; st.chip = null; draw(); await E.wait(fast ? 150 : 350);
+      await raise(id, 1, fast ? 500 : 0); if (!E.live(id)) return;
+      st.ph = 1; draw(); await E.wait(fast ? 250 : 650);
+      await count(id, fast); if (!E.live(id)) return;
+      await E.wait(fast ? 150 : 300); st.ph = 4; draw();
+    }
+    async function next(id){
+      st.pi = (st.pi + 1) % PAIRS.length;
+      st.ph = Math.min(st.ph, 1); await raise(id, 0); if (!E.live(id)) return;
+      st.x = PAIRS[st.pi].slice(); await vote(id, true);
+    }
+    async function run(plan, id){
+      for (const p of plan){
+        if (!E.live(id)) return;
+        if (p === "pause") await E.wait(1300);
+        else if (p === "down"){ st.r = [0, 0]; st.ph = 0; draw(); }
+        else if (p === "up"){ st.ph = 0; await raise(id, 1); if (E.live(id)){ st.ph = 1; draw(); } }
+        else if (p === "up1"){ st.r = [1, 1]; st.ph = 1; draw(); }
+        else if (p === "count") await count(id);
+        else if (p === "counted"){ st.r = [1, 1]; st.ph = 3; draw(); }
+        else if (p === "sum"){ await E.wait(250); st.ph = 4; draw(); }
+        else if (p === "full"){ st.r = [1, 1]; st.ph = 4; draw(); }
+        else if (p === "vote") await vote(id);
+        else if (p === "next") await next(id);
+        else if (typeof p === "object") await tween(p, id);
+      }
+    }
+    return {
+      draw,
+      step(s, id){ st.chip = null; st.code = !!s.code; draw(); return run([].concat(s.go == null ? [] : s.go), id); },
+      slide(v, k){ const [f, i] = KEY[k]; st[f][i] = Math.round(v); st.ph = 4; st.r = [1, 1]; st.chip = null; draw(true); },
+      action(a, id){ st.chip = null; run([a === "vote" ? "vote" : "next"], id); }
+    };
+  }
+};
+
+/* ---------- Сцена «Кран с порогом»: урок f ----------
+   Садовник жмёт на рычаг насоса: нажим — вход x. Насос даёт давление w·x (стрелка манометра), пружина клапана держит b
+   (розовая метка на манометре: при b = −2 клапан откроется, когда давление перевалит за 2). z = w·x + b — насколько
+   давление перевесило пружину (бирюзовая дуга). Кран льёт ReLU(z) = max(0, z): при z ≤ 0 сухо, выше — струя тем толще,
+   чем больше z. Справа доска: пунктир — сумма z, сплошная — ReLU(z), излом в x = −b/w.
+   «Два крана»: на той же трубе второй клапан с пружиной на 2 туже (b₂ = b − 2), оба льют в одно корыто —
+   на доске сумма двух ломаных с двумя изломами. Числа — из разбора урока: w = 1, b = −2. */
+SCENES.tap = {
+  vb: [0, 0, 360, 262], camMin: 360,
+  vals: [["x","нажим на рычаг","--sx"],["z","сумма w·x + b","--syh"],["ReLU(z)","поток из крана","--sf"],["−b/w","где излом","--sb"]],
+  ctrl: [{k:"w", min:-2, max:2, step:0.25, col:"--sw"}, {k:"b", min:-6, max:4, step:0.5, col:"--sb"}],
+  acts: [["pump","▶ Качать"],["two","Второй кран"]],
+  svg: `<svg viewBox="0 0 360 262" role="img" aria-label="Кран с порогом. Садовник жмёт на рычаг насоса — вход x. Насос даёт давление w·x, пружина клапана держит b. Вода течёт, только когда z = w·x + b больше нуля, и тем сильнее, чем больше z: поток ReLU(z). На доске — прямая z и ломаная ReLU(z) с изломом в x = −b/w.">
+<defs><clipPath id="k-clip"><rect x="222" y="54" width="128" height="108"/></clipPath></defs>
+<rect x="-400" y="-400" width="1160" height="636" style="fill:var(--sky)"/>
+<circle cx="24" cy="-40" r="14" style="fill:var(--sun)"/>
+<path d="M58 34a9 9 0 0 1 16-5a11 11 0 0 1 20 3a7 7 0 0 1 2 13H60a6.5 6.5 0 0 1-2-11ZM128 -28a9 9 0 0 1 16-5a11 11 0 0 1 20 3a7 7 0 0 1 2 13h-36a6.5 6.5 0 0 1-2-11Z" style="fill:var(--cloud)"/>
+<path id="k-fence" style="fill:var(--wood)" opacity=".38"/>
+<rect x="-400" y="236" width="1160" height="426" style="fill:var(--floor)"/>
+<rect x="-400" y="232" width="1160" height="6" style="fill:var(--surf)" opacity=".7"/>
+<path d="M240 172V236M322 172V236" stroke-width="4" style="stroke:var(--woodtop)"/>
+<rect x="204" y="4" width="152" height="168" rx="4" style="fill:var(--woodtop)"/>
+<rect x="208" y="8" width="144" height="160" rx="2" style="fill:var(--board)"/>
+<text id="k-r1" x="280" y="22" text-anchor="middle" style="font-size:10.5px"></text>
+<text id="k-r2" x="280" y="37" text-anchor="middle" style="font-size:10.5px"></text>
+<path id="k-lgz" d="M226 47h12" stroke-width="1.5" stroke-dasharray="3 2" style="stroke:var(--syh)"/>
+<text id="k-lgzt" x="241" y="50" style="fill:var(--syh);font-size:8.5px">сумма z</text>
+<path id="k-lgr" d="M286 47h12" stroke-width="2.6" style="stroke:var(--sf)"/>
+<text id="k-lgt" x="301" y="50" style="fill:var(--sf);font-size:8.5px">ReLU(z)</text>
+<path d="M222 126H348M230 162V56" stroke-width="1" style="stroke:var(--axis)"/>
+<path d="M249 124v4M268 124v4M287 124v4M306 124v4M325 124v4M344 124v4" stroke-width="1" style="stroke:var(--axis)"/>
+<g text-anchor="middle" style="fill:var(--muted);font-size:8.5px"><text x="230" y="166.5">0</text><text x="268" y="166.5">2</text><text x="306" y="166.5">4</text><text x="344" y="166.5">6</text></g>
+<text x="350" y="122" text-anchor="end" style="fill:var(--muted);font-size:8.5px">x</text>
+<line id="k-kv" stroke-width="1.2" stroke-dasharray="2 2.5" style="stroke:var(--sb)"/>
+<g clip-path="url(#k-clip)" fill="none" stroke-linejoin="round">
+  <path id="k-gz" stroke-width="1.5" stroke-dasharray="4 3" style="stroke:var(--syh)"/>
+  <path id="k-ga" stroke-width="1.3" stroke-dasharray="2 2" style="stroke:var(--sf)" opacity=".55"/>
+  <path id="k-gb" stroke-width="1.3" stroke-dasharray="2 2" style="stroke:var(--sf)" opacity=".55"/>
+  <path id="k-gr" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--sf)"/>
+</g>
+<circle id="k-k0" r="3.4" stroke-width="1.4" style="fill:var(--sb);stroke:var(--board)"/>
+<circle id="k-k1" r="3.4" stroke-width="1.4" style="fill:var(--sb);stroke:var(--board)"/>
+<line id="k-pc" stroke-width="1.2" stroke-dasharray="1.5 2" style="stroke:var(--muted)"/>
+<circle id="k-pz" r="3" stroke-width="1.5" style="fill:var(--board);stroke:var(--syh)"/>
+<circle id="k-pt" r="4" stroke-width="1.5" style="fill:var(--sf);stroke:var(--board)"/>
+<path id="k-px" style="fill:var(--sx)"/>
+<text id="k-kl0" class="lbb" style="fill:var(--sb);font-size:10px;font-weight:600"></text>
+<text id="k-kl1" class="lbb" style="fill:var(--sb);font-size:10px;font-weight:600"></text>
+<path d="M126 206H200L195 236H131Z" style="fill:var(--reg)"/>
+<path d="M128 209.5H198" stroke-width="3" style="stroke:var(--water)"/>
+<rect x="124" y="204" width="78" height="4" rx="1.5" style="fill:var(--stick)"/>
+<rect x="131" y="214" width="64" height="15" rx="2" style="fill:var(--board)"/>
+<text id="k-tl" x="163" y="225" text-anchor="middle" style="fill:var(--sf);font-weight:700"></text>
+<g fill="none" stroke-linecap="round">
+  <line id="k-w0" x1="146" x2="146" y1="108" y2="208" style="stroke:var(--water)"/>
+  <line id="k-wh0" class="k-flow" x1="146" x2="146" y1="108" y2="208" style="stroke:var(--card)" opacity=".5"/>
+  <line id="k-w1" x1="182" x2="182" y1="108" y2="208" style="stroke:var(--water)"/>
+  <line id="k-wh1" class="k-flow" x1="182" x2="182" y1="108" y2="208" style="stroke:var(--card)" opacity=".5"/>
+</g>
+<ellipse id="k-sh0" cx="146" cy="208.5" ry="2" style="fill:var(--water)"/>
+<ellipse id="k-sh1" cx="182" cy="208.5" ry="2" style="fill:var(--water)"/>
+<path d="M74 224H114V84H146" fill="none" stroke-width="7.5" stroke-linejoin="round" style="stroke:var(--stick)"/>
+<path id="k-p2o" d="M146 84H182" fill="none" stroke-width="7.5" style="stroke:var(--stick)"/>
+<path d="M74 224H114V84H146" fill="none" stroke-width="4.5" stroke-linejoin="round" style="stroke:var(--reg)"/>
+<path id="k-p2i" d="M146 84H182" fill="none" stroke-width="4.5" style="stroke:var(--reg)"/>
+<g id="k-v0"></g><g id="k-v1"></g>
+<circle cx="114" cy="140" r="18.5" stroke-width="2.4" style="fill:var(--board);stroke:var(--stick)"/>
+<g id="k-gt"></g>
+<path id="k-m0" style="fill:var(--sb)"/><path id="k-m1" style="fill:var(--sb)"/>
+<path id="k-z0" fill="none" stroke-width="3" stroke-linecap="round" style="stroke:var(--syh)"/>
+<path id="k-z1" fill="none" stroke-width="3" stroke-linecap="round" style="stroke:var(--syh)"/>
+<line id="k-nd" x1="114" y1="140" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--ink)"/>
+<circle cx="114" cy="140" r="2.2" style="fill:var(--ink)"/>
+<rect x="52" y="229" width="30" height="7" rx="1.5" style="fill:var(--stick)"/>
+<rect x="60" y="168" width="14" height="62" rx="2" style="fill:var(--pc2)"/>
+<rect x="58" y="164" width="18" height="6" rx="1.5" style="fill:var(--stick)"/>
+<line id="k-rod" stroke-width="2.2" style="stroke:var(--stick)"/>
+<g id="k-man" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M16 236L22 204L30 236" stroke-width="5.5" style="stroke:var(--pants)"/>
+  <path id="k-tor" stroke-width="11" style="stroke:var(--apron)"/>
+  <circle id="k-head" r="7.5" stroke="none" style="fill:var(--skin)"/>
+  <path id="k-cap" stroke="none" style="fill:var(--pc1)"/>
+  <path id="k-arm" stroke-width="4.5" style="stroke:var(--apron)"/>
+  <circle id="k-hand" r="2.7" stroke="none" style="fill:var(--skin)"/>
+</g>
+<path id="k-lev" fill="none" stroke-width="4.5" stroke-linecap="round" style="stroke:var(--wood)"/>
+<path id="k-grip" fill="none" stroke-width="6" stroke-linecap="round" style="stroke:var(--tyre)"/>
+<circle cx="67" cy="162" r="2.6" style="fill:var(--stick)"/>
+<text id="k-xl" x="52" y="136" text-anchor="middle" class="lb" style="fill:var(--sx);font-size:10.5px;font-weight:700"></text>
+<text id="k-wl" x="67" y="251" text-anchor="middle" class="lb" style="fill:var(--sw);font-size:10.5px;font-weight:700"></text>
+<text id="k-bl0" x="146" y="70" text-anchor="middle" class="lb" style="fill:var(--sb);font-size:10.5px;font-weight:700"></text>
+<text id="k-bl1" x="177" y="57" text-anchor="middle" class="lb" style="fill:var(--sb);font-size:10.5px;font-weight:700"></text>
+<text id="k-zl0" x="114" y="176" text-anchor="middle" class="lb" style="fill:var(--syh);font-size:10.5px;font-weight:700"></text>
+<text id="k-zl1" x="114" y="189" text-anchor="middle" class="lb" style="fill:var(--syh);font-size:10.5px;font-weight:700"></text>
+</svg>`,
+  init(E){
+    const QC = {}, q = id => QC[id] || (QC[id] = E.svg.querySelector("#k-" + id));
+    const sa = (id, o) => { const e = q(id); for (const k in o) e.setAttribute(k, o[k]); };
+    const tx = (id, t) => { const e = q(id); if (e.textContent !== t) e.textContent = t; };
+    const P = (x, y) => x.toFixed(1) + " " + y.toFixed(1);
+    // свой формат вместо toLocaleString: ползунок перерисовывает десятки чисел за кадр
+    const f2 = v => { const r = Math.round(v * 100), a = Math.abs(r), d = a % 100;
+      return (r < 0 ? "−" : "") + Math.floor(a / 100) + (d ? "," + (d % 10 ? String(d).padStart(2, "0") : d / 10) : ""); };
+    const GX = x => 230 + 19 * x, GY = z => 126 - 10.5 * z, VX = [146, 182], G = [114, 140];
+    const relu = z => z > 0 ? z : 0;
+    const st = {x: 5, w: 1, b: -2, two: false, plain: false, kink: false};
+    const bs = () => st.two ? [st.b, st.b - 2] : [st.b];
+    // забор и деления манометра — неизменные
+    { let s = ""; for (let x = -398; x < 760; x += 13) s += `M${x} 236V194l2.5-4 2.5 4V236Z`;
+      q("fence").setAttribute("d", s + "M-400 202H760v3H-400ZM-400 222H760v3H-400Z");
+      let t = ""; for (let v = -12; v <= 12; v += 3){ const a = v * Math.PI / 18, r0 = v ? 15 : 12.5, c = Math.cos(a), sn = Math.sin(a);
+        t += `<line x1="${(G[0] + sn * r0).toFixed(2)}" y1="${(G[1] - c * r0).toFixed(2)}" x2="${(G[0] + sn * 17.5).toFixed(2)}" y2="${(G[1] - c * 17.5).toFixed(2)}" stroke-width="${v ? 1 : 1.8}" style="stroke:var(--ink)"/>`; }
+      q("gt").innerHTML = t;
+      // клапаны: корпус, окошко с пружиной (розовая — это b) и тарелкой, носик крана
+      VX.forEach((cx, i) => { q("v" + i).innerHTML = `<rect x="${cx - 12}" y="77" width="24" height="22" rx="3" style="fill:var(--pc3)"/>
+        <rect x="${cx - 8}" y="80" width="16" height="16" rx="1.5" style="fill:var(--board)"/>
+        <path id="k-sp${i}" fill="none" stroke-width="1.5" stroke-linejoin="round" style="stroke:var(--sb)"/>
+        <rect id="k-pl${i}" x="${cx - 7}" width="14" height="2.6" rx="1" style="fill:var(--stick)"/>
+        <path d="M${cx} 99V106" stroke-width="5.5" style="stroke:var(--stick)"/><rect x="${cx - 4}" y="104" width="8" height="4" rx="1" style="fill:var(--stick)"/>`; }); }
+    const tagFit = (id, t, max, f0) => { tx(id, t); q(id).style.fontSize = Math.min(f0, max / (Math.max(t.length, 1) * 0.6)).toFixed(2) + "px"; };
+    let rk = "", twoTxt = "";
+    const C = (c, t) => `<tspan style="fill:var(${c})">${t}</tspan>`, M = t => `<tspan style="fill:var(--muted)">${t}</tspan>`;
+    const arc = (r, v0, v1) => { const a0 = v0 * Math.PI / 18, a1 = v1 * Math.PI / 18;
+      return `M${P(G[0] + r * Math.sin(a0), G[1] - r * Math.cos(a0))}A${r} ${r} 0 0 ${v1 > v0 ? 1 : 0} ${P(G[0] + r * Math.sin(a1), G[1] - r * Math.cos(a1))}`; };
+    const cl = v => Math.max(-12, Math.min(12, v));
+
+    function draw(fromSlider){
+      E.view(180);
+      const {x, w} = st, B = bs(), Z = B.map(b => w * x + b), F = Z.map(relu), tot = F.reduce((s, v) => s + v, 0), e = x / 6;
+      // рычаг: нажим 0 — ручка вверху, 6 — внизу; садовник наклоняется
+      const a = (-10 + 40 * x / 6) * Math.PI / 180, tip = [67 - 32 * Math.cos(a), 162 + 32 * Math.sin(a)], rod = [67 + 9 * Math.cos(a), 162 - 9 * Math.sin(a)];
+      sa("lev", {d: `M${P(tip[0], tip[1])}L${P(rod[0], rod[1])}`});
+      sa("grip", {d: `M${P(tip[0], tip[1])}L${P(tip[0] + 7 * Math.cos(a), tip[1] - 7 * Math.sin(a))}`});
+      sa("rod", {x1: rod[0].toFixed(1), y1: rod[1].toFixed(1), x2: 71, y2: 166});
+      const sx = 19 + 4 * e, sy = 169 + 7 * e, hx = sx - 2, hy = sy - 14;
+      sa("tor", {d: `M22 204L${P(sx, sy)}`}); sa("head", {cx: hx.toFixed(1), cy: hy.toFixed(1)});
+      sa("cap", {d: `M${P(hx - 7.6, hy - 0.5)}a7.6 7.6 0 0 1 15.2 -1.5l4 .6l-.6 1.6Z`});
+      const ex = (sx + tip[0]) / 2 + 3, ey = (sy + tip[1]) / 2 + 7;
+      sa("arm", {d: `M${P(sx, sy + 2)}L${P(ex, ey)}L${P(tip[0], tip[1])}`}); sa("hand", {cx: tip[0].toFixed(1), cy: tip[1].toFixed(1)});
+      // манометр: стрелка — давление насоса w·x, розовые метки — пружины (−b), дуги — z
+      const vn = cl(w * x), an = vn * Math.PI / 18;
+      sa("nd", {x2: (G[0] + 14 * Math.sin(an)).toFixed(1), y2: (G[1] - 14 * Math.cos(an)).toFixed(1)});
+      for (let i = 0; i < 2; i++){
+        const on = i < B.length, vb = cl(-(B[i] ?? 0)), ab = vb * Math.PI / 18, ca = Math.cos(ab), sn = Math.sin(ab), ab2 = 0.17;
+        sa("m" + i, {d: on ? `M${P(G[0] + 14.5 * sn, G[1] - 14.5 * ca)}L${P(G[0] + 21 * Math.sin(ab - ab2), G[1] - 21 * Math.cos(ab - ab2))}L${P(G[0] + 21 * Math.sin(ab + ab2), G[1] - 21 * Math.cos(ab + ab2))}Z` : "", opacity: on ? 1 : 0});
+        const r = i ? 7 : 11, zz = on ? Z[i] : 0;
+        sa("z" + i, {d: on && Math.abs(vn - vb) > 0.15 ? arc(r, vb, vn) : "", "stroke-dasharray": zz < 0 ? "2 2.2" : "none", opacity: on ? 1 : 0});
+      }
+      // клапаны и струи
+      for (let i = 0; i < 2; i++){
+        const on = i < B.length, cx = VX[i], f = on ? F[i] : 0, o = Math.min(f / 4, 1), py = 93 - 6 * o;
+        q("v" + i).style.opacity = on ? 1 : 0;
+        let d = `M${cx} 81`; const n = 6, h = (py - 81) / n; for (let k = 1; k <= n; k++) d += `L${(cx + (k === n ? 0 : k % 2 ? 4 : -4))} ${(81 + h * k).toFixed(1)}`;
+        sa("sp" + i, {d}); sa("pl" + i, {y: py.toFixed(1)});
+        const wv = f > 0.02, wd = 1.2 + 1.6 * Math.min(f, 5);
+        sa("w" + i, {"stroke-width": wd.toFixed(2), opacity: wv ? 1 : 0}); sa("wh" + i, {"stroke-width": (wd * 0.35).toFixed(2), opacity: wv ? 0.5 : 0});
+        sa("sh" + i, {rx: (2 + 1.6 * Math.min(f, 5)).toFixed(1), opacity: wv ? 1 : 0});
+      }
+      sa("p2o", {opacity: st.two ? 1 : 0}); sa("p2i", {opacity: st.two ? 1 : 0});
+      // подписи у деталей
+      tx("xl", "x = " + f2(x)); tx("wl", "w = " + f2(w));
+      tx("bl0", (st.two ? "b₁ = " : "b = ") + f2(B[0])); tx("bl1", st.two ? "b₂ = " + f2(B[1]) : "");
+      tx("zl0", (st.two ? "z₁ = " : "z = ") + f2(Z[0])); tx("zl1", st.two ? "z₂ = " + f2(Z[1]) : "");
+      tagFit("tl", st.two ? `${f2(F[0])} + ${f2(F[1])} = ${f2(tot)}` : "ReLU(z) = " + f2(F[0]), 60, 10);
+      // доска: прямая z (пунктир) и ломаная ReLU — по точкам излома
+      const kx = B.map(b => w ? -b / w : null), pts = [0, 6, ...kx.filter(k => k != null && k > 0 && k < 6)].sort((p, r) => p - r);
+      const fx = (u, list) => list.reduce((s, b) => s + relu(w * u + b), 0), line = list => "M" + pts.map(u => P(GX(u), GY(fx(u, list)))).join("L");
+      sa("gz", {d: st.two ? "" : `M${P(GX(-0.6), GY(w * -0.6 + B[0]))}L${P(GX(6.6), GY(w * 6.6 + B[0]))}`});
+      const showR = !st.plain;
+      sa("gr", {d: showR ? line(B) : ""});
+      sa("ga", {d: showR && st.two ? line([B[0]]) : ""}); sa("gb", {d: showR && st.two ? line([B[1]]) : ""});
+      sa("lgr", {opacity: showR ? 1 : 0}); q("lgt").style.opacity = showR ? 1 : 0;
+      // подписи линий: один кран — сумма z и ReLU(z); два крана — каждый кран пунктиром и их сумма
+      sa("lgz", {"stroke-dasharray": st.two ? "2 2" : "3 2", style: st.two ? "stroke:var(--sf)" : "stroke:var(--syh)"});
+      tx("lgzt", st.two ? "краны" : "сумма z"); q("lgzt").style.fill = st.two ? "var(--sf)" : "var(--syh)"; tx("lgt", st.two ? "вместе" : "ReLU(z)");
+      // изломы и подписи к ним: не налезают друг на друга и на края доски
+      const occ = [[341, 112, 352, 124]];   // буква x у оси
+      for (let i = 0; i < 2; i++){
+        const k = i < B.length ? kx[i] : null, on = showR && k != null && k >= -0.02 && k <= 6.02;
+        sa("k" + i, {cx: on ? GX(k).toFixed(1) : 0, cy: GY(0), opacity: on ? 1 : 0, r: on && st.kink ? 4.6 : 3.4});
+        let t = "";
+        if (on){ t = (st.two ? `−b${i ? "₂" : "₁"}/w = ` : "−b/w = ") + f2(k);
+          const tw = t.length * 6, X = GX(k), up = w > 0 ? "end" : "start", dn = w > 0 ? "start" : "end", sg = w > 0 ? -1 : 1;
+          const cands = [[X + sg * 4, 117, up], [X - sg * 4, 141, dn], [X + sg * 4, 141, up], [X - sg * 4, 105, dn], [X, 153, "middle"]];
+          let ok = null;
+          for (const [cx_, cy_, an] of cands){ const x0 = an === "end" ? cx_ - tw : an === "middle" ? cx_ - tw / 2 : cx_, r = [x0, cy_ - 9, x0 + tw, cy_ + 2];
+            if (r[0] < 210 || r[2] > 350) continue;
+            if (occ.some(o => r[0] < o[2] + 2 && o[0] < r[2] + 2 && r[1] < o[3] + 1 && o[1] < r[3] + 1)) continue;
+            occ.push(r); ok = [cx_, cy_, an]; break; }
+          if (ok) sa("kl" + i, {x: ok[0].toFixed(1), y: ok[1], "text-anchor": ok[2]}); else t = "";
+        }
+        tx("kl" + i, t);
+      }
+      const k0 = kx[0], kon = showR && st.kink && !st.two && k0 != null && k0 > 0 && k0 < 6;
+      sa("kv", {x1: kon ? GX(k0) : 0, x2: kon ? GX(k0) : 0, y1: 58, y2: 126, opacity: kon ? 1 : 0});
+      // точка при текущем нажиме: на ломаной (поток) и на прямой (сумма), между ними — срез до нуля
+      const X = GX(x), yr = GY(tot), yz = GY(Z[0]), zIn = Z[0] > -3.2;
+      sa("pt", {cx: X.toFixed(1), cy: yr.toFixed(1), opacity: showR ? 1 : 0});
+      const cut = !st.two && Z[0] < -0.05;
+      sa("pz", {cx: X.toFixed(1), cy: yz.toFixed(1), opacity: (cut || st.plain) && zIn ? 1 : 0});
+      sa("pc", {x1: X.toFixed(1), x2: X.toFixed(1), y1: Math.min(yz, 160).toFixed(1), y2: yr.toFixed(1), opacity: cut && showR ? 1 : 0});
+      sa("px", {d: `M${P(X, 151)}l-3.6 5h7.2Z`});
+      // строки доски
+      const bt = b => b < 0 ? M(" − ") + C("--sb", f2(-b)) : M(" + ") + C("--sb", f2(b));
+      let r1, r2, n1, n2;
+      if (st.two){ n1 = `z₁ = ${f2(Z[0])}, z₂ = ${f2(Z[1])}`; r1 = C("--syh", "z₁") + M(" = ") + C("--syh", f2(Z[0])) + M(", ") + C("--syh", "z₂") + M(" = ") + C("--syh", f2(Z[1]));
+        n2 = `ReLU(${f2(Z[0])}) + ReLU(${f2(Z[1])}) = ${f2(tot)}`; r2 = C("--sf", "ReLU") + M("(") + C("--syh", f2(Z[0])) + M(") + ") + C("--sf", "ReLU") + M("(") + C("--syh", f2(Z[1])) + M(") = ") + C("--sf", f2(tot)); }
+      else { n1 = `z = ${f2(w)}·${f2(x)} − ${f2(B[0])} = ${f2(Z[0])}`; r1 = C("--syh", "z") + M(" = ") + C("--sw", f2(w)) + M("·") + C("--sx", f2(x)) + bt(B[0]) + M(" = ") + C("--syh", f2(Z[0]));
+        n2 = st.plain ? "" : `ReLU(${f2(Z[0])}) = max(0, ${f2(Z[0])}) = ${f2(F[0])}`;
+        r2 = st.plain ? "" : C("--sf", "ReLU") + M("(") + C("--syh", f2(Z[0])) + M(") = max(0, ") + C("--syh", f2(Z[0])) + M(") = ") + C("--sf", f2(F[0])); }
+      if (r1 + r2 !== rk){ rk = r1 + r2; q("r1").innerHTML = r1; q("r2").innerHTML = r2;
+        q("r1").style.fontSize = Math.min(10.5, 138 / (n1.length * 0.6)).toFixed(2) + "px"; q("r2").style.fontSize = Math.min(10.5, 138 / (Math.max(n2.length, 1) * 0.6)).toFixed(2) + "px"; }
+      // плашки и кнопка
+      E.val(0, f2(x));
+      E.val(1, st.two ? f2(Z[0]) + " и " + f2(Z[1]) : f2(Z[0]));
+      E.val(2, st.two ? `${f2(F[0])} + ${f2(F[1])} = ${f2(tot)}` : f2(F[0]));
+      E.val(3, w ? (st.two ? f2(kx[0]) + " и " + f2(kx[1]) : f2(kx[0])) : "нет");
+      const bt2 = st.two ? "Один кран" : "Второй кран";
+      if (bt2 !== twoTxt){ twoTxt = bt2; const btn = E.root.querySelector("[data-act=two]"); if (btn) btn.textContent = bt2; }
+      if (!fromSlider){ E.setCtrl("w", st.w); E.setCtrl("b", st.b); }
+    }
+
+    function anim(ms, id, fn, lin){
+      return new Promise(res => {
+        if (!E.live(id)) return res();
+        const t0 = performance.now();
+        const fr = now => {
+          if (!E.live(id)) return res();
+          const p = Math.min((now - t0) / ms, 1); fn(lin ? p : p < .5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2, p); draw();
+          if (p < 1) requestAnimationFrame(fr); else res();
+        };
+        requestAnimationFrame(fr);
+      });
+    }
+    function tween(o, id){
+      const a = {}; let t = 0;
+      for (const k in o){ a[k] = st[k]; t = Math.max(t, Math.abs(o[k] - st[k]) * (k === "w" ? 700 : 260)); }
+      if (t < 1) return Promise.resolve();
+      return anim(Math.min(Math.max(t, 420), 1600), id, e => { for (const k in o) st[k] = a[k] + (o[k] - a[k]) * e; })
+        .then(() => { if (E.live(id)){ for (const k in o) st[k] = o[k]; draw(); } });
+    }
+    async function pump(id){   // нажим плавно от 0 до 6: точка бежит по ломаной, вода пойдёт после излома
+      if (st.x > 0.01) await anim(Math.min(500, 120 * st.x), id, (_, p) => { st.x = st.x * (1 - p); });
+      if (!E.live(id)) return;
+      st.x = 0; draw(); await E.wait(250);
+      await anim(3400, id, (_, p) => { st.x = 6 * (p < 0.1 ? 5 * p * p : p > 0.9 ? 0.9 - 5 * (1 - p) ** 2 : p - 0.05) / 0.9; }, true);
+      if (E.live(id)){ st.x = 6; draw(); }
+    }
+    async function run(plan, id){
+      for (const p of plan){
+        if (!E.live(id)) return;
+        if (p === "pause") await E.wait(1300);
+        else if (p === "pump") await pump(id);
+        else if (p === "two"){ st.two = true; draw(); }
+        else if (p === "one"){ st.two = false; draw(); }
+        else if (typeof p === "number") await tween({x: p}, id);
+        else if (typeof p === "object") await tween(p, id);
+      }
+    }
+    return {
+      draw,
+      step(s, id){ st.plain = !!s.plain; st.kink = !!s.kink; draw(); return run([].concat(s.go == null ? [] : s.go), id); },
+      slide(v, k){ st[k] = v; st.plain = false; draw(true); },
+      action(a, id){ st.plain = false; if (a === "two"){ st.two = !st.two; draw(); run(["pump"], id); } else run(["pump"], id); }
     };
   }
 };
