@@ -163,7 +163,6 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible,
 .lhead h1{font-size:clamp(21px,5.6vw,28px)}
 .seg2{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:12px}
 .seg2 button{border:0;background:none;border-radius:9px;padding:10px;font-weight:600;font-size:15px}
-.seg2 button[disabled]{opacity:.45;cursor:default}
 .seg2 button.on{background:var(--ink);color:var(--paper)}
 .intro p{margin:0 0 10px;max-width:65ch}
 .blk{font-size:15px;margin:20px 0 8px}
@@ -2159,21 +2158,23 @@ SCENES.cafe = {
 };
 
 /* ================= Урок ================= */
+// peek — просмотр по скрытой ссылке #theory-N: только теория любого урока, без вкладки «Задачи», прогресс не меняется
 function renderLesson(id, peek){
-  const L = LESSONS[id-1], open = lessonUnlocked(L);
-  if (!open && !peek) { go("#home"); return; }
+  const L = LESSONS[id-1];
+  if (!peek && !lessonUnlocked(L)) { go("#home"); return; }
   if (LV.id !== id) LV = {id, view:null, ti:null};
+  LV.peek = !!peek;
   if (!LV.view) LV.view = solvedCount(L) ? "tasks" : "theory";
-  if (peek && (!open || LV.view !== "tasks")) LV.view = "theory";
+  if (peek) LV.view = "theory";
   if (LV.ti == null){ const k = L.tasks.findIndex(t => !S.solved[t.id]); LV.ti = k < 0 ? L.tasks.length : k; }
   const st = STAGES[L.stage-1];
   app.innerHTML = `
-  <div class="topbar"><button class="back" id="bk">← Карта</button>${xpBar()}</div>
+  <div class="topbar"><button class="back" id="bk">${peek ? "← На главную" : "← Карта"}</button>${peek ? `<span class="pill cur">Просмотр теории</span>` : xpBar()}</div>
   <div class="lhead"><span class="glyph big${glyphCls(L.g)}">${esc(L.g)}</span><div><small>Этап ${st.n} · ${esc(st.name)} · урок ${id} из 24</small><h1>${esc(L.title)}</h1></div></div>
-  <nav class="seg2" role="tablist"><button data-v="theory" role="tab">Теория</button><button data-v="tasks" role="tab"${open ? "" : " disabled"}>Задачи <span class="mono" id="tc">${open ? solvedCount(L) + "/" + L.tasks.length : "🔒"}</span></button></nav>
+  ${peek ? "" : `<nav class="seg2" role="tablist"><button data-v="theory" role="tab">Теория</button><button data-v="tasks" role="tab">Задачи <span class="mono" id="tc">${solvedCount(L)}/${L.tasks.length}</span></button></nav>`}
   <section id="pane"></section>`;
   $("#bk").onclick = () => go("#home");
-  $$(".seg2 button").forEach(b => b.onclick = () => { if (!b.disabled){ LV.view = b.dataset.v; showView(L); } });
+  $$(".seg2 button").forEach(b => b.onclick = () => { LV.view = b.dataset.v; showView(L); });
   showView(L);
 }
 function showView(L){
@@ -2197,7 +2198,7 @@ function renderTheory(L, pane){
     <div class="real"><b>В настоящем ИИ</b>${esc(L.real)}</div>
     <p class="src"><b>Откуда:</b> ${esc(L.src)}</p>
     <button class="biglink" id="bl"><span><b>Общая картина</b><span>Как этот урок связан с остальными и с ChatGPT</span></span><i>→</i></button>
-    <div class="next">${lessonUnlocked(L) ? `<button class="btn" id="tt">К задачам →</button>` : `<span class="muted">Задачи откроются, когда будут решены прошлые уроки</span>`}</div>`;
+    ${LV.peek ? "" : `<div class="next"><button class="btn" id="tt">К задачам →</button></div>`}`;
   if (L.stand) renderStand(L, $("#standHost"));
   if ($("#tt")) $("#tt").onclick = () => { LV.view = "tasks"; showView(L); window.scrollTo(0,0); };
   $("#bl").onclick = () => go("#big");
