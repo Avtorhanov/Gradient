@@ -26,7 +26,7 @@
   --wall:#EFE7DB; --floor:#DCCFBD; --wood:#B5865B; --woodtop:#946641; --frame:#FBFCFD; --sky:#BFE2F5; --dusk:#2F3A66; --sun:#F5B83D; --cloud:#FFFFFF;
   --board:#FFFFFF; --glass:rgba(150,200,228,.26); --reg:#CBD3DD; --lcd:#E4F4EF; --apron:#4E6E60; --shirt:#FFFFFF; --pc1:#C67C5E; --pc2:#7E9A57; --pc3:#C9A23F; --scoop:#F2A7BA; --scoop2:#F1D9A0; --cup:#FFFFFF; --tea:#B7652E;
   --car:#F2B630; --carw:#BFD9EA; --road:#B9C1CB; --lane:#F8FAFC; --tyre:#2B313A; --dbk:#2B313A; --dbc:#F1E3C2; --dbr:#D6453D; --dbg:#3E9A5B;
-  --sf:#9A5B00; --curt:#A8323E; --cloth:#33506E; --water:#4FA3D8;
+  --sf:#9A5B00; --curt:#A8323E; --cloth:#33506E; --water:#4FA3D8; --fur:#E39A4F; --fur2:#B8682A; --rug:#B7D0E6; --cream:#F7E6C8;
   --f-display:'Unbounded','Golos Text',system-ui,sans-serif;
   --f-body:'Golos Text',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --f-mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
@@ -43,7 +43,7 @@
     --wall:#212935; --floor:#181E27; --wood:#5E4530; --woodtop:#755639; --frame:#3A4656; --sky:#3B6E92; --dusk:#121830; --sun:#F2B544; --cloud:rgba(228,236,244,.85);
     --board:#121923; --glass:rgba(120,170,210,.15); --reg:#3A4656; --lcd:#0E1A1B; --apron:#7FA393; --shirt:#C9D3DD; --pc1:#D99376; --pc2:#93B06B; --pc3:#D8B456; --scoop:#E79AAE; --scoop2:#E6CF97; --cup:#D5DDE6; --tea:#E08A4F;
     --car:#E0A92E; --carw:#4A6F8C; --road:#2A3340; --lane:#7C8594; --tyre:#0B0F14; --dbk:#0B0F14; --dbc:#D9CBA8; --dbr:#E0605A; --dbg:#55B072;
-  --sf:#F0A84A; --curt:#7A2B35; --cloth:#24394F; --water:#3E8FC6;
+  --sf:#F0A84A; --curt:#7A2B35; --cloth:#24394F; --water:#3E8FC6; --fur:#C98443; --fur2:#8F5424; --rug:#2C4560; --cream:#D9C4A0;
     color-scheme:dark;
   }
 }
@@ -57,7 +57,7 @@
   --wall:#212935; --floor:#181E27; --wood:#5E4530; --woodtop:#755639; --frame:#3A4656; --sky:#3B6E92; --dusk:#121830; --sun:#F2B544; --cloud:rgba(228,236,244,.85);
   --board:#121923; --glass:rgba(120,170,210,.15); --reg:#3A4656; --lcd:#0E1A1B; --apron:#7FA393; --shirt:#C9D3DD; --pc1:#D99376; --pc2:#93B06B; --pc3:#D8B456; --scoop:#E79AAE; --scoop2:#E6CF97; --cup:#D5DDE6; --tea:#E08A4F;
   --car:#E0A92E; --carw:#4A6F8C; --road:#2A3340; --lane:#7C8594; --tyre:#0B0F14; --dbk:#0B0F14; --dbc:#D9CBA8; --dbr:#E0605A; --dbg:#55B072;
-  --sf:#F0A84A; --curt:#7A2B35; --cloth:#24394F; --water:#3E8FC6;
+  --sf:#F0A84A; --curt:#7A2B35; --cloth:#24394F; --water:#3E8FC6; --fur:#C98443; --fur2:#8F5424; --rug:#2C4560; --cream:#D9C4A0;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -1125,6 +1125,32 @@ const LESSONS = [
     ["h = [3, 0]","Выход слоя: по одному числу от каждого нейрона."]]},
   analog:"Слой — как бригада экспертов, которые смотрят на одну картинку: один ищет уши, другой усы, третий хвост. Каждый выдаёт свою оценку, а следующая бригада решает по их отчётам.",
   src:"Принс, гл. 3–4 (неглубокие и глубокие сети, матричная запись). Гудфеллоу и соавторы, гл. 6.",
+  stand:{scene:"crew", steps:[
+    {names:["уши","усы","хвост"], nopin:true, t:"Один нейрон даёт один излом. <b>Слой</b> — это много нейронов, которые смотрят на одни и те же входы, но у каждого свои веса, и каждый замечает что-то своё. Как бригада экспертов над снимком кота: первый отвечает за уши, второй — за усы, третий — за хвост. Каждый кладёт по снимку свою линейку — это его излом: по эту сторону он молчит, за линейкой — говорит.",
+     go:["ring", {N:3}, "clear", "lay"],
+     ex:[["Гудфеллоу и соавторы, гл. 6","Авторы предлагают смотреть на слой двумя способами: как на одну функцию, которая превращает набор входов в набор выходов, или как на много маленьких блоков, работающих параллельно. Каждый блок получает все входы слоя и выдаёт одно своё число — поэтому его и сравнивают с нейроном."]]},
+    {t:"Вход — точка снимка: два числа <b style=\"color:var(--sx)\">x</b> = [x₁, x₂], где она по горизонтали и по вертикали. Веса всего слоя складывают в таблицу — матрицу <b style=\"color:var(--sw)\">W</b>: строки — входы, столбцы — нейроны. Столбец — веса одного эксперта, они задают наклон его линейки, а сдвиг <b style=\"color:var(--sb)\">b</b> — как далеко она от центра. 2 входа и 3 нейрона → W 2 × 3; добавили эксперта — добавился столбец: 2 × 4.",
+     go:["ring", {N:3}, "clear", {pin:[1, 2]}, "scan", "pause", {N:4}, "scan"],
+     ex:[["Принс, гл. 4","Автор записывает сеть короче: веса слоя собирает в матрицу, сдвиги — в вектор, и весь слой умещается в одну строку: активация от «сдвиг + матрица × вход». В книге матрица повёрнута — строки у неё нейроны, столбцы входы; в коде удобнее x @ W, как в этом уроке. Смысл тот же."]]},
+    {t:"Разбор примера: два нейрона, точка <b style=\"color:var(--sx)\">x</b> = [1, 2]. Эксперт 1, веса [1, 1], b = 0: <b style=\"color:var(--syh)\">z₁</b> = 1·1 + 1·2 = 3, ReLU(3) = 3 — точка за его линейкой, он говорит 3. Эксперт 2, веса [1, −1]: z₂ = 1·1 − 1·2 = −1, ReLU(−1) = 0 — молчит. Столбцы вместе — <b style=\"color:var(--sw)\">W</b> = [[1, 1], [1, −1]], а выход слоя <b style=\"color:var(--sf)\">h</b> = [3, 0]: по числу от каждого.",
+     go:["ex", "pause", "one"],
+     ex:[["Гудфеллоу и соавторы, гл. 6","Главный пример главы — задача XOR: четыре точки, которые одной прямой не разделить. Авторы ставят перед ответом слой из двух нейронов с ReLU: W = [[1, 1], [1, 1]], сдвиги [0, −1]. Слой переносит точки на новые места — две из них сливаются в одну, — и там их уже делит одна прямая."]]},
+    {t:"Весь слой считается одной командой: <b><span style=\"color:var(--sf)\">h</span> = ReLU(<span style=\"color:var(--sx)\">x</span> @ <span style=\"color:var(--sw)\">W</span> + <span style=\"color:var(--sb)\">b</span>)</b>. Строку x умножают сразу на все столбцы W — эксперты отвечают одновременно, а не по очереди. Поэтому для ИИ важны видеокарты: они очень быстро перемножают такие таблицы.",
+     go:["ring", {N:6}, "clear", {pin:[3, -1]}, "all", "pause", {pin:[-3, -1]}, "all", "pause", {pin:[0, -3]}, "all"]},
+    {boss:true, bnd:true, t:"Слои ставят друг за другом: выход одного — вход следующего. Отчёты <b style=\"color:var(--sf)\">h</b> уходят старшему — это следующий слой. Он говорит «кот», только если все эксперты молчат. Отсюда «глубокое» обучение: первые слои замечают простое — эксперт видит лишь свою прямую, — а следующие собирают из простого сложное: по отчётам старший узнаёт целого кота.",
+     go:["ring", {N:6}, "clear", {pin:[0, 0]}, "all", "chief", "pause", {pin:[3, -1]}, "all", "chief"],
+     ex:[["Гудфеллоу и соавторы, гл. 6","Сеть у авторов — цепочка функций: первая обрабатывает вход, вторая — то, что выдала первая, третья — выход второй. Длину цепочки называют глубиной сети, отсюда и название «глубокое обучение»."],
+         ["Принс, гл. 4","Автор показывает, что второй слой работает с уже «сложенным» пространством: первый как бы сгибает лист с входами, и всё, что нарисует второй, повторяется на каждом сгибе. Поэтому с глубиной число кусков ломаной растёт гораздо быстрее, чем если добавлять нейроны в один слой."]]},
+    {boss:true, bnd:true, t:"Сколько нужно экспертов? Один — одна прямая: кота не обвести, угадано 46 %. Два — полоса, 63 %. Три — <b style=\"color:var(--syh)\">граница</b> замкнулась в треугольник, 83 %. Шесть — почти круг, 98 %. Точку в углу старший при трёх экспертах путает с котом, при четырёх — уже нет. Это и есть задача 3 урока: больше нейронов — сложнее форма границы.",
+     go:["ring", {N:1}, "clear", {pin:[-2, 2]}, "full", "pause", {N:2}, "pause", {N:3}, "pause", {N:4}, "pause", {N:5}, "pause", {N:6}],
+     ex:[["Принс, гл. 3","Автор переходит от одного входа к двум: теперь излом каждого скрытого нейрона — это прямая на плоскости входов. С одной её стороны нейрон молчит, с другой работает. Три нейрона — три прямые, и плоскость режется на многоугольники, на каждом из которых выход меняется по-своему."]]},
+    {look:true, boss:true, bnd:true, t:"Медкомиссия: окулист, лор и хирург смотрят одного и того же человека, но каждый — своё. Каждый пишет справку — это его h. Заключение «годен» пишет председатель по их справкам — следующий слой. Ни один врач не видит всего, а комиссия вместе видит.",
+     go:["ring", {N:3}, "clear", {pin:[0, 0]}, "one", "chief"]},
+    {look:true, t:"Чеки в трёх магазинах. Список покупок <b style=\"color:var(--sx)\">x</b> = [2 батона, 1 молоко]. У каждого магазина свой прайс — столбец <b style=\"color:var(--sw)\">W</b>: у дома батон 50 ₽ и молоко 90 ₽, на рынке 40 и 100, в гипермаркете 45 и 80. x @ W сразу даёт три чека: [190, 180, 170]. Одно умножение — все магазины разом.",
+     go:["ring", {N:3}, "clear", {pin:[3, -1]}, "all"]},
+    {look:true, boss:true, bnd:true, t:"Круг ножницами. Вырежьте из бумаги круг, но ножницы режут только по прямой. Три разреза — треугольник, шесть — шестиугольник, мелкими разрезами — почти круг. Каждый разрез — один нейрон: сам он прямой, а вместе разрезы дают кривую.",
+     go:["ring", {N:3}, "clear", {pin:[0, 0]}, "full", "pause", {N:4}, "pause", {N:5}, "pause", {N:6}]}
+  ]},
   tasks:[
     {t:"num", q:"Вход x = [2, 1]. Нейрон с весами [1, 3] и b = −4. Чему равен его выход после ReLU?", a:1, hint:"z = 1·2 + 3·1 − 4, потом ReLU.", why:"z = 2 + 3 − 4 = 1, ReLU(1) = 1.", steps:["Взвешенная сумма: 1 · 2 + 3 · 1 = 2 + 3 = 5.", "Прибавляем сдвиг: 5 + (−4) = 1.", "ReLU(1) = 1: число положительное, проходит как есть."], idea:"Каждый нейрон слоя делает одно и то же: сумма → сдвиг → изгиб. Слой — просто много таких нейронов сразу."},
     {t:"mc", q:"Слой: 3 входа, 5 нейронов. Какого размера матрица W?", o:["3 × 5","5 × 5","3 × 3","8 × 1"], a:0, hint:"Строки — входы, столбцы — нейроны.", why:"3 строки (входы) × 5 столбцов (нейроны).", steps:["Каждому нейрону нужен вес для каждого входа: 3 веса на нейрон.", "Нейронов 5 → 5 столбцов по 3 веса.", "Таблица: 3 строки (входы) × 5 столбцов (нейроны) = 15 весов."], idea:"Размер матрицы сразу говорит, сколько у слоя входов и сколько в нём нейронов."},
@@ -3714,6 +3740,388 @@ SCENES.tap = {
       step(s, id){ st.plain = !!s.plain; st.kink = !!s.kink; draw(); return run([].concat(s.go == null ? [] : s.go), id); },
       slide(v, k){ st[k] = v; st.plain = false; draw(true); },
       action(a, id){ st.plain = false; if (a === "two"){ st.two = !st.two; draw(); run(["pump"], id); } else run(["pump"], id); }
+    };
+  }
+};
+
+/* ---------- Сцена «Бригада экспертов»: урок W ----------
+   Снимок кота, свернувшегося клубком: тело — круг радиуса 2 на плоскости входов x₁, x₂ (снимок от −3,33 до 3,33, 18 единиц
+   картинки на 1). Вход слоя — точка снимка x = [x₁, x₂] (булавка). Эксперт j — нейрон: столбец W — наклон его линейки,
+   b — насколько она отодвинута от центра. По эту сторону линейки он молчит (h = 0), за ней говорит h = ReLU(x·W[:, j] + b)
+   и поднимает руку тем выше, чем дальше точка. Старший (следующий слой) говорит «кот», только если все молчат:
+   граница — многоугольник из линеек. Кольцо экспертов: N направлений через 360°/N от 60° по часовой стрелке
+   («уши» — справа сверху, «усы» — справа снизу, «хвост» — слева), веса округлены до 0,1, b = −2.
+   Угадано по снимку (сетка 90 × 90): 1 → 46 %, 2 → 63 %, 3 → 83 %, 4 → 94 %, 5 → 96 %, 6 → 98 %.
+   Режим примера (разбор урока): два эксперта, W = [[1, 1], [1, −1]], b = 0, x = [1, 2] → z = [3, −1], h = [3, 0]. */
+SCENES.crew = {
+  vb: [0, 0, 360, 262], camMin: 360,
+  vals: [["W","веса слоя","--sw"],["x","точка снимка","--sx"],["h","отчёты экспертов","--sf"],["граница","угадано","--syh"]],
+  ctrl: {k:"нейроны", min:1, max:6, step:1, col:"--sw"},
+  acts: [["one","По очереди"],["all","Все разом"]],
+  svg: `<svg viewBox="0 0 360 262" role="img" aria-label="Бригада экспертов над снимком кота, свернувшегося клубком. Каждый эксперт — нейрон слоя: кладёт по снимку свою линейку-прямую и говорит число h, если точка x за его линейкой. Веса всех экспертов — столбцы таблицы W на доске. Старший — следующий слой — говорит «кот», только если все молчат; линейки вместе образуют границу вокруг кота.">
+<defs>
+  <clipPath id="e-clip"><rect x="12" y="8" width="120" height="120"/></clipPath>
+  <clipPath id="e-crug"><path clip-rule="evenodd" d="M12 8H132V128H12ZM72 32a36 36 0 1 0 .01 0Z"/></clipPath>
+  <clipPath id="e-cout"><path id="e-coutp" clip-rule="evenodd"/></clipPath>
+  <pattern id="e-hatch" width="4.5" height="4.5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M1 0V4.5" stroke-width="1.6" style="stroke:var(--ink)"/></pattern>
+</defs>
+<rect x="-400" y="-400" width="1160" height="636" style="fill:var(--wall)"/>
+<rect x="-400" y="236" width="1160" height="426" style="fill:var(--floor)"/>
+<path d="M-400 236H760" stroke-width="2" style="stroke:var(--woodtop)"/>
+<path d="M90 -400V-34M270 -400V-34" stroke-width="1.2" style="stroke:var(--muted)"/>
+<path d="M80 -34h20l5 13h-30ZM260 -34h20l5 13h-30Z" style="fill:var(--tyre)"/>
+<path d="M78 -21l-20 40h64l-20-40ZM258 -21l-20 40h64l-20-40Z" style="fill:var(--sun)" opacity=".13"/>
+<text x="180" y="-52" text-anchor="middle" class="deco" style="fill:var(--woodtop);font-family:var(--f-display);font-size:14px;font-weight:700;letter-spacing:.04em">ЭКСПЕРТНЫЙ СОВЕТ</text>
+<g clip-path="url(#e-clip)">
+  <rect x="12" y="8" width="120" height="120" style="fill:var(--rug)"/>
+  <path id="e-rugp" fill="none" stroke-width="3" style="stroke:var(--card)" opacity=".22"/>
+  <path d="M46 53A30 30 0 0 0 69.4 97.9" fill="none" stroke-width="9" stroke-linecap="round" style="stroke:var(--fur2)"/>
+  <circle cx="72" cy="68" r="36" style="fill:var(--fur)"/>
+  <path id="e-strp" fill="none" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--fur2)" opacity=".55"/>
+  <path d="M46.6 54.5A29 29 0 0 0 69.4 97" fill="none" stroke-width="7.5" stroke-linecap="round" style="stroke:var(--fur2)"/>
+  <path d="M63 96.6a29 29 0 0 0 6.4 .9" fill="none" stroke-width="7" stroke-linecap="round" style="stroke:var(--cream)"/>
+  <ellipse cx="84.6" cy="87.6" rx="3.8" ry="2.5" stroke-width=".8" style="fill:var(--cream);stroke:var(--fur2)"/>
+  <ellipse cx="95.4" cy="87.6" rx="3.8" ry="2.5" stroke-width=".8" style="fill:var(--cream);stroke:var(--fur2)"/>
+  <path d="M78.7 65.5L78.6 52.6L85 60.2Z M95 60.2L101.4 52.6L101.3 65.5Z" stroke-width="1" stroke-linejoin="round" style="fill:var(--fur);stroke:var(--fur2)"/>
+  <path d="M80.3 62.4L80.2 56.6L83.2 60.1Z M96.8 60.1L99.8 56.6L99.7 62.4Z" style="fill:var(--scoop)" opacity=".85"/>
+  <circle cx="90" cy="72" r="13" stroke-width="1.1" style="fill:var(--fur);stroke:var(--fur2)"/>
+  <path d="M86.6 62.4v3.2M90 61.6v3.8M93.4 62.4v3.2" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--fur2)" opacity=".55"/>
+  <ellipse cx="86.7" cy="77.2" rx="3.8" ry="3" style="fill:var(--cream)"/>
+  <ellipse cx="93.3" cy="77.2" rx="3.8" ry="3" style="fill:var(--cream)"/>
+  <path d="M88.5 73.7h3l-1.5 1.8Z" stroke-width=".6" stroke-linejoin="round" style="fill:var(--scoop);stroke:var(--fur2)"/>
+  <path d="M83.6 76.3L77.3 74.6M83.4 77.7L76.8 78.1M83.7 79.1L77.6 81.5M96.4 76.3L102.7 74.6M96.6 77.7L103.2 78.1M96.3 79.1L102.4 81.5" fill="none" stroke-width=".7" stroke-linecap="round" style="stroke:var(--ink)" opacity=".5"/>
+  <path id="e-mrug" style="fill:url(#e-hatch)" clip-path="url(#e-crug)" opacity=".4"/>
+  <circle id="e-mcat" cx="72" cy="68" r="36" style="fill:url(#e-hatch)" clip-path="url(#e-cout)" opacity=".4"/>
+  <g id="e-sides"></g>
+  <g id="e-lines" fill="none" stroke-width=".9" stroke-dasharray="3 2.5" style="stroke:var(--ink)" opacity=".5"></g>
+  <g id="e-rul"></g>
+  <path id="e-bd" fill="none" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round" style="stroke:var(--syh)"/>
+  <g id="e-chips"></g>
+</g>
+<path fill-rule="evenodd" d="M7 3H137V133H7ZM12 8V128H132V8Z" style="fill:var(--woodtop)"/>
+<circle id="e-pinr" r="6" style="fill:var(--sx)" opacity=".28"/>
+<circle id="e-pin" r="3.4" stroke-width="1.4" style="fill:var(--sx);stroke:var(--card)"/>
+<g id="e-tpin"><rect rx="2" height="12" style="fill:var(--card)" opacity=".9"/><text text-anchor="middle" style="fill:var(--sx);font-size:9px;font-weight:700"></text></g>
+<g id="e-tbd"><rect rx="2" height="12" style="fill:var(--card)" opacity=".9"/><text text-anchor="middle" style="fill:var(--syh);font-size:8.5px;font-weight:700"></text></g>
+<rect x="141" y="3" width="216" height="130" rx="3" style="fill:var(--reg)"/>
+<rect x="144" y="6" width="210" height="124" rx="2" style="fill:var(--board)"/>
+<text id="e-f" x="249" y="18" text-anchor="middle" style="font-size:10.5px;font-weight:600"></text>
+<g id="e-hl"></g>
+<rect id="e-wbox" y="36" height="24" rx="3" stroke-width="1" style="fill:var(--sw);stroke:var(--sw)" fill-opacity=".07" stroke-opacity=".55"/>
+<line id="e-sep" x1="148" y1="74" y2="74" stroke-width="1" style="stroke:var(--line)"/>
+<text id="e-wl" x="183" y="31" text-anchor="end" style="fill:var(--sw);font-size:9.5px;font-weight:700"></text>
+<g text-anchor="end" style="font-size:8.5px;font-weight:600">
+  <text id="e-lx1" x="183" y="47" style="fill:var(--sx)"></text><text id="e-lx2" x="183" y="59" style="fill:var(--sx)"></text>
+  <text x="183" y="71" style="fill:var(--sb)">b</text><text x="183" y="86" style="fill:var(--syh)">z</text><text x="183" y="98" style="fill:var(--sf)">h</text>
+</g>
+<g id="e-cells" text-anchor="middle" style="font-size:8.5px;font-weight:600"></g>
+<text id="e-rule" x="249" y="112" text-anchor="middle" style="font-size:8.5px"></text>
+<text id="e-acc" x="249" y="124" text-anchor="middle" style="fill:var(--syh);font-size:8.5px;font-weight:600"></text>
+<g id="e-boss" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M25 236V214M35 236V214" stroke-width="5" style="stroke:var(--tyre)"/>
+  <path d="M19 217V188q0-10 10-10h2q10 0 10 10V217Z" stroke="none" style="fill:var(--cloth)"/>
+  <path d="M26.5 178.3l3.5 6 3.5-6Z" stroke="none" style="fill:var(--shirt)"/>
+  <circle cx="30" cy="169" r="8" stroke="none" style="fill:var(--skin)"/>
+  <path d="M21.8 170.5q-1-9 4-11.2q4.2-1.8 8.4 0q5 2.2 4 11.2q-1.2-3.4-2.4-5.2q-6-1.6-11.6 0q-1.2 1.8-2.4 5.2Z" stroke="none" style="fill:var(--stick)"/>
+  <path id="e-ba" stroke-width="4.5" style="stroke:var(--cloth)"/><circle id="e-bha" r="2.6" stroke="none" style="fill:var(--skin)"/>
+  <path id="e-bb" stroke-width="4.5" style="stroke:var(--cloth)"/><circle id="e-bhb" r="2.6" stroke="none" style="fill:var(--skin)"/>
+</g>
+<g id="e-bs"><rect x="-24" y="-9" width="48" height="18" rx="3" stroke-width="1.4" style="fill:var(--board);stroke:var(--syh)"/><text id="e-bt" y="3.6" text-anchor="middle" style="fill:var(--syh);font-size:9.5px;font-weight:700"></text></g>
+<rect x="54" y="190" width="310" height="6" rx="1.5" style="fill:var(--woodtop)"/>
+<rect x="56" y="196" width="310" height="40" style="fill:var(--wood)"/>
+<g id="e-man" stroke-linecap="round" stroke-linejoin="round"></g>
+<g id="e-plates"></g>
+<g id="e-fly"></g>
+<g text-anchor="middle" style="fill:var(--muted);font-size:8px">
+  <text id="e-w0" x="30" y="248"></text><text x="30" y="257.5">слой 2</text>
+  <text id="e-w1" x="206" y="248"></text><text x="206" y="257.5">слой 1</text>
+</g>
+</svg>`,
+  init(E){
+    const QC = {}, q = id => QC[id] || (QC[id] = E.svg.querySelector("#e-" + id));
+    const sa = (e, o) => { if (typeof e === "string") e = q(e); for (const k in o) e.setAttribute(k, o[k]); };
+    const tx = (e, t) => { if (typeof e === "string") e = q(e); if (e.textContent !== t) e.textContent = t; };
+    const P = (x, y) => x.toFixed(1) + " " + y.toFixed(1);
+    // свой формат вместо toLocaleString: ползунок перерисовывает десятки чисел за кадр
+    const f2 = v => { const r = Math.round(v * 100), a = Math.abs(r), d = a % 100;
+      return (r < 0 ? "−" : "") + Math.floor(a / 100) + (d ? "," + (d % 10 ? String(d).padStart(2, "0") : d / 10) : ""); };
+    const CX = 72, CY = 68, U = 18, LM = 60 / U, R2 = 4;   // центр снимка, единиц картинки на 1, край снимка, радиус² тела кота
+    const S = (x, y) => [CX + U * x, CY - U * y];
+    const SUB = "₁₂₃₄₅₆", SHIRT = ["--pc1", "--cloth", "--pc2", "--pack", "--apron", "--pants"];
+    const RP = [[1, 2], [0, 0], [3, -1], [-1, 1], [-3, -1], [1, -1], [-2, 2], [0, -3]];   // точки для кнопок: кольцо
+    const XP = [[1, 2], [2, -1], [-2, 1], [1, 1]];                                         // точки для кнопок: пример
+    const WHO = ["старший", "бригада"];
+    const r1 = v => { const r = Math.round(v * 10) / 10; return r === 0 ? 0 : r; };
+    const ringW = n => Array.from({length: n}, (_, j) => { const a = (60 - 360 * j / n) * Math.PI / 180; return [r1(Math.cos(a)), r1(Math.sin(a))]; });
+    const CFG = {};
+    const cur = () => { const k = st.cfg + st.N; return CFG[k] || (CFG[k] = st.cfg === "ex" ? {W: [[1, 1], [1, -1]], B: [0, 0]} : {W: ringW(st.N), B: new Array(st.N).fill(-2)}); };
+    // угадано по снимку: доля точек сетки, где «все молчат» совпадает с «это кот»
+    const ACC = [0];
+    for (let n = 1; n <= 6; n++){ const W = ringW(n), G = 90; let ok = 0;
+      for (let i = 0; i < G; i++) for (let k = 0; k < G; k++){ const x = -LM + (i + .5) * 2 * LM / G, y = -LM + (k + .5) * 2 * LM / G;
+        if ((x * x + y * y < R2) === W.every(([a, c]) => a * x + c * y - 2 <= 0)) ok++; }
+      ACC[n] = Math.round(ok / G / G * 100); }
+    // часть квадрата снимка, где a·x + c·y + b ≤ 0
+    const SQ = [[-LM, -LM], [LM, -LM], [LM, LM], [-LM, LM]];
+    const clip = (poly, a, c, b) => { const out = [];
+      for (let i = 0; i < poly.length; i++){ const p = poly[i], r = poly[(i + 1) % poly.length], fp = a * p[0] + c * p[1] + b, fr = a * r[0] + c * r[1] + b;
+        if (fp <= 0) out.push(p);
+        if ((fp < 0 && fr > 0) || (fp > 0 && fr < 0)){ const t = fp / (fp - fr); out.push([p[0] + (r[0] - p[0]) * t, p[1] + (r[1] - p[1]) * t]); } }
+      return out; };
+    const pth = poly => poly.length ? "M" + poly.map(p => P(...S(p[0], p[1]))).join("L") + "Z" : "";
+    const onB = (p, r) => [0, 1].some(k => Math.abs(Math.abs(p[k]) - LM) < 1e-6 && Math.abs(p[k] - r[k]) < 1e-6);
+
+    // неизменное: ковёр, полоски кота, эксперты, таблички, ячейки таблицы, линейки
+    { let s = ""; for (let k = -120; k < 140; k += 13) s += `M${k} 128L${k + 120} 8`; q("rugp").setAttribute("d", s);
+      let t = ""; for (const a of [100, 118, 136]){ const c = Math.cos(a * Math.PI / 180), n = Math.sin(a * Math.PI / 180);
+        t += `M${P(CX + 17 * c, CY - 17 * n)}Q${P(CX + 26 * c + 3 * n, CY - 26 * n + 3 * c)} ${P(CX + 32 * c, CY - 32 * n)}`; }
+      q("strp").setAttribute("d", t);
+      const HAIR = [
+        '<path d="M-8.2 162a8.2 8.2 0 0 1 16.4 0c-2.5-3-5.5-4-8.2-4s-5.7 1-8.2 4Z" style="fill:var(--tyre)"/>',
+        '<circle cy="153.6" r="3.6" style="fill:var(--pack)"/><path d="M-8.2 162a8.2 8.2 0 0 1 16.4 0c-3-2-5-3.5-8.2-3.5s-5.2 1.5-8.2 3.5Z" style="fill:var(--pack)"/>',
+        '<path d="M-8.4 161a8.4 8.4 0 0 1 16.8 0Z" style="fill:var(--curt)"/><path d="M6 161h6" stroke-width="2.2" style="stroke:var(--curt)"/>',
+        '<path d="M-8.4 164q-2.4-9 3.6-11.6q4.8-3.6 9.6 0q6 2.6 3.6 11.6q-1.6-5-8.4-6.2q-6.8 1.2-8.4 6.2Z" style="fill:var(--woodtop)"/>',
+        '<path d="M-8.6 171V162a8.6 8.6 0 0 1 17.2 0V171h-2.8V163q-5.8-3.2-11.6 0V171Z" style="fill:var(--stick)"/>',
+        '<path d="M-8.5 161.4a8.5 8.5 0 0 1 17 0Z" style="fill:var(--pc2)"/><circle cy="153.4" r="2.2" style="fill:var(--pc2)"/>'];
+      let m = "", pl = "", cells = "", hl = "", rul = "", chips = "", lines = "", sides = "", fly = "";
+      for (let j = 0; j < 6; j++){ const c = SHIRT[j];
+        m += `<g id="e-m${j}"><path d="M-11 192V181q0-9 9-9h4q9 0 9 9V192Z" style="fill:var(${c})"/><path d="M-3.5 172.3l3.5 5 3.5-5Z" style="fill:var(--shirt)"/>
+          <circle cy="163" r="8" style="fill:var(--skin)"/>${HAIR[j]}
+          <path d="M-8 177L-13 186L-8 190.5" fill="none" stroke-width="4.5" style="stroke:var(${c})"/><circle cx="-7.5" cy="190.5" r="2.5" style="fill:var(--skin)"/>
+          <path id="e-a${j}" fill="none" stroke-width="4.5" style="stroke:var(${c})"/><circle id="e-h${j}" r="2.5" style="fill:var(--skin)"/></g>`;
+        pl += `<g id="e-p${j}"><rect id="e-pr${j}" x="-18" y="199" width="36" height="23" rx="3" stroke-width="1" style="fill:var(--board);stroke:var(--line)"/>
+          <text id="e-pn${j}" y="207.6" text-anchor="middle" style="fill:var(--muted);font-size:7px"></text>
+          <text id="e-pv${j}" y="218.6" text-anchor="middle" style="fill:var(--sf);font-size:10px;font-weight:700"></text></g>`;
+        hl += `<rect id="e-c${j}" y="22" height="80" rx="3" style="fill:var(--sw)" opacity="0"/>`;
+        cells += `<g id="e-k${j}"><circle id="e-kc${j}" cy="28" r="5" style="fill:var(--ink)"/><text id="e-kt${j}" y="30.5" style="fill:var(--card);font-size:7px;font-weight:700">${j + 1}</text>
+          <text id="e-k0${j}" y="47" style="fill:var(--sw)"></text><text id="e-k1${j}" y="59" style="fill:var(--sw)"></text><text id="e-k2${j}" y="71" style="fill:var(--sb)"></text>
+          <text id="e-k3${j}" y="86" style="fill:var(--syh)"></text><text id="e-k4${j}" y="98" style="fill:var(--sf)"></text></g>`;
+        sides += `<path id="e-s${j}" style="fill:var(--sf)" opacity="0"/>`;
+        lines += `<path id="e-l${j}"/>`;
+        rul += `<g id="e-r${j}"><path id="e-rb${j}" stroke-width=".8" style="fill:var(--pc3);stroke:var(--woodtop)"/><path id="e-rt${j}" fill="none" stroke-width=".8" style="stroke:var(--ink)" opacity=".5"/></g>`;
+        chips += `<g id="e-q${j}"><circle id="e-qc${j}" r="5" stroke-width="1.1" style="fill:var(--ink);stroke:var(--card)"/><text id="e-qt${j}" text-anchor="middle" style="fill:var(--card);font-size:7px;font-weight:700">${j + 1}</text></g>`;
+        fly += `<rect id="e-y${j}" width="11" height="7.5" rx="1.5" style="fill:var(--sf)" opacity="0"/>`;
+      }
+      q("man").innerHTML = m; q("plates").innerHTML = pl; q("hl").innerHTML = hl; q("cells").innerHTML = cells;
+      q("rul").innerHTML = rul; q("chips").innerHTML = chips; q("lines").innerHTML = lines; q("sides").innerHTML = sides; q("fly").innerHTML = fly;
+      const C = (c, t) => `<tspan style="fill:var(${c})">${t}</tspan>`, M = t => `<tspan style="fill:var(--muted)">${t}</tspan>`;
+      q("f").innerHTML = C("--sf", "h") + M(" = ") + C("--sf", "ReLU") + M("(") + C("--sx", "x") + M(" @ ") + C("--sw", "W") + M(" + ") + C("--sb", "b") + M(")");
+      q("rule").innerHTML = M("старший: «") + C("--syh", "кот") + M("», если все ") + C("--sf", "h") + M(" = 0");
+    }
+
+    // ph — что посчитано: done[j] — эксперт ответил; hand — насколько поднята рука; hl — подсветка столбца, линейки, таблички;
+    // lay — линейка на месте (0 — за краем снимка); bs — табличка старшего поднята; fly — отчёты летят к старшему
+    const st = {cfg: "ring", N: 3, pin: [1, 2], pinOn: true, done: [0, 0, 0, 0, 0, 0], hand: [0, 0, 0, 0, 0, 0], hl: [0, 0, 0, 0, 0, 0], lay: [1, 1, 1, 1, 1, 1],
+                bnd: false, boss: false, bs: 0, fly: null, names: null, who: WHO};
+    const ZH = () => { const {W, B} = cur(), [x1, x2] = st.pin, Z = W.map(([a, c], j) => a * x1 + c * x2 + B[j]); return [Z, Z.map(z => z > 1e-9 ? z : 0)]; };
+    const tgt = (j, H) => st.done[j] && H[j] > 0 ? 0.35 + 0.65 * Math.min(1, H[j] / 1.5) : 0;
+    const xc = (j, n) => 58 + 296 * (j + 0.5) / n;
+    let vk = "";
+
+    function draw(fromSlider){
+      E.view(180);
+      const {W, B} = cur(), N = W.length, ring = st.cfg === "ring", [x1, x2] = st.pin, [Z, H] = ZH();
+      const xi = [Math.round(x1), Math.round(x2)];   // пока булавка едет, подписи — целые
+      const occ = [];   // рамки поставленных подписей на снимке
+      const hit = r => r[0] < 14 || r[2] > 130 || r[1] < 10 || r[3] > 126 || occ.some(o => r[0] < o[2] + 1 && o[0] < r[2] + 1 && r[1] < o[3] + 1 && o[1] < r[3] + 1);
+      // булавка и её подпись — первыми, номера линеек обходят их
+      const [PXs, PYs] = S(x1, x2);
+      sa("pin", {cx: PXs.toFixed(1), cy: PYs.toFixed(1), opacity: st.pinOn ? 1 : 0}); sa("pinr", {cx: PXs.toFixed(1), cy: PYs.toFixed(1), opacity: st.pinOn ? 0.28 : 0});
+      if (st.pinOn) occ.push([PXs - 5, PYs - 5, PXs + 5, PYs + 5]);
+      function tag(id, text, fs, cands){
+        const g = q(id), w = text.length * 0.6 * fs + 6;
+        if (text) for (const [X, Y] of cands){ const r = [X - w / 2, Y - 6, X + w / 2, Y + 6]; if (hit(r)) continue; occ.push(r);
+          sa(g.firstChild, {x: (X - w / 2).toFixed(1), y: (Y - 6).toFixed(1), width: w.toFixed(1)}); sa(g.lastChild, {x: X.toFixed(1), y: (Y + 3.2).toFixed(1)});
+          tx(g.lastChild, text); g.setAttribute("opacity", 1); return; }
+        g.setAttribute("opacity", 0);
+      }
+      const pl = `x = [${f2(xi[0])}, ${f2(xi[1])}]`, pw = pl.length * 5.4 / 2 + 9;
+      tag("tpin", st.pinOn ? pl : "", 9, [[PXs, PYs - 12], [PXs, PYs + 13], [PXs + pw, PYs], [PXs - pw, PYs], [PXs + pw, PYs - 6], [PXs - pw, PYs - 6],
+        [PXs + pw - 6, PYs - 12], [PXs - pw + 6, PYs - 12], [PXs + pw - 6, PYs + 13], [PXs - pw + 6, PYs + 13]]);
+      // эксперты, их линейки и таблички
+      for (let j = 0; j < 6; j++){
+        const on = j < N, g = q("m" + j);
+        g.style.display = on ? "" : "none"; q("p" + j).style.display = on ? "" : "none";
+        q("r" + j).style.display = on ? "" : "none"; q("q" + j).style.display = on ? "" : "none"; q("k" + j).style.display = on ? "" : "none";
+        q("l" + j).style.display = on ? "" : "none"; q("s" + j).style.display = on ? "" : "none";
+        if (!on){ sa("c" + j, {opacity: 0}); sa("y" + j, {opacity: 0}); continue; }
+        const cx = xc(j, N), e = st.hand[j], hj = st.hl[j];
+        sa(g, {transform: `translate(${cx.toFixed(1)} 0)`}); sa("p" + j, {transform: `translate(${cx.toFixed(1)} 0)`});
+        const ex = 13 + e, ey = 186 - 21 * e, hx = 8 + 5 * e, hy = 190.5 - 50 * e;
+        sa("a" + j, {d: `M8 177L${P(ex, ey)}L${P(hx, hy)}`}); sa("h" + j, {cx: hx.toFixed(1), cy: hy.toFixed(1)});
+        sa("pr" + j, {style: hj > 0.5 ? "fill:var(--board);stroke:var(--sw)" : "fill:var(--board);stroke:var(--line)", "stroke-width": hj > 0.5 ? 1.6 : 1});
+        tx("pn" + j, st.names && st.names[j] ? st.names[j] : "h" + SUB[j]);
+        tx("pv" + j, st.names ? "" : st.done[j] ? f2(H[j]) : "?");
+        q("pv" + j).style.opacity = st.done[j] && H[j] === 0 ? 0.55 : 1;
+        // линейка: внутренний край — прямая, где z = 0; лежит со стороны, где эксперт говорит
+        const [a, c] = W[j], nn = Math.hypot(a, c), n0 = a / nn, n1 = c / nn, d = -B[j] / nn, t0 = -n1, t1 = n0;
+        const out = (1 - st.lay[j]) * 2.6, s0 = ring ? 0 : -1.5, bx = (d + out) * n0, by = (d + out) * n1, T = 0.32, HL = 1.5;
+        const pt = (s, o) => S(bx + (s0 + s) * t0 + o * n0, by + (s0 + s) * t1 + o * n1);
+        sa("rb" + j, {d: `M${P(...pt(-HL, 0))}L${P(...pt(HL, 0))}L${P(...pt(HL, T))}L${P(...pt(-HL, T))}Z`, opacity: st.lay[j] > 0.01 ? 1 : 0,
+          style: hj > 0.5 ? "fill:var(--pc3);stroke:var(--sw)" : "fill:var(--pc3);stroke:var(--woodtop)", "stroke-width": hj > 0.5 ? 1.6 : 0.8});
+        let tk = ""; for (let k = -6; k <= 6; k++){ const l = k % 2 ? 0.1 : 0.17; tk += `M${P(...pt(k * 0.25, 0))}L${P(...pt(k * 0.25, l))}`; }
+        sa("rt" + j, {d: tk, opacity: st.lay[j] > 0.01 ? 0.5 : 0});
+        const l0 = S(d * n0 - 6 * t0, d * n1 - 6 * t1), l1 = S(d * n0 + 6 * t0, d * n1 + 6 * t1);
+        sa("l" + j, {d: `M${P(...l0)}L${P(...l1)}`, opacity: st.lay[j]});
+        sa("s" + j, {d: hj > 0.01 ? pth(clip(SQ, -a, -c, -B[j])) : "", opacity: (0.2 * hj).toFixed(3)});
+        // номер на линейке — где не мешает булавке и другим номерам
+        let ok = false;
+        for (const s of [0, 0.8, -0.8, 1.15, -1.15]){ const [X, Y] = pt(s, T / 2), r = [X - 5.5, Y - 5.5, X + 5.5, Y + 5.5];
+          if (hit(r)) continue; occ.push(r); ok = true;
+          sa("qc" + j, {cx: X.toFixed(1), cy: Y.toFixed(1)}); sa("qt" + j, {x: X.toFixed(1), y: (Y + 2.5).toFixed(1)}); break; }
+        q("q" + j).setAttribute("opacity", ok && st.lay[j] > 0.5 ? 1 : 0);
+        // столбец таблицы
+        const CW = Math.min(46, 161 / N), X0 = 188 + CW * j, Xm = (X0 + CW / 2).toFixed(1);
+        sa("c" + j, {x: (X0 + 1).toFixed(1), width: (CW - 2).toFixed(1), opacity: (0.17 * hj).toFixed(3)});
+        sa("kc" + j, {cx: Xm}); sa("kt" + j, {x: Xm});
+        for (let r = 0; r < 5; r++) sa("k" + r + j, {x: Xm});
+        tx("k0" + j, f2(a)); tx("k1" + j, f2(c)); tx("k2" + j, f2(B[j]));
+        tx("k3" + j, st.done[j] ? f2(Z[j]) : "?"); tx("k4" + j, st.done[j] ? f2(H[j]) : "?");
+        // отчёт в полёте: с таблички к старшему
+        const u = st.fly ? st.fly[j] : 0;
+        if (u > 0 && u < 1){ const fx = cx + (30 - cx) * u - 5.5, fy = 207 + (146 - 207) * u - Math.sin(u * Math.PI) * 26;
+          sa("y" + j, {x: fx.toFixed(1), y: fy.toFixed(1), opacity: 0.95}); } else sa("y" + j, {opacity: 0});
+      }
+      // таблица: размер, рамка W, входы
+      const CW = Math.min(46, 161 / N);
+      tx("wl", `W 2 × ${N}`); sa("wbox", {x: 187, width: (CW * N + 2).toFixed(1)}); sa("sep", {x2: (188 + CW * N).toFixed(1)});
+      tx("lx1", st.pinOn ? "x₁ = " + f2(xi[0]) : "x₁"); tx("lx2", st.pinOn ? "x₂ = " + f2(xi[1]) : "x₂");
+      q("rule").style.opacity = st.boss && ring ? 1 : 0;
+      tx("acc", ring && st.bnd ? `угадано по снимку: ${ACC[N]} %` : "");
+      // граница: где молчат все — многоугольник из линеек; штриховка — где старший ошибается
+      const bon = ring && st.bnd;
+      let poly = SQ; if (bon) for (let j = 0; j < N; j++) poly = clip(poly, W[j][0], W[j][1], B[j]);
+      let bd = "";
+      if (bon && poly.length) for (let i = 0; i < poly.length; i++){ const p = poly[i], r = poly[(i + 1) % poly.length]; if (!onB(p, r)) bd += `M${P(...S(...p))}L${P(...S(...r))}`; }
+      sa("bd", {d: bd}); sa("mrug", {d: bon ? pth(poly) : ""}); sa("coutp", {d: "M12 8H132V128H12Z" + (bon ? pth(poly) : "")}); sa("mcat", {opacity: bon ? 0.4 : 0});
+      // «граница» — у середины одной из сторон, внутри (подпись булавки и номера линеек уже стоят)
+      const bc = [];
+      if (bd) for (let i = 0; i < poly.length; i++){ const p = poly[i], r = poly[(i + 1) % poly.length]; if (onB(p, r)) continue;
+        const mx = (p[0] + r[0]) / 2, my = (p[1] + r[1]) / 2, m = Math.hypot(mx, my) || 1;
+        for (const k of [0.55, -0.6]){ const [X, Y] = S(mx - k * mx / m, my - k * my / m); bc.push([X, Y, Math.hypot(X - 40, Y - 30)]); } }
+      bc.sort((u, v) => u[2] - v[2]);
+      tag("tbd", bd ? "граница" : "", 8.5, bc);
+      // старший: руки и табличка с решением
+      const bsv = st.bs, verdict = H.every(v => v === 0), right = verdict === (x1 * x1 + x2 * x2 < R2);
+      const ly = 176 - 30 * bsv;
+      sa("bs", {transform: `translate(30 ${ly.toFixed(1)})`, opacity: bsv > 0.05 && ring ? 1 : 0});
+      const ha = [17 - 4 * bsv, 206 - 54 * bsv + (ly - 146) * 0], hb = [43 + 4 * bsv, 206 - 54 * bsv];
+      sa("ba", {d: `M22 183L${P(19 - 4 * bsv, 196 - 30 * bsv)}L${P(ha[0], ha[1])}`}); sa("bha", {cx: ha[0].toFixed(1), cy: ha[1].toFixed(1)});
+      sa("bb", {d: `M38 183L${P(41 + 4 * bsv, 196 - 30 * bsv)}L${P(hb[0], hb[1])}`}); sa("bhb", {cx: hb[0].toFixed(1), cy: hb[1].toFixed(1)});
+      const vt = (verdict ? "кот" : "не кот") + (right ? " ✓" : " ✗");
+      if (vt !== vk){ vk = vt; q("bt").innerHTML = (verdict ? "кот" : "не кот") + `<tspan style="fill:var(${right ? "--good" : "--bad"})">${right ? " ✓" : " ✗"}</tspan>`; }
+      tx("w0", st.who[0]); tx("w1", st.who[1]);
+      // плашки
+      E.val(0, `2 × ${N}`);
+      E.val(1, st.pinOn ? `[${f2(xi[0])}, ${f2(xi[1])}]` : "—");
+      const hv = Array.from({length: N}, (_, j) => st.done[j] ? f2(H[j]) : "?"), hs = `[${hv.join(hv.some(v => v.includes(",")) ? "; " : ", ")}]`;
+      E.val(2, hs); const hvEl = E.root.querySelector("#stV2"); if (hvEl){ hvEl.style.fontSize = Math.min(20, 128 / (hs.length * 0.6)).toFixed(1) + "px"; hvEl.style.whiteSpace = "nowrap"; }
+      E.val(3, ring && st.bnd ? ACC[N] + " %" : "—");
+      if (!fromSlider) E.setCtrl("нейроны", N);
+    }
+
+    function anim(ms, id, fn){
+      return new Promise(res => {
+        if (!E.live(id)) return res();
+        const t0 = performance.now();
+        const fr = now => {
+          if (!E.live(id)) return res();
+          const p = Math.min((now - t0) / ms, 1); fn(p < .5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2, p); draw();
+          if (p < 1) requestAnimationFrame(fr); else res();
+        };
+        requestAnimationFrame(fr);
+      });
+    }
+    const reset = () => { st.done.fill(0); st.hand.fill(0); st.hl.fill(0); st.bs = 0; st.fly = null; };
+    const full = () => { const [, H] = ZH(); st.done.fill(1); for (let j = 0; j < 6; j++) st.hand[j] = j < H.length ? tgt(j, H) : 0; st.hl.fill(0); st.bs = st.boss ? 1 : 0; };
+    async function clear(id){
+      const h0 = st.hand.slice(), b0 = st.bs;
+      if (h0.some(v => v > 0.01) || b0 > 0.01) await anim(260, id, e => { for (let j = 0; j < 6; j++) st.hand[j] = h0[j] * (1 - e); st.bs = b0 * (1 - e); });
+      if (!E.live(id)) return;
+      reset(); draw();
+    }
+    async function movePin(p, id){
+      await clear(id); if (!E.live(id)) return;
+      const a = st.pin.slice(), dist = Math.hypot(p[0] - a[0], p[1] - a[1]); st.pinOn = true;
+      if (dist > 0.01) await anim(Math.min(900, 300 + 110 * dist), id, e => { st.pin = [a[0] + (p[0] - a[0]) * e, a[1] + (p[1] - a[1]) * e]; });
+      if (E.live(id)){ st.pin = p.slice(); draw(); }
+    }
+    async function one(id, k){   // эксперты по очереди: столбец за столбцом
+      const N = cur().W.length, [, H] = ZH();
+      for (let j = 0; j < N; j++){
+        if (!E.live(id)) return;
+        await anim(260 * k, id, e => { st.hl[j] = e; if (j) st.hl[j - 1] = 1 - e; });
+        if (!E.live(id)) return;
+        st.done[j] = 1; const t = tgt(j, H);
+        await anim(420 * k, id, e => { st.hand[j] = t * e; });
+        if (!E.live(id)) return;
+        await E.wait(380 * k);
+      }
+      await anim(220, id, e => { st.hl[N - 1] = 1 - e; });
+    }
+    async function all(id){   // одна команда: все столбцы разом
+      const N = cur().W.length, [, H] = ZH();
+      await anim(300, id, e => { for (let j = 0; j < N; j++) st.hl[j] = e; });
+      if (!E.live(id)) return;
+      st.done.fill(1); const T = Array.from({length: 6}, (_, j) => j < N ? tgt(j, H) : 0);
+      await anim(450, id, e => { for (let j = 0; j < 6; j++) st.hand[j] = T[j] * e; });
+      if (!E.live(id)) return;
+      await E.wait(450);
+      await anim(260, id, e => { for (let j = 0; j < N; j++) st.hl[j] = 1 - e; });
+    }
+    async function chief(id){   // отчёты летят старшему, он поднимает табличку
+      if (st.cfg !== "ring") return;
+      st.boss = true; const N = cur().W.length, D = 620, G = 90, tot = D + G * (N - 1);
+      st.fly = new Array(6).fill(0);
+      await anim(tot, id, (_, p) => { for (let j = 0; j < N; j++) st.fly[j] = Math.max(0, Math.min(1, (p * tot - G * j) / D)); });
+      st.fly = null; if (!E.live(id)) return;
+      await anim(380, id, e => { st.bs = e; });
+    }
+    async function lay(id){   // линейки ложатся по одной
+      const N = cur().W.length; st.lay.fill(0); draw();
+      for (let j = 0; j < N; j++){
+        if (!E.live(id)) return;
+        await anim(700, id, (e, p) => { st.lay[j] = e; st.hl[j] = Math.sin(p * Math.PI) * 0.95; });
+        if (!E.live(id)) return;
+        st.hl[j] = 0; await E.wait(280);
+      }
+    }
+    async function scan(id){   // столбцы W загораются по одному вместе с линейкой и экспертом
+      const N = cur().W.length;
+      for (let j = 0; j < N; j++){ if (!E.live(id)) return; await anim(950, id, (_, p) => { st.hl[j] = Math.sin(p * Math.PI); }); }
+      if (E.live(id)){ st.hl.fill(0); draw(); }
+    }
+    function setN(n){ const was = st.done.some(v => v); st.N = n; st.lay.fill(1); st.hl.fill(0); if (was) full(); else reset(); draw(); }
+    async function run(plan, id){
+      for (const p of plan){
+        if (!E.live(id)) return;
+        if (p === "pause") await E.wait(1300);
+        else if (p === "ring"){ st.cfg = "ring"; draw(); }
+        else if (p === "ex"){ st.cfg = "ex"; st.N = 2; st.pin = [1, 2]; st.pinOn = true; st.bnd = false; st.boss = false; reset(); st.lay.fill(1); draw(); }
+        else if (p === "clear") await clear(id);
+        else if (p === "lay") await lay(id);
+        else if (p === "scan") await scan(id);
+        else if (p === "one") await one(id, 1);
+        else if (p === "one2") await one(id, 0.75);
+        else if (p === "all") await all(id);
+        else if (p === "chief") await chief(id);
+        else if (p === "full"){ full(); draw(); }
+        else if (p.N != null) setN(p.N);
+        else if (p.pin) await movePin(p.pin, id);
+      }
+    }
+    return {
+      draw,
+      step(s, id){ st.fly = null; st.hl.fill(0); st.lay.fill(1); st.names = s.names || null; st.who = s.who || WHO;
+        st.bnd = !!s.bnd; st.boss = !!s.boss; st.pinOn = !s.nopin; if (!st.boss) st.bs = 0;
+        draw(); return run([].concat(s.go == null ? [] : s.go), id); },
+      slide(v){ st.cfg = "ring"; st.N = Math.round(v); st.bnd = true; st.boss = true; st.pinOn = true; st.names = null; st.who = WHO; st.lay.fill(1); st.fly = null; full(); draw(true); },
+      action(a, id){
+        st.fly = null; st.hl.fill(0); st.lay.fill(1); st.names = null; st.who = WHO;
+        const ring = st.cfg === "ring", L = ring ? RP : XP; if (ring){ st.boss = true; st.bnd = true; }
+        const i = L.findIndex(p => p[0] === st.pin[0] && p[1] === st.pin[1]);
+        run([{pin: L[(i + 1) % L.length]}, a === "one" ? "one2" : "all", "chief"], id);
+      }
     };
   }
 };
