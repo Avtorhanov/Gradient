@@ -1177,6 +1177,28 @@ const LESSONS = [
     ["a получает −2 · b = 6; b получает −2 · a = −4","Проверка: при a = 2,01 выходит L = −7,94, то есть +0,06 = 6 · 0,01."]]},
   analog:"Разбор провала в команде: директор спрашивает с руководителя, тот — со своих сотрудников, те — со своих. Каждый получает долю вины по своему вкладу, и никого не нужно проверять отдельно.",
   src:"Карпатый, лекция «building micrograd» (этот пример с a, b, c, f). Принс, гл. 7 (градиенты и обратное распространение). Траск, гл. 6.",
+  stand:{scene:"stairs", steps:[
+    {t:"В сети тысячи ручек. Нужно узнать градиент каждой: как изменится ошибка, если её чуть подвинуть. Двигать по одной и всё пересчитывать — слишком долго. Возьмём граф из разбора: команда на трибуне считает <b style=\"color:var(--cool)\">L</b> = (a·b + c)·f. Значения поднимаются снизу вверх: a и b дают e = −6, e и c — d = 4, d и f — итог L = −8.",
+     go:["fwd"],
+     ex:[["Принс, гл. 7","Автор начинает главу с того же вопроса: у глубокой сети огромное число параметров, и для каждого нужна производная ошибки. Если считать каждую отдельно, одни и те же промежуточные вычисления пришлось бы повторять снова и снова. Обратное распространение получает их все за два прохода — вперёд и назад."]]},
+    {path:true, t:"Помогает <b>правило цепочки</b>: если одно число влияет на второе с силой 2, а второе на ошибку с силой 3, то первое влияет на ошибку с силой 2 × 3 = 6. Влияния вдоль пути перемножаются. Путь от a к директору: a влияет на e с силой b = −3, e на d — с силой 1, d на L — с силой f = −2. Вместе <b style=\"color:var(--accent)\">∂L/∂a</b> = (−3) · 1 · (−2) = 6.",
+     ex:[["Карпатый, лекция «building micrograd»","Правило цепочки автор поясняет примером из Википедии: машина едет вдвое быстрее велосипеда, а велосипед вчетверо быстрее пешехода. Значит, машина быстрее пешехода в 2 × 4 = 8 раз — скорости вдоль цепочки перемножаются."]]},
+    {t:"Двух правил хватает почти на всё. <b>Сложение</b> d = e + c: вина, пришедшая к d, достаётся e и c без изменений — по −2. <b>Умножение</b> L = d · f: d получает вину L, умноженную на соседа f, а f — умноженную на d. Табличка соседа обведена пунктиром.",
+     go:[{bk:3}, "pause", "back", "back", "pause", {bk:1}, "back", "back"],
+     ex:[["Карпатый, лекция «building micrograd»","Узел сложения автор называет раздатчиком: он просто передаёт пришедший градиент всем слагаемым, без изменений. А узел умножения как бы меняет множители местами: каждый получает градиент выхода, умноженный на значение другого."]]},
+    {t:"Начинают с конца: вина ошибки перед самой собой равна 1 — папку получает директор. Дальше идут назад, человек за человеком: каждому нужна вина того, кто стоит выше, поэтому порядок — сверху вниз. Это и есть <b>обратное распространение</b> (backpropagation): один проход назад — и вина известна у всех.",
+     go:[{bk:0}, "run"],
+     ex:[["Принс, гл. 7","Пример автора — цепочка из нескольких функций, вложенных одна в другую. Проход вперёд считает и запоминает все промежуточные значения. Проход назад идёт от ошибки к началу и на каждом звене умножает на производную этого звена, а нужные для этого числа уже сохранены."],
+         ["Траск, гл. 6","Автор называет обратное распространение передачей ошибки на большое расстояние: промах выхода отправляют назад, в средний слой, и каждый узел получает долю — через вес связи, которой он влиял на ответ. Узел, который при прогнозе молчал (ReLU дала 0), вины не получает."]]},
+    {t:"Разбор примера: a = 2, b = −3, c = 10, f = −2. Вперёд: e = 2·(−3) = −6, d = −6 + 10 = 4, <b style=\"color:var(--cool)\">L</b> = 4·(−2) = −8. Назад: ∂L/∂L = 1; d получает f = −2, f получает d = 4; e и c — по −2; a получает −2 · b = 6, b получает −2 · a = −4.",
+     go:[{bk:7}],
+     ex:[["Карпатый, лекция «building micrograd»","Это граф из лекции, с теми же числами и L = −8. Автор сначала находит градиенты руками, а потом проверяет каждый: чуть сдвигает одно число, пересчитывает L и смотрит, насколько она изменилась."]]},
+    {check:true, t:"Проверка: <b style=\"color:var(--accent)\">∂L/∂a</b> = 6 значит, что сдвиг a на 0,1 сдвинет L на 6 · 0,1 = 0,6. Ползунок a: при a = 2,1 выходит L = −7,4 — ровно на 0,6 больше. При a = 2,01 было бы L = −7,94. Вина a от самого a не зависит, а вина b = −2 · a — меняется.",
+     go:[{a:2.1}, "pause", {a:3}, "pause", {a:1.5}]},
+    {look:true, path:true, t:"Обмен через третью валюту: пусть за доллар дают 0,9 евро, а за евро — 100 рублей. Тогда за доллар — 0,9 × 100 = 90 рублей: курсы вдоль цепочки перемножаются. Так же вина идёт по трибуне: от директора к a через d и e, и силы связей перемножаются."},
+    {look:true, t:"Площадь комнаты = длина × ширина: 4 × 3 = 12 м². Удлините комнату на метр — площадь вырастет на 3 м², то есть на ширину: это «× на соседа». А общий счёт в кафе — сумма заказов: подорожал любой заказ на 100 ₽ — и счёт вырос на те же 100 ₽. Сложение передаёт как есть.",
+     go:[{bk:5}, "back", "pause", {bk:3}, "back"]}
+  ]},
   tasks:[
     {t:"num", q:"a влияет на b с силой 2, b влияет на ошибку с силой 5. С какой силой a влияет на ошибку?", a:10, hint:"Влияния вдоль пути перемножаются.", why:"2 × 5 = 10.", steps:["a меняется на 1 → b меняется на 2.", "b меняется на 2 → ошибка меняется на 2 · 5 = 10.", "Влияния вдоль цепочки перемножаются: 2 × 5 = 10."], idea:"Так считают влияние любой ручки на ошибку, даже если между ними десятки слоёв: перемножают влияния вдоль пути."},
     {t:"num", q:"z = x + y. К z пришёл градиент 7. Какой градиент получит x?", a:7, hint:"Сложение передаёт градиент как есть.", why:"При сложении градиент проходит без изменений: 7.", steps:["z = x + y: если x вырастет на 1, z тоже вырастет на 1.", "Значит, влияние x на z равно 1.", "Градиент x = 7 · 1 = 7 — проходит без изменений."], idea:"Сложение — «прозрачный» узел: передаёт градиент дальше как есть. Это пригодится в уроке «+» про остаточные связи."},
@@ -1202,6 +1224,31 @@ const LESSONS = [
     ["a.grad = 6.0","Тот же ответ, что вы посчитали вручную."]]},
   analog:"Бухгалтер хранит все чеки. Чтобы понять, откуда взялась итоговая сумма, он идёт по чекам в обратном порядке. Если не выбросить чеки прошлого месяца (zero_grad), они попадут в новый отчёт.",
   src:"Карпатый, micrograd (класс Value и backward). Траск, гл. 13 (своя мини-библиотека с автоградиентами). Рашка, приложение A (основы PyTorch и autograd).",
+  stand:{scene:"ledger", steps:[
+    {t:"Правило цепочки можно поручить компьютеру. Для этого каждое число запоминает, из каких чисел и какой операцией оно получено. Как бухгалтер: на каждую операцию — чек, где записано, что с чем перемножили или сложили и что вышло. Чек 1: e = a · b = −6, чек 2: d = e + c = 4, чек 3: <b style=\"color:var(--cool)\">L</b> = d · f = −8. Чеки по порядку — это и есть <b>граф вычислений</b>.",
+     go:["clear", "print"],
+     ex:[["Траск, гл. 13","Автор строит свою маленькую библиотеку для глубокого обучения. Каждый тензор в ней помнит, из каких тензоров он получен и какой операцией — сложением, умножением или другой. По этим записям потом можно пройти назад и посчитать градиенты."]]},
+    {t:"Вызов <b>backward()</b> обходит граф от ошибки к началу и в каждом узле применяет правило: для сложения — передать как есть, для умножения — умножить на соседа. Бухгалтер идёт по чекам в обратном порядке, от итога L к первому, и на каждом раздаёт градиент тем, из кого число получено. Это называют автоматическим дифференцированием.",
+     go:["bw"],
+     ex:[["Карпатый, лекция «building micrograd»","Чтобы пройти граф в правильном порядке, автор выстраивает узлы топологической сортировкой: узел попадает в список только после всех, из кого он получен. Потом backward идёт по этому списку с конца и у каждого узла вызывает его маленькое правило — своё для сложения и своё для умножения."]]},
+    {t:"Разбор примера: что происходит при L.backward(). Старт с конца: <b style=\"color:var(--accent)\">L.grad = 1</b>. Чек умножения L = d · f раздаёт: d.grad += f · L.grad = −2, f.grad += d · L.grad = 4. Чек сложения d = e + c передаёт −2 как есть. Последний — снова умножение, и <b style=\"color:var(--accent)\">a.grad = 6.0</b>: тот же ответ, что вы посчитали руками в прошлом уроке.",
+     go:["bwS"],
+     ex:[["Карпатый, лекция «building micrograd»","Под конец автор пересчитывает свой пример в PyTorch — градиенты совпадают с теми, что дал micrograd. Разница только в размахе: PyTorch работает не с отдельными числами, а с целыми таблицами чисел — тензорами."]]},
+    {cards:true, t:"В PyTorch это одна строка: <b>loss.backward()</b>. После неё у каждой ручки появляется поле <b style=\"color:var(--accent)\">.grad</b> — её градиент: на карточках a, b, c и f. Дальше оптимизатор делает шаг — сдвигает каждую ручку против её .grad.",
+     go:["bwI"],
+     ex:[["Рашка, приложение A","Автор показывает autograd на маленькой логистической регрессии: если у тензора включено requires_grad, PyTorch сам строит граф вычислений. После loss.backward() градиенты лежат в поле .grad у веса и сдвига — выводить формулы руками не нужно."],
+         ["Траск, гл. 13","В своей библиотеке автор пишет и оптимизатор: он хранит список параметров и умеет две вещи — сделать шаг, сдвинув каждый параметр против его градиента, и обнулить градиенты перед следующим шагом."]]},
+    {t:"Важная деталь: градиенты копятся (+=). Бухгалтер не стирает карточки сам: второй backward() прибавит новые числа к старым — a.grad = 6 + 6 = 12, и шаг выйдет вдвое длиннее, чем нужно. Поэтому перед новым шагом их обнуляют: <b>optimizer.zero_grad()</b> — старые записи в корзину.",
+     go:["bwI", "pause", "bw", "pause", "zero", "pause", "bwI"],
+     ex:[["Карпатый, лекция «building micrograd»","Автор сам натыкается на ошибку: если число входит в формулу дважды, например b = a + a, его градиент должен прийти с обеих сторон и сложиться, а при «=» вторая часть затирала первую. Поэтому в коде везде +=. А в цикле обучения он забывает обнулить градиенты, и они копятся от шага к шагу, — и признаёт, что это очень частая ошибка."],
+         ["Рашка, приложение A","В цикле обучения у автора перед loss.backward() стоит optimizer.zero_grad(): градиенты прошлого шага обнуляют, иначе они прибавились бы к новым."]]},
+    {t:"Поменяйте <b>a</b> ползунком — бухгалтер заведёт новые чеки и пройдёт их заново. a.grad = b · e.grad = 6 при любом a. А b.grad = a · e.grad = −2 · a: при a = 1 он −2, при a = 2,5 — −5. Поменяли одно число — все градиенты пересчитались сами, как в задаче с кодом.",
+     go:[{a:1}, "pause", {a:2.5}, "pause", {a:2}]},
+    {look:true, t:"Суточный пробег в машине: счётчик копит километры, пока его не сбросить. Забыли нажать сброс перед новой поездкой — к ней прибавится прошлая. zero_grad() — та же кнопка сброса, только для градиентов: без неё каждый backward() докидывает к старым числам новые.",
+     go:["bwI", "pause", "bwI", "pause", "bwI", "pause", "zero"]},
+    {look:true, t:"Таблица Excel: ячейка с формулой помнит, из каких ячеек она посчитана, — Excel умеет показать их стрелками. Граф вычислений — такие же стрелки от чисел к чекам. backward() идёт по ним в обратную сторону и каждой ячейке-источнику дописывает её долю.",
+     go:["bw"]}
+  ]},
   tasks:[
     {t:"code", q:"Запустите код: он считает градиенты сам. Потом поменяйте a на 3.0 и снова нажмите «Проверить». Каким станет градиент b?", srcId:"code-value", hint:"Градиент b = градиент e × a = −2 × a.", sol:"a = Value(3.0) → градиент b: −6.0", why:"b получает градиент −2 × a = −6: умножение берёт соседа.", steps:["В графе e = a · b, и к e приходит градиент −2.", "Для b сосед по умножению — a. Значит, градиент b = −2 · a.", "При a = 3: −2 · 3 = −6. Программа посчитала то же самое."], idea:"Вы поменяли одно число — и все градиенты пересчитались сами. В этом сила автоматического подсчёта градиентов.",
      check:{out:o => /градиент b: -6\.0/.test(o), code:c => /=\s*Value\(\s*3(\.0*)?\s*\)\s*,\s*Value\(\s*-3/.test(c)}},
@@ -4122,6 +4169,500 @@ SCENES.crew = {
         const i = L.findIndex(p => p[0] === st.pin[0] && p[1] === st.pin[1]);
         run([{pin: L[(i + 1) % L.length]}, a === "one" ? "one2" : "all", "chief"], id);
       }
+    };
+  }
+};
+
+/* ---------- Сцена «Разбор провала на трибуне»: урок ∂ ----------
+   Граф из разбора урока: L = (a·b + c)·f, a = 2, b = −3, c = 10, f = −2. Команда стоит на ступенях трибуны, как на общем
+   фото: директор L наверху, под ним d и f, ниже e и c (их число собирает d), внизу a и b (их собирает e). У тех, кто
+   собирает двоих, на груди значок операции (× или +). Под ногами у каждого табличка: значение («d = e + c = 4») и вина
+   ∂L/∂ («∂L/∂d = −2»); линии от таблички ведут к тем, из кого число получено. «Вперёд» — значения поднимаются снизу вверх
+   (e = −6, d = 4, L = −8). «Шаг назад» — вина спускается красной папкой на одного человека (порядок L, d, f, e, c, a, b):
+   директор получает 1, при умножении — вина сверху × сосед (табличка соседа обведена пунктиром), при сложении — как есть.
+   Ползунок a: L = 6·a − 20, поэтому сдвиг a на Δ меняет L ровно на 6·Δ — проверка ∂L/∂a = 6; ∂L/∂b = −2·a, ∂L/∂f = d. */
+SCENES.stairs = {
+  vb: [0, 0, 360, 262], camMin: 360,
+  vals: [["L","ошибка","--cool"],["узел","кто получил вину","--accent",1],["∂L/∂","его вина","--accent",1],["∂L/∂a","вина a","--accent"]],
+  ctrl: {k:"a", min:0, max:4, step:0.1, col:"--sw"},
+  acts: [["fwd","Вперёд"],["back","Шаг назад"]],
+  svg: `<svg viewBox="0 0 360 262" role="img" aria-label="Разбор провала на трибуне. Команда посчитала ошибку L = (a·b + c)·f: директор L наверху, под ним d и f, ниже e и c, внизу a и b. Под ногами у каждого табличка со значением и виной ∂L/∂. Вперёд значения поднимаются снизу вверх, назад вина спускается папкой от директора: при сложении проходит как есть, при умножении умножается на соседа.">
+<rect x="-400" y="-400" width="1160" height="636" style="fill:var(--wall)"/>
+<rect x="-400" y="236" width="1160" height="426" style="fill:var(--floor)"/>
+<path d="M-400 236H760" stroke-width="2" style="stroke:var(--woodtop)"/>
+<path d="M120 -400V-34M290 -400V-34" stroke-width="1.2" style="stroke:var(--muted)"/>
+<path d="M110 -34h20l5 13h-30ZM280 -34h20l5 13h-30Z" style="fill:var(--tyre)"/>
+<path d="M108 -21l-20 40h64l-20-40ZM278 -21l-20 40h64l-20-40Z" style="fill:var(--sun)" opacity=".13"/>
+<text x="205" y="-52" text-anchor="middle" class="deco" style="fill:var(--woodtop);font-family:var(--f-display);font-size:14px;font-weight:700;letter-spacing:.04em">РАЗБОР ПРОВАЛА</text>
+<rect x="40" y="192" width="720" height="44" style="fill:var(--wood)"/>
+<rect x="108" y="148" width="652" height="44" style="fill:var(--wood)"/>
+<rect x="176" y="104" width="584" height="44" style="fill:var(--wood)"/>
+<path d="M40 233.5H760M108 189.5H760M176 145.5H760" stroke-width="3" style="stroke:var(--ink)" opacity=".07"/>
+<path d="M40 193.5H760M108 149.5H760M176 105.5H760" stroke-width="3" style="stroke:var(--woodtop)"/>
+<path d="M40.8 192V236M108.8 148V192M176.8 104V148" stroke-width="1.6" style="stroke:var(--woodtop)"/>
+<rect x="4" y="4" width="166" height="96" rx="4" style="fill:var(--woodtop)"/>
+<rect x="8" y="8" width="158" height="88" rx="2" style="fill:var(--board)"/>
+<text id="o-t0" x="87" y="22" text-anchor="middle" style="fill:var(--ink);font-size:10px;font-weight:700"></text>
+<path d="M14 28.5H160" stroke-width="1" style="stroke:var(--line)"/>
+<g text-anchor="middle" style="fill:var(--ink);font-size:9px">
+  <text id="o-t1" x="87" y="42"></text><text id="o-t2" x="87" y="56"></text><text id="o-t3" x="87" y="70"></text><text id="o-t4" x="87" y="84"></text>
+</g>
+<g id="o-cn" fill="none" stroke-linecap="round"></g>
+<g id="o-pl"></g>
+<g id="o-man" stroke-linecap="round" stroke-linejoin="round"></g>
+<g id="o-chips"></g>
+<g id="o-fold" opacity="0"><path d="M-10 -7.5h6l1.5 2H10V5H-10Z" style="fill:var(--accent)"/><path d="M-10 -3.4H10" stroke-width=".8" style="stroke:var(--card)" opacity=".45"/><text class="deco" y="3.4" text-anchor="middle" style="fill:var(--card);font-size:7px;font-weight:700"></text></g>
+</svg>`,
+  init(E){
+    const QC = {}, q = id => QC[id] || (QC[id] = E.svg.querySelector("#o-" + id));
+    const sa = (e, o) => { if (typeof e === "string") e = q(e); for (const k in o) e.setAttribute(k, o[k]); };
+    const tx = (e, t) => { if (typeof e === "string") e = q(e); if (e.textContent !== t) e.textContent = t; };
+    const P = (x, y) => x.toFixed(1) + " " + y.toFixed(1);
+    // свой формат вместо toLocaleString: ползунок перерисовывает десятки чисел за кадр
+    const f2 = v => { const r = Math.round(v * 100), a = Math.abs(r), d = a % 100;
+      return (r < 0 ? "−" : "") + Math.floor(a / 100) + (d ? "," + (d % 10 ? String(d).padStart(2, "0") : d / 10) : ""); };
+    const pn = v => Math.round(v * 100) < 0 ? "(" + f2(v) + ")" : f2(v);
+    const fit = (id, t, w, f0) => { tx(id, t); q(id).style.fontSize = Math.min(f0, w / (Math.max(t.length, 1) * 0.6)).toFixed(2) + "px"; };
+    const Y = [104, 148, 192, 236];   // ступени: где стоят ноги
+    const N = {L:[258, 0], d:[186, 1], f:[318, 1], e:[118, 2], c:[250, 2], a:[56, 3], b:[178, 3]};
+    const ORD = ["L","d","f","e","c","a","b"], PAR = {d:"L", f:"L", e:"d", c:"d", a:"e", b:"e"};
+    const OP = {L:["d","f","·"], d:["e","c","+"], e:["a","b","·"]}, FW = ["e","d","L"], PATH = ["L","d","e","a"];
+    const LOOK = {L:["--cloth",0], d:["--pc1",3], f:["--pc2",2], e:["--pack",1], c:["--apron",5], a:["--curt",4], b:["--pc3",6]};
+    const HAIR = [
+      '<path d="M-8.2 162a8.2 8.2 0 0 1 16.4 0c-2.5-3-5.5-4-8.2-4s-5.7 1-8.2 4Z" style="fill:var(--tyre)"/>',
+      '<circle cy="153.6" r="3.6" style="fill:var(--pack)"/><path d="M-8.2 162a8.2 8.2 0 0 1 16.4 0c-3-2-5-3.5-8.2-3.5s-5.2 1.5-8.2 3.5Z" style="fill:var(--pack)"/>',
+      '<path d="M-8.4 161a8.4 8.4 0 0 1 16.8 0Z" style="fill:var(--curt)"/><path d="M6 161h6" stroke-width="2.2" style="stroke:var(--curt)"/>',
+      '<path d="M-8.4 164q-2.4-9 3.6-11.6q4.8-3.6 9.6 0q6 2.6 3.6 11.6q-1.6-5-8.4-6.2q-6.8 1.2-8.4 6.2Z" style="fill:var(--woodtop)"/>',
+      '<path d="M-8.6 171V162a8.6 8.6 0 0 1 17.2 0V171h-2.8V163q-5.8-3.2-11.6 0V171Z" style="fill:var(--stick)"/>',
+      '<path d="M-8.5 161.4a8.5 8.5 0 0 1 17 0Z" style="fill:var(--pc2)"/><circle cy="153.4" r="2.2" style="fill:var(--pc2)"/>',
+      '<path d="M-8.2 162L-7.4 156.6L-5.2 158.2L-3.6 154.4L-1.2 157L.6 153.8L2.6 156.8L4.6 154.6L5.6 158L7.8 157L8.2 162Q4 158.8 0 158.8T-8.2 162Z" style="fill:var(--stick)"/>'];
+    const PW = k => OP[k] ? 74 : 58, PT = k => N[k][1] < 3 ? Y[N[k][1]] + 6 : 238;   // ширина и верх таблички
+    const PC = k => [N[k][0], PT(k) + 11.5];
+    const C = (c, t) => c ? `<tspan style="fill:var(${c})">${t}</tspan>` : t;
+    const ACC = "--accent", MU = "--muted", CO = "--cool";
+
+    // неизменное: люди, таблички, линии от табличек к тем, из кого число получено, фишки значений
+    { let m = "", pl = "", cn = "", ch = "";
+      for (const k of ORD){ const [x, r] = N[k], [c, h] = LOOK[k], op = OP[k], w = PW(k), t = PT(k);
+        m += `<g id="o-m${k}" transform="translate(${x} ${Y[r]})">
+          <path d="M-3.8 0V-14M3.8 0V-14" fill="none" stroke-width="5" style="stroke:var(--pants)"/>
+          <path d="M-10 -13V-27q0-6 6-6h8q6 0 6 6V-13Z" style="fill:var(${c})"/>
+          <path d="M-3 -33l3 4.2 3-4.2Z" style="fill:var(--shirt)"/>${k === "L" ? '<path d="M0 -29.2l-1.7 2.4 1.7 8.4 1.7-8.4Z" style="fill:var(--curt)"/>' : ""}
+          ${op ? `<circle cx="-4.8" cy="-20.5" r="3.9" stroke-width=".8" style="fill:var(--board);stroke:var(--ink)"/><path d="${op[2] === "+" ? "M-7 -20.5h4.4M-4.8 -22.7v4.4" : "M-6.4 -22.1l3.2 3.2M-3.2 -22.1l-3.2 3.2"}" stroke-width="1.3" style="stroke:var(--ink)"/>` : ""}
+          <path id="o-al${k}" fill="none" stroke-width="4" style="stroke:var(${c})"/><circle id="o-hl${k}" r="2.3" style="fill:var(--skin)"/>
+          <path id="o-ar${k}" fill="none" stroke-width="4" style="stroke:var(${c})"/><circle id="o-hr${k}" r="2.3" style="fill:var(--skin)"/>
+          <circle cy="-38.5" r="6.3" style="fill:var(--skin)"/>
+          <g transform="translate(0 -38.5) scale(.79) translate(0 -163)">${HAIR[h]}</g></g>`;
+        pl += `<g id="o-p${k}"><rect id="o-pr${k}" x="${x - w / 2}" y="${t}" width="${w}" height="23" rx="3" stroke-width="1" style="fill:var(--board);stroke:var(--line)"/>
+          <text id="o-pa${k}" x="${x}" y="${t + 9.6}" text-anchor="middle" style="fill:var(--ink);font-size:8.5px;font-weight:600"></text>
+          <text id="o-pb${k}" x="${x}" y="${t + 19.6}" text-anchor="middle" style="font-size:8.5px;font-weight:700"></text></g>`;
+        if (PAR[k]){ const p = PAR[k], px = N[p][0], yc = PT(p) + 11.5, s = x < px ? -1 : 1;
+          cn += `<path id="o-c${k}" d="M${px + s * PW(p) / 2} ${yc}H${x - s * 10.5}" stroke-width="1.4" style="stroke:var(--muted)"/>`; }
+      }
+      for (let j = 0; j < 2; j++) ch += `<g id="o-k${j}" opacity="0"><rect id="o-kr${j}" y="-6" height="11" rx="2.5" stroke-width="1" style="fill:var(--board);stroke:var(--ink)"/><text id="o-kt${j}" class="deco" y="2.6" text-anchor="middle" style="fill:var(--ink);font-size:7.5px;font-weight:700"></text></g>`;
+      q("man").innerHTML = m; q("pl").innerHTML = pl; q("cn").innerHTML = cn; q("chips").innerHTML = ch;
+      q("t0").innerHTML = C(CO, "L") + " = (a·b + c) · f";
+    }
+
+    // fw — сколько чисел посчитано вперёд (e, d, L); bk — у скольких вина известна (по порядку ORD);
+    // cur — чья вина сейчас; path — путь a → L со множителями; check — проверка ползунком a;
+    // arm — поднятые руки; fold — папка вины; chips — числа, летящие вверх
+    const st = {a: 2, fw: 3, bk: 0, cur: null, path: false, check: false, fwShow: false, arm: {}, fold: null, chips: null};
+    const V = () => { const a = st.a, b = -3, c = 10, f = -2, e = a * b, d = e + c; return {a, b, c, f, e, d, L: d * f}; };
+    const G = v => { const g = {L: 1}; g.d = v.f; g.f = v.d; g.e = g.d; g.c = g.d; g.a = g.e * v.b; g.b = g.e * v.a; return g; };
+    const known = k => ORD.indexOf(k) < st.bk;
+    const focus = () => st.cur || (st.bk > 0 && st.bk < 7 ? ORD[st.bk - 1] : null);
+    // рука: сторона s (−1 — левая, 1 — правая), r — насколько поднята; up — ловит папку, иначе протягивает её вниз-вбок
+    const armPts = (s, r, up) => up ? [s * (11 + 2 * r), -23 - 10 * r, s * (11.5 + 3 * r), -16 - 24 * r]
+                                    : [s * (11 + 5 * r), -23 + r, s * (11.5 + 10 * r), -16 + 2 * r];
+    const handAt = (k, s, r, up) => { const p = armPts(s, r, up); return [N[k][0] + p[2], Y[N[k][1]] + p[3]]; };
+
+    function board(v, g, fc){
+      if (st.check){ const d = Math.round((st.a - 2) * 100) / 100, dl = 6 * d;
+        if (!d) return [[["проверка: ", MU], ["∂L/∂a = 6", ACC]], [["a = 2, "], ["L = −8", CO]], [["подвиньте a ползунком:", MU]], [["L сдвинется на 6 · Δa", MU]]];
+        return [[["проверка: ", MU], ["∂L/∂a = 6", ACC]], [["a: 2 → " + f2(st.a)]], [["L: −8 → " + f2(v.L), CO]], [[`L ${dl > 0 ? "выросла" : "упала"} на ${f2(Math.abs(dl))} = 6 · ${f2(Math.abs(d))}`, ACC]]]; }
+      if (st.path) return [[["путь a → e → d → L", MU]], [["силы связей: ", MU], [`${pn(v.b)}, 1, ${pn(v.f)}`]], [[`${pn(v.b)} · 1 · ${pn(v.f)} = ${f2(g.a)}`, ACC]], [["влияния перемножаются", MU]]];
+      if (st.fwShow){ const L = [[["вперёд — снизу вверх:", MU]]];
+        if (st.fw >= 1) L.push([[`e = ${f2(v.a)}·${pn(v.b)} = ${f2(v.e)}`]]);
+        if (st.fw >= 2) L.push([[`d = ${f2(v.e)} + ${f2(v.c)} = ${f2(v.d)}`]]);
+        if (st.fw >= 3) L.push([[`L = ${f2(v.d)}·${pn(v.f)} = `], [f2(v.L), CO]]);
+        return L; }
+      if (fc === "L") return [[["старт с конца:", MU]], [["∂L/∂L = 1", ACC]], [["ошибка влияет на себя", MU]], [["один к одному", MU]]];
+      if (fc){ const p = PAR[fc], [u, w, op] = OP[p];
+        if (op === "·"){ const nb = u === fc ? w : u;
+          return [[[`${p} = ${u}·${w}`], [" — умножение", MU]], [[`∂L/∂${fc} = ∂L/∂${p} · ${nb}`, ACC]], [[`= ${pn(g[p])} · ${pn(v[nb])} = ${f2(g[fc])}`, ACC]], [["× на соседа " + nb, MU]]]; }
+        return [[[`${p} = ${u} + ${w}`], [" — сложение", MU]], [[`∂L/∂${fc} = ∂L/∂${p}`, ACC]], [["= " + f2(g[fc]), ACC]], [["вина проходит как есть", MU]]]; }
+      if (st.bk >= 7) return [[["вина найдена у всех:", MU]], [[`a: ${f2(g.a)}, b: ${f2(g.b)}, c: ${f2(g.c)}`, ACC]], [[`f: ${f2(g.f)}, e: ${f2(g.e)}, d: ${f2(g.d)}`, ACC]], [["за один проход назад", MU]]];
+      return [[["вперёд посчитали:", MU]], [[`e = ${f2(v.e)}, d = ${f2(v.d)}, `], ["L = " + f2(v.L), CO]], [["теперь вина — сверху вниз:", MU]], [["жмите «Шаг назад»", MU]]];
+    }
+
+    let bkey = "";
+    function draw(fromSlider){
+      E.view(180);
+      const v = V(), g = G(v), fc = focus(), pp = fc && PAR[fc];
+      const nb = pp && OP[pp][2] === "·" ? (OP[pp][0] === fc ? OP[pp][1] : OP[pp][0]) : null, mark = !st.path && !st.check;
+      for (const k of ORD){
+        // руки: опущены, протягивают папку или ловят её
+        const am = st.arm[k];
+        for (const s of [-1, 1]){ const on = am && am.s === s, [ex, ey, hx, hy] = armPts(s, on ? am.r : 0, on && am.up), n = s < 0 ? "l" : "r";
+          sa("a" + n + k, {d: `M${s * 7.5} -30L${P(ex, ey)}L${P(hx, hy)}`}); sa("h" + n + k, {cx: hx.toFixed(1), cy: hy.toFixed(1)}); }
+        const dim = st.path && !PATH.includes(k) ? 0.35 : 1;
+        q("m" + k).style.opacity = dim; q("p" + k).style.opacity = dim;
+        // табличка: значение и вина (на пути — во сколько раз число влияет на следующее)
+        const op = OP[k];
+        const l1 = op ? `${k} = ${op[0]}${op[2] === "+" ? " + " : "·"}${op[1]} = ${FW.indexOf(k) < st.fw ? f2(v[k]) : "?"}` : `${k} = ${f2(v[k])}`;
+        let l2, kn = known(k);
+        if (st.path && PATH.includes(k) && k !== "L"){ l2 = `на ${PAR[k]}: × ${pn(k === "d" ? v.f : k === "e" ? 1 : v.b)}`; kn = true; }
+        else l2 = `∂L/∂${k} = ${kn ? f2(g[k]) : "?"}`;
+        fit("pa" + k, l1, PW(k) - 6, 8.5); fit("pb" + k, l2, PW(k) - 6, 8.5);
+        q("pb" + k).style.fill = kn ? "var(--accent)" : "var(--muted)";
+        const hot = mark && k === fc, nbr = mark && k === nb;
+        sa("pr" + k, {style: `fill:var(--board);stroke:var(${hot || nbr ? "--accent" : "--line"})`, "stroke-width": hot ? 1.8 : nbr ? 1.4 : 1, "stroke-dasharray": nbr ? "3 2" : "none"});
+        if (PAR[k]){ const on = (st.path && PATH.includes(k)) || (mark && k === fc);
+          sa("c" + k, {style: `stroke:var(${on ? "--accent" : "--muted"})`, "stroke-width": on ? 2 : 1.4}); }
+      }
+      // папка вины и фишки значений
+      const fd = st.fold;
+      if (fd){ sa("fold", {transform: `translate(${P(fd.x, fd.y)})`, opacity: fd.o.toFixed(2)}); tx(q("fold").lastChild, fd.t); }
+      else sa("fold", {opacity: 0});
+      for (let j = 0; j < 2; j++){ const c = st.chips && st.chips[j];
+        if (!c || c.x == null){ sa("k" + j, {opacity: 0}); continue; }
+        const w = c.t.length * 4.6 + 7; sa("kr" + j, {x: (-w / 2).toFixed(1), width: w.toFixed(1)}); tx("kt" + j, c.t);
+        sa("k" + j, {transform: `translate(${P(c.x, c.y)})`, opacity: c.o.toFixed(2)}); }
+      // доска
+      const B = board(v, g, fc), key = JSON.stringify(B);
+      if (key !== bkey){ bkey = key;
+        for (let i = 0; i < 4; i++){ const ln = B[i] || [], el = q("t" + (i + 1)), plain = ln.map(s => s[0]).join("");
+          el.innerHTML = ln.map(([t, c]) => C(c, t)).join(""); el.style.fontSize = Math.min(9, 150 / (Math.max(plain.length, 1) * 0.6)).toFixed(2) + "px"; } }
+      // плашки
+      E.val(0, st.fw >= 3 ? f2(v.L) : "?");
+      let u = "—", w = "—";
+      if (st.check){ u = "a: проверка"; w = "ΔL = 6 · Δa"; }
+      else if (st.path){ u = "a → e → d → L"; w = `${pn(v.b)} · 1 · ${pn(v.f)} = ${f2(g.a)}`; }
+      else if (fc === "L"){ u = "L: старт"; w = "1"; }
+      else if (fc){ const p = PAR[fc];
+        if (nb){ u = `${fc}: × сосед ${nb}`; w = `${pn(g[p])} · ${pn(v[nb])} = ${f2(g[fc])}`; } else { u = fc + ": как есть"; w = `${f2(g[p])} → ${f2(g[fc])}`; } }
+      else if (st.bk >= 7){ u = "все семеро"; w = "найдена"; }
+      E.val(1, u); E.val(2, w);
+      E.val(3, known("a") || st.path || st.check ? f2(g.a) : "?");
+      if (!fromSlider) E.setCtrl("a", st.a);
+    }
+
+    function anim(ms, id, fn){
+      return new Promise(res => {
+        if (!E.live(id)) return res();
+        const t0 = performance.now();
+        const fr = now => {
+          if (!E.live(id)) return res();
+          const p = Math.min((now - t0) / ms, 1); fn(p < .5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2, p); draw();
+          if (p < 1) requestAnimationFrame(fr); else res();
+        };
+        requestAnimationFrame(fr);
+      });
+    }
+    async function fwd(id){   // значения снизу вверх: e = a·b, d = e + c, L = d·f
+      st.bk = 0; st.cur = null; st.fw = 0; st.fwShow = true; st.arm = {}; st.fold = null; draw();
+      await E.wait(300);
+      for (let i = 0; i < 3; i++){
+        if (!E.live(id)) return;
+        const k = FW[i], [u, w] = OP[k], A = [PC(u), PC(w)], B = PC(k), v = V();
+        st.chips = [{t: f2(v[u])}, {t: f2(v[w])}];
+        await anim(750, id, (e, p) => st.chips.forEach((c, j) => { c.x = A[j][0] + (B[0] - A[j][0]) * e; c.y = A[j][1] + (B[1] - A[j][1]) * e - Math.sin(e * Math.PI) * 14;
+          c.o = p > 0.88 ? (1 - p) / 0.12 : Math.min(1, p * 6); }));
+        st.chips = null; if (!E.live(id)) return;
+        st.fw = i + 1; draw(); await E.wait(420);
+      }
+    }
+    async function back(id){   // вина на одного человека ниже
+      st.fwShow = false; st.path = false; st.check = false; if (st.fw < 3) st.fw = 3;
+      if (st.bk >= 7){ st.bk = 0; st.cur = null; draw(); await E.wait(350); if (!E.live(id)) return; }
+      const k = ORD[st.bk], g = G(V()); st.cur = k;
+      if (k === "L"){ draw();   // директор берёт папку: вина ошибки перед собой = 1
+        await anim(380, id, e => { st.arm = {L: {s: -1, r: e, up: true}}; const [x, y] = handAt("L", -1, e, true); st.fold = {x, y: y - 3, t: "1", o: e}; });
+        if (!E.live(id)) return; st.bk = 1; draw(); await E.wait(500); if (!E.live(id)) return;
+        await anim(300, id, e => { st.arm = {L: {s: -1, r: 1 - e, up: true}}; const [x, y] = handAt("L", -1, 1 - e, true); st.fold = {x, y: y - 3, t: "1", o: 1 - e}; });
+        st.fold = null; st.arm = {}; draw(); return; }
+      const p = PAR[k], s = N[k][0] < N[p][0] ? -1 : 1;
+      draw();
+      await anim(320, id, e => { st.arm = {[p]: {s, r: e, up: false}}; const [x, y] = handAt(p, s, e, false); st.fold = {x, y: y - 3, t: f2(g[p]), o: e}; });
+      if (!E.live(id)) return;
+      const A = handAt(p, s, 1, false), Bh = handAt(k, -s, 1, true);
+      await anim(720, id, e => {
+        st.arm = {[p]: {s, r: 1 - Math.max(0, e - 0.4) / 0.6, up: false}, [k]: {s: -s, r: Math.min(1, e * 1.7), up: true}};
+        st.fold = {x: A[0] + (Bh[0] - A[0]) * e, y: A[1] + (Bh[1] - A[1]) * e - 3 - Math.sin(e * Math.PI) * 16, t: f2(e < 0.8 ? g[p] : g[k]), o: 1}; });
+      if (!E.live(id)) return;
+      st.bk++; draw(); await E.wait(420); if (!E.live(id)) return;
+      await anim(300, id, e => { st.arm = {[k]: {s: -s, r: 1 - e, up: true}}; const [x, y] = handAt(k, -s, 1 - e, true); st.fold = {x, y: y - 3, t: f2(g[k]), o: 1 - e}; });
+      st.fold = null; st.arm = {}; draw();
+    }
+    async function runAll(id){   // весь проход назад
+      if (st.bk >= 7){ st.bk = 0; st.cur = null; }
+      while (st.bk < 7){ if (!E.live(id)) return; await back(id); if (!E.live(id)) return; await E.wait(200); }
+      await E.wait(500); if (!E.live(id)) return; st.cur = null; draw();
+    }
+    function tweenA(to, id){   // a идёт сотыми, чтобы расчёт на доске сходился до цифры
+      const a0 = st.a; if (Math.abs(to - a0) < 1e-6) return Promise.resolve();
+      return anim(Math.min(1400, 400 + 500 * Math.abs(to - a0)), id, e => { st.a = Math.round((a0 + (to - a0) * e) * 100) / 100; })
+        .then(() => { if (E.live(id)){ st.a = to; draw(); } });
+    }
+    async function run(plan, id){
+      for (const p of plan){
+        if (!E.live(id)) return;
+        if (p === "pause") await E.wait(1300);
+        else if (p === "fwd") await fwd(id);
+        else if (p === "back") await back(id);
+        else if (p === "run") await runAll(id);
+        else if (p.bk != null){ st.fw = 3; st.fwShow = false; st.bk = p.bk; st.cur = p.bk > 0 && p.bk < 7 ? ORD[p.bk - 1] : null; st.arm = {}; st.fold = null; draw(); }
+        else if (p.a != null) await tweenA(p.a, id);
+      }
+    }
+    return {
+      draw,
+      step(s, id){ st.path = !!s.path; st.check = !!s.check; st.a = 2; st.arm = {}; st.fold = null; st.chips = null; st.fwShow = false;
+        if (st.check || st.path){ st.fw = 3; st.bk = 7; st.cur = null; }
+        draw(); return run([].concat(s.go == null ? [] : s.go), id); },
+      slide(v){ st.a = +v; st.check = true; st.path = false; st.fw = 3; st.bk = 7; st.cur = null; st.fwShow = false; st.arm = {}; st.fold = null; st.chips = null; draw(true); },
+      action(a, id){ st.path = false; st.check = false; st.arm = {}; st.fold = null; st.chips = null; draw(); run([a === "fwd" ? "fwd" : "back"], id); }
+    };
+  }
+};
+
+/* ---------- Сцена «Бухгалтер»: урок ⟲ ----------
+   Тот же граф, что в уроке ∂: L = (a·b + c)·f, a = 2, b = −3, c = 10, f = −2. Каждая операция — чек на пробковой доске,
+   по порядку: чек 1 e = a·b, чек 2 d = e + c, чек 3 L = d·f. На чеке — что с чем сделали, что вышло, из каких чисел,
+   и поле .grad. Справа ящик с карточками ручек a, b, c, f: значение и .grad. Прогноз — бухгалтер прикалывает чеки слева
+   направо. backward() — он идёт по чекам назад (3 → 2 → 1): пишет L.grad = 1 и на каждом чеке раздаёт градиент тем,
+   из кого число получено (листки летят на их .grad): умножение — × на соседа, сложение — как есть. В облачке — строка кода.
+   Новый backward() — новые чеки (их .grad с нуля), а на карточках .grad копится (+=): второй проход без zero_grad() даёт
+   a.grad = 6 + 6 = 12. zero_grad() — листки с карточек в корзину. Ползунок a — новые чеки и чистый проход:
+   a.grad = 6 при любом a, b.grad = a · e.grad = −2·a, f.grad = d = 10 − 3·a. */
+SCENES.ledger = {
+  vb: [0, 0, 360, 262], camMin: 360,
+  vals: [["L","итог чеков","--cool"],["a.grad","градиент a","--accent",1],["b.grad","градиент b","--accent",1],["+=","проходов подряд","--sy"]],
+  ctrl: {k:"a", min:0, max:4, step:0.5, col:"--sw"},
+  acts: [["bw","backward()"],["zero","zero_grad()"]],
+  svg: `<svg viewBox="0 0 360 262" role="img" aria-label="Бухгалтер и чеки. Каждая операция графа — чек на доске: e = a·b, d = e + c, L = d·f; на чеке записано, из каких чисел он получен, и поле .grad. Вызов backward() — бухгалтер идёт по чекам в обратном порядке и раздаёт градиенты, на карточках ручек a, b, c, f появляется .grad. Градиенты копятся (+=), поэтому перед новым шагом их обнуляют — zero_grad(), старые записи летят в корзину.">
+<rect x="-400" y="-400" width="1160" height="636" style="fill:var(--wall)"/>
+<rect x="-400" y="236" width="1160" height="426" style="fill:var(--floor)"/>
+<path d="M-400 236H760" stroke-width="2" style="stroke:var(--woodtop)"/>
+<path d="M90 -400V-34M270 -400V-34" stroke-width="1.2" style="stroke:var(--muted)"/>
+<path d="M80 -34h20l5 13h-30ZM260 -34h20l5 13h-30Z" style="fill:var(--tyre)"/>
+<path d="M78 -21l-20 40h64l-20-40ZM258 -21l-20 40h64l-20-40Z" style="fill:var(--sun)" opacity=".13"/>
+<text x="180" y="-52" text-anchor="middle" class="deco" style="fill:var(--woodtop);font-family:var(--f-display);font-size:14px;font-weight:700;letter-spacing:.04em">БУХГАЛТЕРИЯ</text>
+<path d="M13 216c-2-9-8-13-11-24c7 4 11 11 11 24ZM13 216c1-11 5-18 12-23c-2 9-6 16-12 23ZM13 216c-1-13 0-22 1-31c3 10 2 20-1 31Z" style="fill:var(--surf)" opacity=".85"/>
+<path d="M5 216h16l-2.5 20h-11Z" style="fill:var(--pc1)"/>
+<rect x="4" y="4" width="262" height="150" rx="4" style="fill:var(--woodtop)"/>
+<rect x="8" y="8" width="254" height="142" rx="2" style="fill:var(--card)"/>
+<rect x="8" y="8" width="254" height="142" rx="2" style="fill:var(--wood)" opacity=".45"/>
+<path d="M90 49h6.5M93.8 46.3l2.7 2.7-2.7 2.7M173 49h6.5M176.8 46.3l2.7 2.7-2.7 2.7" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--ink)" opacity=".55"/>
+<g id="u-rec"></g>
+<rect x="270" y="4" width="86" height="150" rx="4" style="fill:var(--woodtop)"/>
+<rect x="274" y="8" width="78" height="142" rx="2" style="fill:var(--reg)"/>
+<text x="313" y="19.5" text-anchor="middle" style="fill:var(--ink);font-size:8.5px;font-weight:700">ручки</text>
+<g id="u-cards"></g>
+<path d="M292 209H318L314.5 236H295.5Z" style="fill:var(--reg)" opacity=".6"/>
+<g id="u-trash"></g>
+<path d="M292 209H318L314.5 236H295.5ZM297.5 209L298.6 236M303 209V236M308.5 209L307.4 236M313 209L311.8 236M292.9 218H317.1M293.8 227H316.2" fill="none" stroke-width="1.1" style="stroke:var(--stick)"/>
+<g id="u-man" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
+<g id="u-bub" opacity="0"><path id="u-bt" stroke-width="1" style="fill:var(--board);stroke:var(--line)"/><rect id="u-bb" y="157" height="28" rx="4" stroke-width="1" style="fill:var(--board);stroke:var(--line)"/>
+  <text id="u-b1" y="168.5" style="fill:var(--ink);font-size:8px;font-weight:600"></text><text id="u-b2" y="180" style="fill:var(--ink);font-size:8px;font-weight:600"></text></g>
+<g id="u-slips"></g>
+</svg>`,
+  init(E){
+    const QC = {}, q = id => QC[id] || (QC[id] = E.svg.querySelector("#u-" + id));
+    const sa = (e, o) => { if (typeof e === "string") e = q(e); for (const k in o) e.setAttribute(k, o[k]); };
+    const tx = (e, t) => { if (typeof e === "string") e = q(e); if (e.textContent !== t) e.textContent = t; };
+    const P = (x, y) => x.toFixed(1) + " " + y.toFixed(1);
+    // свой формат вместо toLocaleString: ползунок перерисовывает десятки чисел за кадр
+    const f2 = v => { const r = Math.round(v * 100), a = Math.abs(r), d = a % 100;
+      return (r < 0 ? "−" : "") + Math.floor(a / 100) + (d ? "," + (d % 10 ? String(d).padStart(2, "0") : d / 10) : ""); };
+    const pn = v => Math.round(v * 100) < 0 ? "(" + f2(v) + ")" : f2(v);
+    const fit = (id, t, w, f0) => { tx(id, t); q(id).style.fontSize = Math.min(f0, w / (Math.max(t.length, 1) * 0.6)).toFixed(2) + "px"; };
+    const RX = [52, 135, 218], KN = ["a","b","c","f"], CY = [25, 56, 87, 118], HOME = 238, RACK = 250;
+    const REC = [["e","a","b","·"], ["d","e","c","+"], ["L","d","f","·"]];   // чек: результат, из чего, операция
+    const BW = [["d.grad += f · L.grad", "f.grad += d · L.grad"], ["e.grad += d.grad", "c.grad += d.grad"], ["a.grad += b · e.grad", "b.grad += a · e.grad"]];
+
+    // неизменное: чеки, карточки ручек, бухгалтер, листки, мусор в корзине
+    { let r = "", k = "", s = "", t = "";
+      RX.forEach((cx, i) => { const x0 = cx - 37; let z = `M${x0} 18H${x0 + 74}V136`; for (let j = 0; j < 9; j++) z += "l-4.11 4l-4.11 -4"; z += "Z";
+        r += `<g id="u-r${i}"><path id="u-rp${i}" d="${z}" stroke-width="1" style="fill:var(--card);stroke:var(--line)"/>
+          <circle cx="${cx}" cy="22.5" r="2.6" style="fill:var(--curt)"/>
+          <text x="${cx}" y="34" text-anchor="middle" style="fill:var(--muted);font-size:7.5px">чек ${i + 1}</text>
+          <text id="u-rf${i}" x="${cx}" y="48" text-anchor="middle" style="fill:var(--ink);font-size:9.5px;font-weight:700"></text>
+          <text id="u-rc${i}" x="${cx}" y="62" text-anchor="middle" style="fill:var(--ink);font-size:8.5px"></text>
+          <text id="u-ro${i}" x="${cx}" y="76" text-anchor="middle" style="fill:var(--muted);font-size:7.5px"></text>
+          <path d="M${x0 + 7} 86H${x0 + 67}" stroke-width="1" stroke-dasharray="2 2" style="stroke:var(--line)"/>
+          <text x="${cx}" y="99" text-anchor="middle" style="fill:var(--muted);font-size:7.5px">.grad</text>
+          <text id="u-rg${i}" x="${cx}" y="120" text-anchor="middle" style="font-size:13px;font-weight:700"></text></g>`; });
+      KN.forEach((n, i) => { const y = CY[i];
+        k += `<g id="u-k${i}"><rect id="u-kr${i}" x="277" y="${y}" width="72" height="28" rx="3" stroke-width="1" style="fill:var(--card);stroke:var(--line)"/>
+          <text id="u-kv${i}" x="282" y="${y + 11}" style="fill:var(--ink);font-size:9px;font-weight:700"></text>
+          <text x="344" y="${y + 10.5}" text-anchor="end" style="fill:var(--muted);font-size:7px">.grad</text>
+          <text id="u-kg${i}" x="282" y="${y + 23}" style="fill:var(--accent);font-size:9px;font-weight:700"></text></g>`; });
+      for (let j = 0; j < 4; j++) s += `<g id="u-s${j}" opacity="0"><rect id="u-sr${j}" y="-6" height="11" rx="2" style="fill:var(--accent)"/><text id="u-st${j}" class="deco" y="2.6" text-anchor="middle" style="fill:var(--card);font-size:7.5px;font-weight:700"></text></g>`;
+      for (let j = 0; j < 8; j++) t += `<circle id="u-t${j}" cx="${(296.5 + (j % 4) * 5.6 + (j > 3 ? 2.8 : 0)).toFixed(1)}" cy="${j > 3 ? 206.5 : 210.5}" r="2.9" style="fill:var(--accent)" opacity="0"/>`;
+      q("rec").innerHTML = r; q("cards").innerHTML = k; q("slips").innerHTML = s; q("trash").innerHTML = t;
+      q("man").innerHTML = `<path id="u-l0" stroke-width="7" style="stroke:var(--pants)"/><path id="u-l1" stroke-width="7" style="stroke:var(--pants)"/>
+        <path d="M-16 -25V-49q0-10 10-10h12q10 0 10 10V-25Z" stroke="none" style="fill:var(--pc2)"/>
+        <path d="M-5 -59l5 6.6 5-6.6Z" stroke="none" style="fill:var(--shirt)"/>
+        <path d="M-13 -52L-18.5 -40L-18 -29" stroke-width="6.5" style="stroke:var(--pc2)"/><circle cx="-18" cy="-29" r="3.6" stroke="none" style="fill:var(--skin)"/>
+        <path id="u-ar" stroke-width="6.5" style="stroke:var(--pc2)"/><circle id="u-hr" r="3.6" stroke="none" style="fill:var(--skin)"/>
+        <path id="u-pen" stroke-width="2.4" style="stroke:var(--cool)"/>
+        <circle cy="-69" r="10.5" stroke="none" style="fill:var(--skin)"/>
+        <g stroke="none" transform="translate(0 -69) scale(1.31) translate(0 -163)"><path d="M-8.4 164q-2.4-9 3.6-11.6q4.8-3.6 9.6 0q6 2.6 3.6 11.6q-1.6-5-8.4-6.2q-6.8 1.2-8.4 6.2Z" style="fill:var(--tyre)"/></g>`;
+    }
+
+    // rec — сколько чеков на доске, rin — насколько каждый проявился; gd — у скольких чеков с конца известен .grad;
+    // con — что накопилось на карточках (+=), pass — проходов без zero_grad; ux, ph — где бухгалтер и шаг ног; arm — рука с ручкой;
+    // bub — облачко со строкой кода; slips — летящие листки; cur — чек в работе; hot — карточка, куда только что пришёл листок
+    const st = {a: 2, rec: 3, rin: [1, 1, 1], gd: 0, con: {a: [], b: [], c: [], f: []}, pass: 0, ux: HOME, ph: 0, arm: 0,
+                bub: null, slips: [], cur: -1, hot: {}, trash: 0, cards: false};
+    const V = () => { const a = st.a, b = -3, c = 10, f = -2, e = a * b, d = e + c; return {a, b, c, f, e, d, L: d * f}; };
+    const G = v => { const g = {L: 1}; g.d = v.f; g.f = v.d; g.e = g.d; g.c = g.d; g.a = g.e * v.b; g.b = g.e * v.a; return g; };
+    const fmtCon = n => { const L = st.con[n]; if (!L.length) return "0"; if (L.length === 1) return f2(L[0]);
+      const sm = L.reduce((p, x) => p + x, 0), term = x => Math.round(x * 100) < 0 ? " − " + f2(-x) : " + " + f2(x);
+      return (L.length <= 3 ? f2(L[0]) + L.slice(1).map(term).join("") : "…" + term(L[L.length - 1])) + " = " + f2(sm); };
+
+    function draw(fromSlider){
+      E.view(180);
+      const v = V(), g = G(v);
+      // чеки
+      for (let i = 0; i < 3; i++){ const [n, u, w, op] = REC[i], o = i < st.rec ? st.rin[i] : 0, el = q("r" + i);
+        el.style.opacity = o.toFixed(2); sa(el, {transform: `translate(0 ${((1 - o) * -6).toFixed(1)})`});
+        tx("rf" + i, `${n} = ${u} ${op} ${w}`);
+        fit("rc" + i, `${f2(v[u])} ${op} ${pn(v[w])} = ${f2(v[n])}`, 66, 8.5);
+        tx("ro" + i, `из ${u} и ${w}`);
+        const kn = 2 - i < st.gd; tx("rg" + i, kn ? f2(g[n]) : "?"); q("rg" + i).style.fill = kn ? "var(--accent)" : "var(--muted)";
+        const hot = i === st.cur; sa("rp" + i, {style: `fill:var(--card);stroke:var(${hot ? "--accent" : "--line"})`, "stroke-width": hot ? 1.8 : 1}); }
+      // карточки ручек
+      KN.forEach((n, i) => { tx("kv" + i, `${n} = ${f2(v[n])}`); fit("kg" + i, fmtCon(n), 64, 9);
+        const on = (st.hot[n] || 0) > 0.05 || st.cards;
+        sa("kr" + i, {style: `fill:var(--card);stroke:var(${on ? "--accent" : "--line"})`, "stroke-width": on ? 1.8 : 1}); });
+      // бухгалтер: ноги шагают, правая рука с ручкой тянется к чеку
+      const sw = 5.5 * Math.sin(st.ph), r = st.arm;
+      sa("man", {transform: `translate(${st.ux.toFixed(1)} 236)`});
+      sa("l0", {d: `M-5 -26L${(-6 + sw).toFixed(1)} 0`}); sa("l1", {d: `M5 -26L${(6 - sw).toFixed(1)} 0`});
+      const ex = 18.5 + 3.5 * r, ey = -40 - 27 * r, hx = 18 - 2 * r, hy = -29 - 57 * r;
+      sa("ar", {d: `M13 -52L${P(ex, ey)}L${P(hx, hy)}`}); sa("hr", {cx: hx.toFixed(1), cy: hy.toFixed(1)});
+      sa("pen", {d: `M${P(hx, hy)}l-2.5 -10.5`, opacity: r > 0.3 ? 1 : 0});
+      // облачко со строкой кода — справа от бухгалтера, если влезает, иначе слева
+      if (st.bub){ const [l1, l2] = st.bub, w = Math.max(l1.length, l2.length) * 4.8 + 12, right = st.ux + 30 + w <= 356, x0 = right ? st.ux + 30 : st.ux - 30 - w;
+        sa("bub", {opacity: 1}); sa("bb", {x: x0.toFixed(1), width: w.toFixed(1)});
+        const bx = right ? x0 + 1 : x0 + w - 1;
+        sa("bt", {d: `M${P(bx, 163)}L${P(st.ux + (right ? 14 : -14), 168)}L${P(bx, 174)}Z`});
+        sa("b1", {x: (x0 + 6).toFixed(1)}); sa("b2", {x: (x0 + 6).toFixed(1)}); tx("b1", l1); tx("b2", l2);
+      } else sa("bub", {opacity: 0});
+      // листки
+      for (let j = 0; j < 4; j++){ const s = st.slips[j], el = q("s" + j);
+        if (!s){ el.setAttribute("opacity", 0); continue; }
+        const w = s.t.length * 4.5 + 8; sa("sr" + j, {x: (-w / 2).toFixed(1), width: w.toFixed(1)}); tx("st" + j, s.t);
+        sa(el, {transform: `translate(${P(s.x, s.y)})`, opacity: s.o.toFixed(2)}); }
+      for (let j = 0; j < 8; j++) q("t" + j).setAttribute("opacity", j < st.trash ? 0.8 : 0);
+      // плашки
+      E.val(0, st.rec >= 3 ? f2(v.L) : "?"); E.val(1, fmtCon("a")); E.val(2, fmtCon("b")); E.val(3, String(st.pass));
+      if (!fromSlider) E.setCtrl("a", st.a);
+    }
+
+    function anim(ms, id, fn){
+      return new Promise(res => {
+        if (!E.live(id)) return res();
+        const t0 = performance.now();
+        const fr = now => {
+          if (!E.live(id)) return res();
+          const p = Math.min((now - t0) / ms, 1); fn(p < .5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2, p); draw();
+          if (p < 1) requestAnimationFrame(fr); else res();
+        };
+        requestAnimationFrame(fr);
+      });
+    }
+    async function walkTo(x, id){
+      const x0 = st.ux, d = Math.abs(x - x0); if (d < 0.5) return;
+      await anim(Math.max(260, d * 4.2), id, e => { st.ux = x0 + (x - x0) * e; st.ph = Math.abs(st.ux - x0) * 0.21; });
+      if (E.live(id)){ st.ux = x; st.ph = 0; draw(); }
+    }
+    const raise = (to, id, ms = 280) => { const r0 = st.arm; return Math.abs(to - r0) < 0.01 ? Promise.resolve() : anim(ms, id, e => { st.arm = r0 + (to - r0) * e; }); };
+    async function fly(from, to, id, ms){   // листки по дуге: from — точка, to — [{x, y, t}]
+      st.slips = to.map(d => ({t: d.t, x: from[0], y: from[1], o: 1}));
+      await anim(ms, id, (e, p) => st.slips.forEach((s, j) => { const T = to[j], F = T.from || from;
+        s.x = F[0] + (T.x - F[0]) * e; s.y = F[1] + (T.y - F[1]) * e - Math.sin(e * Math.PI) * (T.lift ?? 24); s.o = p > 0.86 ? (1 - p) / 0.14 : 1; }));
+      st.slips = [];
+    }
+    const recPt = i => ({x: RX[i], y: 114}), cardPt = n => ({x: 313, y: CY[KN.indexOf(n)] + 19});
+    const fresh = () => { st.rec = 3; st.rin = [1, 1, 1]; st.gd = 0; };
+    function bwI(){ const g = G(V()); fresh(); st.gd = 3; KN.forEach(n => st.con[n].push(g[n])); st.pass++; }
+    function clean(){ st.con = {a: [], b: [], c: [], f: []}; st.pass = 0; bwI(); }
+
+    async function print(id){   // прогноз: чеки прикалываются слева направо, каждый помнит, из чего он
+      const v = V(); st.rec = 0; st.gd = 0; st.rin = [0, 0, 0]; st.cur = -1; draw();
+      for (let i = 0; i < 3; i++){ const [n, u, w, op] = REC[i];
+        await walkTo(RX[i], id); if (!E.live(id)) return;
+        st.bub = [`${n} = ${u} ${op} ${w} = ${f2(v[n])}`, `помнит: ${u}, ${w} и «${op}»`]; st.rec = i + 1;
+        await anim(420, id, e => { st.arm = e; st.rin[i] = e; }); if (!E.live(id)) return;
+        await E.wait(450); await raise(0, id, 220); if (!E.live(id)) return; }
+      st.bub = null; await walkTo(HOME, id);
+    }
+    async function backward(id, k){
+      const g = G(V());
+      if (st.rec < 3) fresh();
+      else if (st.gd > 0){   // новый шаг — новые чеки, их .grad с нуля; карточки ручек никто не стирал
+        st.bub = ["новый шаг: новые чеки", st.pass ? "старые .grad остались!" : "карточки чистые"];
+        await anim(520 * k, id, (e, p) => { const o = Math.abs(1 - 2 * p); st.rin = [o, o, o]; if (p >= 0.5) st.gd = 0; });
+        if (!E.live(id)) return; fresh(); draw(); await E.wait(800 * k); }
+      if (!E.live(id)) return;
+      st.bub = ["L.backward()", "L.grad = 1 — старт"];
+      await walkTo(RX[2], id); if (!E.live(id)) return;
+      st.cur = 2; await raise(1, id); if (!E.live(id)) return;
+      st.gd = 1; draw(); await E.wait(550 * k);
+      const plan = [[2, [{r: 1, t: g.d}, {n: "f", t: g.f}]], [1, [{r: 0, t: g.e}, {n: "c", t: g.c}]], [0, [{n: "a", t: g.a}, {n: "b", t: g.b}]]];
+      for (const [i, to] of plan){
+        if (!E.live(id)) return;
+        if (i !== 2){ await raise(0, id); if (!E.live(id)) return; await walkTo(RX[i], id); if (!E.live(id)) return; st.cur = i; await raise(1, id); if (!E.live(id)) return; }
+        st.bub = BW[2 - i]; draw(); await E.wait(380 * k); if (!E.live(id)) return;
+        await fly([RX[i], 110], to.map(d => Object.assign(d.r != null ? recPt(d.r) : cardPt(d.n), {t: "+= " + f2(d.t)})), id, 650 * k);
+        if (!E.live(id)) return;
+        for (const d of to){ if (d.r != null) st.gd = Math.max(st.gd, 3 - d.r); else { st.con[d.n].push(d.t); st.hot[d.n] = 1; } }
+        draw(); await anim(420 * k, id, e => { for (const n in st.hot) st.hot[n] = 1 - e; }); st.hot = {};
+        if (!E.live(id)) return; await E.wait(200 * k);
+      }
+      st.pass++; st.cur = -1; draw();
+      await raise(0, id); if (!E.live(id)) return; await E.wait(500 * k); if (!E.live(id)) return;
+      st.bub = null; await walkTo(HOME, id);
+    }
+    async function zero(id){   // zero_grad(): .grad с карточек — в корзину
+      const ks = KN.filter(n => st.con[n].length);
+      st.cur = -1; st.bub = ["optimizer.zero_grad()", ks.length ? "все .grad ручек = 0" : "и так по нулям"];
+      await walkTo(RACK, id); if (!E.live(id)) return;
+      await raise(1, id); if (!E.live(id)) return;
+      if (ks.length){ const to = ks.map(n => ({x: 305, y: 211, lift: 8, from: [313, cardPt(n).y], t: fmtCon(n).split(" = ").pop()}));
+        ks.forEach(n => { st.con[n] = []; }); st.pass = 0;
+        await fly([313, 100], to, id, 800); if (!E.live(id)) return;
+        st.trash = Math.min(8, st.trash + ks.length); }
+      st.pass = 0; draw(); await E.wait(550); if (!E.live(id)) return;
+      await raise(0, id); if (!E.live(id)) return; await E.wait(350); if (!E.live(id)) return;
+      st.bub = null; await walkTo(HOME, id);
+    }
+    function setA(a){ st.a = a; clean(); const g = G(V()); st.bub = ["b.grad = a · e.grad", `= ${f2(a)} · ${pn(g.e)} = ${f2(g.b)}`]; }
+    async function run(plan, id){
+      for (const p of plan){
+        if (!E.live(id)) return;
+        if (p === "pause") await E.wait(1300);
+        else if (p === "clear"){ st.rec = 0; st.gd = 0; draw(); }
+        else if (p === "print") await print(id);
+        else if (p === "printI"){ fresh(); draw(); }
+        else if (p === "bw") await backward(id, 1);
+        else if (p === "bwS") await backward(id, 1.5);
+        else if (p === "bwI"){ bwI(); draw(); }
+        else if (p === "zero") await zero(id);
+        else if (p.a != null){ setA(p.a); draw(); }
+      }
+    }
+    const calm = () => { st.arm = 0; st.ph = 0; st.slips = []; st.hot = {}; st.cur = -1; st.bub = null; if (st.rec >= 3) st.rin = [1, 1, 1]; };
+    return {
+      draw,
+      step(s, id){ calm(); st.a = 2; st.ux = HOME; st.trash = 0; st.cards = !!s.cards; st.con = {a: [], b: [], c: [], f: []}; st.pass = 0; fresh();
+        draw(); return run([].concat(s.go == null ? [] : s.go), id); },
+      slide(v){ calm(); st.cards = false; setA(+v); draw(true); },
+      action(a, id){ calm(); st.cards = false; draw(); run([a], id); }
     };
   }
 };
