@@ -8,11 +8,11 @@
 Уроки с суффиксом «:tasks» (например 1,2,3,4,5,6,7,8,9,10,11,12,13,14:tasks) — без прогона стендов: сравнение, движок, теория,
 автопрохождение и панели — около 10 минут.
 Нужны Playwright для Python и Chrome (/usr/bin/google-chrome). Уроки 3,4 — около 5 минут, 6,7 — около 9 минут, 1,2,3,4 — около 9 минут,
-8,9 — около 10 минут, 10 — около 7 минут, 11,12 — около 12 минут, 13,14 — около 12 минут, 15,16 — около 15 минут (дольше 10 минут — запускать в фоне и читать вывод из файла).
+8,9 — около 10 минут, 10 — около 7 минут, 11,12 — около 12 минут, 13,14 — около 12 минут, 15,16 — около 15 минут, 17,18 — около 15 минут (дольше 10 минут — запускать в фоне и читать вывод из файла).
 Итог печатается в конце, полный список — <папка>/report.json.
 Для новой сцены: дописать паузы шагов в WAITS (мс, по шагам — сколько длится анимация), id героя в HERO,
 перебор ручек и прогон кнопок в sweep(); в autoplay — способ решить новые виды задач (уже есть: mc, tf, num, match, fill,
-order, xread, fit, slope, lrrun, gd, wfit, relu, circle, chain, tokgoal, emb, softmax, code с правками CODE_FIX).
+order, xread, fit, slope, lrrun, gd, wfit, relu, circle, chain, tokgoal, emb, softmax, temp, gen, attn, code с правками CODE_FIX).
 Переключатель в sweep() — щелчок по [data-sw="<номер ручки>"][data-v="<значение>"]."""
 import sys, json, asyncio, os
 from playwright.async_api import async_playwright
@@ -22,7 +22,7 @@ _ls = sys.argv[3] if len(sys.argv) > 3 else "1,2,3,4"
 TASKS_ONLY = _ls.endswith(":tasks")
 LESSONS_TO_CHECK = [int(x) for x in _ls.replace(":tasks", "").split(",")]
 PREV = sys.argv[4] if len(sys.argv) > 4 else None
-HERO = ["#c-bar", "#v-torso", "#t-car", "#d-man", "#s-man", "#j-man", "#k-man", "#e-man", "#o-man", "#u-man", "#m-man", "#n-man", "#p-man", "#q-man"]   # группа героя в сцене (у долины — родитель #v-torso)
+HERO = ["#c-bar", "#v-torso", "#t-car", "#d-man", "#s-man", "#j-man", "#k-man", "#e-man", "#o-man", "#u-man", "#m-man", "#n-man", "#p-man", "#q-man", "#g-man", "#l-man"]   # группа героя в сцене (у долины — родитель #v-torso)
 os.makedirs(OUT, exist_ok=True)
 URL = "file://" + os.path.abspath(HTML)
 WAITS = {1: [2200, 7000, 4200, 10500, 6000, 12500, 7500], 2: [2400, 5000, 2400, 3000, 3000, 6000, 4500, 6500], 5: [2500]*8,
@@ -32,7 +32,8 @@ WAITS = {1: [2200, 7000, 4200, 10500, 6000, 12500, 7500], 2: [2400, 5000, 2400, 
          10: [3300, 8600, 4200, 10400, 9800, 8200, 6200, 3000, 5400],
          11: [4200, 900, 10300, 14300, 900, 5500, 900, 5400], 12: [6000, 9600, 12600, 900, 17800, 3200, 7300, 9600],
          13: [14500, 4800, 11500, 6500, 1800, 5200, 3000], 14: [9800, 4600, 4300, 2000, 5000, 6400, 700],
-         15: [4500, 3800, 2200, 2300, 4600, 5200, 2800], 16: [1700, 2000, 4000, 2500, 4700, 5700, 800, 2500]}
+         15: [4500, 3800, 2200, 2300, 4600, 5200, 2800], 16: [1700, 2000, 4000, 2500, 4700, 5700, 800, 2500],
+         17: [1600, 8000, 21500, 14000, 16000, 8500, 10500, 6800], 18: [2700, 3300, 11500, 1800, 3900, 8600, 8200]}
 # автопрохождение: правки кода в задачах с Python (Pyodide в проверке не грузится — задачу проверяет check.code)
 CODE_FIX = {"L3T6": [("b = 20", "b = 50")], "L4T7": [("w, b = 10, 20", "w, b = 10, 10")], "L7T4": [("w += lr * dw", "w -= lr * dw"), ("b += lr * db", "b -= lr * db")],
             "L12T1": [("Value(2.0), Value(-3.0)", "Value(3.0), Value(-3.0)")]}
@@ -279,6 +280,28 @@ async def sweep(page, lesson, tag):
             await page.click("[data-act=plus]"); await watch(page, f"{tag} «Всем +1» №{k + 1}", 1200, 200)
             if main: report["notes"].append(f"{tag}: «Всем +1» №{k + 1}: плашки {await page.evaluate(VALS)}")
 
+    if lesson == 17:   # клавиатура: все T ползунком, «▶ Пишем» при T = 0,3, 1 и 2, «Ещё буква» подряд
+        for k in range(2, 21):
+            await page.evaluate(SET_SL, [0, round(k / 10, 1)]); await page.wait_for_timeout(30)
+            await check_ov(page, f"{tag} T={k / 10}")
+            if main and k in (3, 10, 15, 20): report["notes"].append(f"{tag}: T = {k / 10}: плашки {await page.evaluate(VALS)}")
+        for v in ["0.3", "1", "2"]:
+            await page.evaluate(SET_SL, [0, v]); await page.wait_for_timeout(60)
+            await page.click("[data-act=write]"); await watch(page, f"{tag} T={v} «Пишем»", 9500, 250)
+            if main: report["notes"].append(f"{tag}: T = {v}, «Пишем»: плашки {await page.evaluate(VALS)}")
+        for k in range(6):
+            await page.click("[data-act=one]"); await watch(page, f"{tag} «Ещё буква» №{k + 1}", 3800, 250)
+        if main: report["notes"].append(f"{tag}: после «Ещё буквы»: плашки {await page.evaluate(VALS)}, имена «{await page.evaluate('document.querySelector(\"#g-rb\").textContent')}»")
+    if lesson == 18:   # библиотека: каждое слово-запрос, «▶ Ищем» для каждого, «Голова» по кругу
+        for v in ["0", "1", "2"]:
+            await page.click(f"[data-sw='0'][data-v='{v}']"); await page.wait_for_timeout(120)
+            await check_ov(page, f"{tag} запрос {v}")
+            if main: report["notes"].append(f"{tag}: запрос {v}: плашки {await page.evaluate(VALS)}, тетрадь «{await page.evaluate('document.querySelector(\"#l-n1\").textContent')}»")
+            await page.click("[data-act=find]"); await watch(page, f"{tag} запрос {v}, «Ищем»", 7500, 250)
+        for k in range(4):
+            await page.click("[data-act=head]"); await watch(page, f"{tag} «Голова» №{k + 1}", 2800, 200)
+            if main: report["notes"].append(f"{tag}: «Голова» №{k + 1}: плашки {await page.evaluate(VALS)}, кнопка «{await page.evaluate('document.querySelector(\"[data-act=head]\").textContent')}»")
+
 async def run_steps(b, lesson, theme, w, h, fs=False):
     tag = f"L{lesson} {theme} {w}x{h}{' fs' if fs else ''}"
     page, errs = await new_page(b, w, h, theme)
@@ -472,6 +495,16 @@ async def autoplay(b):
                 vals = [2, 0, 0] if t["goal"] == "cat" else [2, 2, 2]
                 await page.evaluate("vs => vs.forEach((v, i) => { const s = document.querySelector('#z' + i); s.value = v; s.dispatchEvent(new Event('input')); })", vals)
                 await page.click("[data-a=check]")
+            elif typ == "temp":   # температура: меньше 0,3 — лидер больше 80 %, 1,5 и выше — лидер меньше 25 %
+                await page.evaluate("v => { const s = document.querySelector('#tp'); s.value = v; s.dispatchEvent(new Event('input')); }", 0.3 if t["goal"] == "low" else 1.5)
+                await page.click("[data-a=check]")
+            elif typ == "gen":   # «Дописать 6 раз», пока не появится новое имя
+                for _ in range(25):
+                    await page.click("#gn"); await page.wait_for_timeout(60)
+                    if await page.evaluate("[...document.querySelectorAll('.nm-chip.new')].some(e => e.textContent.length >= 4)"): break
+                await page.click("[data-a=check]")
+            elif typ == "attn":   # внимание: «она» больше всего смотрит на «Кошку»
+                await page.click(".words button[data-i='0']")
             elif typ == "emb":   # карта смыслов: нажать нужное слово
                 await page.click(f"svg g[data-w='{t['target']}']")
             elif typ == "code":
